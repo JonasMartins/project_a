@@ -1,0 +1,19 @@
+
+
+
+Project A.
+
+Descrição Rápida
+
+Um sistema de gerenciamento, aonde qualquer empresa genérica pode usar de maneira
+a gerenciar os seus funcionários e todos as demais necessidades que essa possa necessitar
+
+
+Tecnologias:
+
+React.js, como Front.
+Postgresql, como Banco.
+
+
+
+
