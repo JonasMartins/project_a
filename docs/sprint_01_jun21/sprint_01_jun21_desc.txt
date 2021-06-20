@@ -1,0 +1,20 @@
+
+
+Objetivo:
+
+
+- Iniciar o projeto, iniciando os estudos e os conceitos para estudar e integrar
+Graphql, node.js, postgresql, e o inicio do front com react js.
+
+
+- Os objetivos dessa sprint incluem:
+
+    - Aprender todas as tecnologias.
+    - Iniciar a api, com a funcionalidade de login.
+    - Todos os padrões e segurança necessárias para a funcionalidade
+    de login/logout de usuários no sistema, já iniciando a API e o banco de 
+    dados e o front-end
+
+
+
+
