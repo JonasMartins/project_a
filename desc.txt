@@ -57,6 +57,11 @@ com a linguagem que qualquer usuário pode alterar ao estar logado, toda a lógi
 com relação ao acesso ao banco por esses termos ainda será definida.
 
 
+============ JIRA, TELA INICIAL
 
+- O sistema simula a platadorma JIRA, porem será usado apenas algumas das 
+funcionalidades do JIRA, projetos podem ser cadastrados, times cadastrados, as
+adequações de cada profissional será informado, será esquisado no programa fonte, 
+as caracteísticas iniciais, os termos usados, para a criação do sistema.
 
 
