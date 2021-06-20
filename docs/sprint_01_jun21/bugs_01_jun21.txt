@@ -1,0 +1,10 @@
+
+POSTGRES
+
+Is the server running locally and accepting connections on Unix domain socket “/var/run/
+postgresql/.s.PGSQL.5432”?
+
+solução:
+sudo service postgresql restart
+
+

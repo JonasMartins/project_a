@@ -1,0 +1,13 @@
+
+POSTGRES
+
+- Setando inicialmente o postgres no linux, criar usuário, logar
+criar banco etc.
+
+https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart-pt
+
+
+
+- Conectando node com postgres
+
+https://www.luiztools.com.br/post/como-usar-nodejs-postgresql/
