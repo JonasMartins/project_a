@@ -2,7 +2,8 @@ import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
-
+//user: "dev",
+//password: "dev$2021",
 const microConfig = {
     migrations: {
         path: path.join(__dirname, "./migrations"),
@@ -11,8 +12,8 @@ const microConfig = {
 
     entities: [Post],
     dbName: "lireddit",
-    user: "dev",
-    password: "dev$2021",
+    user: "postgres",
+    password: "postgres",
     debug: !__prod__,
     type: "postgresql",
 } as Parameters<typeof MikroORM.init>[0];

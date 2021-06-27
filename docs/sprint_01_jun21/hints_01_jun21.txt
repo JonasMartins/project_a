@@ -11,3 +11,14 @@ https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ub
 - Conectando node com postgres
 
 https://www.luiztools.com.br/post/como-usar-nodejs-postgresql/
+
+
+- Iniciando postgres
+sudo service postgresql start
+
+- Logando usuario postgres:
+
+sudo -u dev psql.
+
+npm run watch // para iniciar execução do ts
+npm run dev // para startar o servidor

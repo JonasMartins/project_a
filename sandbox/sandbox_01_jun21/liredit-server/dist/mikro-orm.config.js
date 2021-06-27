@@ -13,8 +13,8 @@ const microConfig = {
     },
     entities: [Post_1.Post],
     dbName: "lireddit",
-    user: "dev",
-    password: "dev$2021",
+    user: "postgres",
+    password: "postgres",
     debug: !constants_1.__prod__,
     type: "postgresql",
 };
