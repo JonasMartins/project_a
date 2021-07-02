@@ -161,6 +161,9 @@ let UserResolver = class UserResolver {
     getUserByName(name, { em }) {
         return em.findOneOrFail(User_1.User, { username: name });
     }
+    getAllUsers({ em }) {
+        return em.find(User_1.User, {});
+    }
 };
 __decorate([
     type_graphql_1.Query(() => User_1.User, { nullable: true }),
@@ -201,6 +204,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "getUserByName", null);
+__decorate([
+    type_graphql_1.Query(() => [User_1.User], { nullable: true }),
+    __param(0, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "getAllUsers", null);
 UserResolver = __decorate([
     type_graphql_1.Resolver()
 ], UserResolver);

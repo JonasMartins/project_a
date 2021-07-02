@@ -162,4 +162,9 @@ export class UserResolver {
     ): Promise<User | null> {
         return em.findOneOrFail(User, { username: name });
     }
+
+    @Query(() => [User], { nullable: true })
+    getAllUsers(@Ctx() { em }: MyContext): Promise<User[]> {
+        return em.find(User, {});
+    }
 }
