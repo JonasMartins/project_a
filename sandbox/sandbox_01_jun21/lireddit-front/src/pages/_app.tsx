@@ -1,5 +1,6 @@
 import { ChakraProvider, ColorModeProvider } from "@chakra-ui/react";
-import { createClient, Provider } from "urql";
+import { cacheExchange } from "@urql/exchange-graphcache";
+import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
 import theme from "../theme";
 
 const client = createClient({
@@ -7,6 +8,7 @@ const client = createClient({
     fetchOptions: {
         credentials: "include",
     },
+    exchanges: [dedupExchange, cacheExchange({}), fetchExchange],
 });
 
 function MyApp({ Component, pageProps }) {
