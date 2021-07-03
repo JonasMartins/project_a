@@ -111,6 +111,11 @@ export type UsernamePasswordInfo = {
   password: Scalars['String'];
 };
 
+export type CommonUserGettersFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'username'>
+);
+
 export type LoginMutationVariables = Exact<{
   options: UsernamePasswordInfo;
 }>;
@@ -125,7 +130,7 @@ export type LoginMutation = (
       & Pick<FieldError, 'field' | 'message'>
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'username'>
+      & CommonUserGettersFragment
     )> }
   ) }
 );
@@ -145,7 +150,7 @@ export type RegisterMutation = (
       & Pick<FieldError, 'field' | 'message'>
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'username' | 'id' | 'createdAt'>
+      & CommonUserGettersFragment
     )> }
   ) }
 );
@@ -157,11 +162,16 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me?: Maybe<(
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
+    & CommonUserGettersFragment
   )> }
 );
 
-
+export const CommonUserGettersFragmentDoc = gql`
+    fragment CommonUserGetters on User {
+  id
+  username
+}
+    `;
 export const LoginDocument = gql`
     mutation Login($options: UsernamePasswordInfo!) {
   login(options: $options) {
@@ -170,11 +180,11 @@ export const LoginDocument = gql`
       message
     }
     user {
-      username
+      ...CommonUserGetters
     }
   }
 }
-    `;
+    ${CommonUserGettersFragmentDoc}`;
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
@@ -187,13 +197,11 @@ export const RegisterDocument = gql`
       message
     }
     user {
-      username
-      id
-      createdAt
+      ...CommonUserGetters
     }
   }
 }
-    `;
+    ${CommonUserGettersFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
@@ -201,11 +209,10 @@ export function useRegisterMutation() {
 export const MeDocument = gql`
     query Me {
   me {
-    id
-    username
+    ...CommonUserGetters
   }
 }
-    `;
+    ${CommonUserGettersFragmentDoc}`;
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });

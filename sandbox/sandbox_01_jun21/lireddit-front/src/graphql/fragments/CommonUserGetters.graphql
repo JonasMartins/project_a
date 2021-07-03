@@ -1,0 +1,4 @@
+fragment CommonUserGetters on User {
+    id
+    username
+}
