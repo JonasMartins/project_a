@@ -6,6 +6,8 @@ import { Box, Button } from "@chakra-ui/react";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
+import { withUrqlClient } from "next-urql";
+import { createUrqlCleint } from "../utils/createUrqlClient";
 
 const Login: React.FC<{}> = ({}) => {
     const router = useRouter();
@@ -54,4 +56,4 @@ const Login: React.FC<{}> = ({}) => {
     );
 };
 
-export default Login;
+export default withUrqlClient(createUrqlCleint)(Login);

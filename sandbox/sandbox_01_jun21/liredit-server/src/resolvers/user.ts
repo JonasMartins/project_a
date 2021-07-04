@@ -13,6 +13,7 @@ import {
 } from "type-graphql";
 import argon2 from "argon2";
 import { EntityManager } from "@mikro-orm/postgresql";
+import { COOKIE_NAME } from "../constants";
 @InputType()
 class UsernamePasswordInfo {
     @Field()
@@ -172,5 +173,19 @@ export class UserResolver {
     @Query(() => [User], { nullable: true })
     getAllUsers(@Ctx() { em }: MyContext): Promise<User[]> {
         return em.find(User, {});
+    }
+
+    @Mutation(() => Boolean)
+    logout(@Ctx() { req, res }: MyContext) {
+        return new Promise((resolve) =>
+            req.session.destroy((err) => {
+                if (err) {
+                    resolve(false);
+                    return;
+                }
+                res.clearCookie(COOKIE_NAME);
+                resolve(true);
+            })
+        );
     }
 }
