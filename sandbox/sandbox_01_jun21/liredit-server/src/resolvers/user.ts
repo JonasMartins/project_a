@@ -188,4 +188,10 @@ export class UserResolver {
             })
         );
     }
+
+    @Mutation(() => Boolean)
+    async deleteAllUsers(@Ctx() { em }: MyContext): Promise<boolean> {
+        const result = await em.nativeDelete(User, {});
+        return !!result;
+    }
 }
