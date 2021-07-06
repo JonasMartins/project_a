@@ -23,7 +23,7 @@ declare module "express-session" {
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig); // connect to database
-    orm.getMigrator().up(); // run migrations
+    //orm.getMigrator().up(); // run migrations
 
     const app = express();
 
@@ -70,8 +70,8 @@ const main = async () => {
         cors: false,
     });
 
-    app.listen(4000, () => {
-        console.log("server running at port 4000");
+    app.listen(4001, () => {
+        console.log("server running at port 4001");
     });
 };
 

@@ -1,0 +1,53 @@
+
+1 Set Up node, express typescript
+
+yarn add express
+yarn add -D typescript ts-node nodemon @types/node @types/express
+
+2 Init tsconfig
+
+npx tsc --init
+
+3 Index starting and scripts:
+
+index.ts:
+
+import express from "express";
+
+const app = express();
+
+app.get("/", (_, res) => {
+    res.send("Well done!");
+});
+
+app.listen(3000, () => {
+    console.log("The application is listening on port 3000!");
+});
+
+
+Scripts:
+
+"scripts": {
+    "watch": "tsc -w",
+    "dev": "nodemon dist/index.js",
+    "start": "node dist/index.js"
+},
+
+
+4 ORM (mikro-orm)
+
+https://mikro-orm.io/docs/quick-start/
+
+yarn add @mikro-orm/core @mikro-orm/postgresql
+
+
+5 Graphql, Apollo and types
+
+yarn add apollo-server-express graphql type-graphql
+
+
+
+
+
+
+
