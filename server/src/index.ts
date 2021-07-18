@@ -8,6 +8,7 @@ import { UserResolver } from "./resolvers/user";
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig); // connect to
+    //orm.getMigrator().up(); // run migrations
 
     const app = express();
 

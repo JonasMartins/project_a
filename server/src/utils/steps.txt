@@ -1,0 +1,28 @@
+
+1) Após config inicial com as as bibliotecas.
+criar as entidades, e os resolevers.
+
+2) Para setar a funcionalidade de migrations é preciso registrar a cli do 
+mikro-orm.
+
+3) Mikro-orm config, 
+"npx mikro-orm migration:create" e 
+orm.getMigrator().up(); // run migrations 
+no index.ts para que sejam executadas as migrações, as migrações
+criam outra tabela com a ordem dessas migrações para que não sejam 
+executadas queries repetidas no banco.
+
+-- Lembrando que as migrações identificam as entidades passadas como props
+Ex: 
+entities: [User]
+
+-- Quando orm.getMigrator().up(), serão geradas as alterações nas entidades
+e novas entidades, sendo necessário informa-las na propriedade.
+
+
+
+
+
+
+
+
