@@ -11,6 +11,8 @@ import {
 import { Context } from "./../types";
 import { User } from "./../entities/User";
 import argon2 from "argon2";
+import { sign } from "jsonwebtoken";
+import { COOKIE_NAME } from "./../utils/cons";
 
 @InputType()
 class UserBasicData {
@@ -37,6 +39,14 @@ class ErrorFieldHandler {
 
     @Field()
     method: string;
+}
+
+@ObjectType()
+class LoginResponse {
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => String, { nullable: true })
+    accessToken?: string;
 }
 
 @ObjectType()
@@ -89,5 +99,56 @@ export class UserResolver {
         await em.persistAndFlush(user);
 
         return { user };
+    }
+
+    @Mutation(() => LoginResponse)
+    async login(
+        @Arg("email", () => String) email: string,
+        @Arg("password", () => String) password: string,
+        @Ctx() { em, res }: Context
+    ): Promise<LoginResponse> {
+        const user = await em.findOne(User, { email: email });
+
+        if (!user) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: "Email not found",
+                        method: `Method: login, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        const validPass = await argon2.verify(user.password, password);
+
+        if (!validPass) {
+            return {
+                errors: [
+                    {
+                        field: "password",
+                        message: "Incorrect password",
+                        method: `Method: login, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        res.cookie(
+            COOKIE_NAME,
+            sign({ userId: user.id }, "paSecretCookie", {
+                expiresIn: "1d",
+            }),
+            {
+                httpOnly: true,
+            }
+        );
+
+        return {
+            accessToken: sign({ userId: user.id }, "paSecret", {
+                expiresIn: "10m",
+            }),
+        };
     }
 }

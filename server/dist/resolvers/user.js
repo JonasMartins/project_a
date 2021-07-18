@@ -28,6 +28,8 @@ exports.UserResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("./../entities/User");
 const argon2_1 = __importDefault(require("argon2"));
+const jsonwebtoken_1 = require("jsonwebtoken");
+const cons_1 = require("./../utils/cons");
 let UserBasicData = class UserBasicData {
 };
 __decorate([
@@ -62,6 +64,19 @@ __decorate([
 ErrorFieldHandler = __decorate([
     type_graphql_1.ObjectType()
 ], ErrorFieldHandler);
+let LoginResponse = class LoginResponse {
+};
+__decorate([
+    type_graphql_1.Field(() => [ErrorFieldHandler], { nullable: true }),
+    __metadata("design:type", Array)
+], LoginResponse.prototype, "errors", void 0);
+__decorate([
+    type_graphql_1.Field(() => String, { nullable: true }),
+    __metadata("design:type", String)
+], LoginResponse.prototype, "accessToken", void 0);
+LoginResponse = __decorate([
+    type_graphql_1.ObjectType()
+], LoginResponse);
 let UserResponse = class UserResponse {
 };
 __decorate([
@@ -110,6 +125,44 @@ let UserResolver = class UserResolver {
             return { user };
         });
     }
+    login(email, password, { em, res }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield em.findOne(User_1.User, { email: email });
+            if (!user) {
+                return {
+                    errors: [
+                        {
+                            field: "email",
+                            message: "Email not found",
+                            method: `Method: login, at ${__filename}`,
+                        },
+                    ],
+                };
+            }
+            const validPass = yield argon2_1.default.verify(user.password, password);
+            if (!validPass) {
+                return {
+                    errors: [
+                        {
+                            field: "password",
+                            message: "Incorrect password",
+                            method: `Method: login, at ${__filename}`,
+                        },
+                    ],
+                };
+            }
+            res.cookie(cons_1.COOKIE_NAME, jsonwebtoken_1.sign({ userId: user.id }, "paSecretCookie", {
+                expiresIn: "1d",
+            }), {
+                httpOnly: true,
+            });
+            return {
+                accessToken: jsonwebtoken_1.sign({ userId: user.id }, "paSecret", {
+                    expiresIn: "10m",
+                }),
+            };
+        });
+    }
 };
 __decorate([
     type_graphql_1.Query(() => String),
@@ -125,6 +178,15 @@ __decorate([
     __metadata("design:paramtypes", [UserBasicData, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "createUser", null);
+__decorate([
+    type_graphql_1.Mutation(() => LoginResponse),
+    __param(0, type_graphql_1.Arg("email", () => String)),
+    __param(1, type_graphql_1.Arg("password", () => String)),
+    __param(2, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "login", null);
 UserResolver = __decorate([
     type_graphql_1.Resolver()
 ], UserResolver);
