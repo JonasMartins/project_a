@@ -4,4 +4,5 @@ export type Context = {
     em: EntityManager<IDatabaseDriver<Connection>>;
     req: Request;
     res: Response;
+    payload?: { userId: string };
 };

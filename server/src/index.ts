@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { MikroORM } from "@mikro-orm/core";
 import microConfig from "./mikro-orm.config";

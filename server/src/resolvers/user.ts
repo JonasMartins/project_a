@@ -7,12 +7,14 @@ import {
     ObjectType,
     Query,
     Resolver,
+    UseMiddleware,
 } from "type-graphql";
 import { Context } from "./../types";
 import { User } from "./../entities/User";
 import argon2 from "argon2";
-import { sign } from "jsonwebtoken";
 import { COOKIE_NAME } from "./../utils/cons";
+import { createRefreshToken, createAcessToken } from "../utils/auth";
+import { isAuth } from "./../utils/isAuth";
 
 @InputType()
 class UserBasicData {
@@ -62,6 +64,12 @@ export class UserResolver {
     @Query(() => String)
     hello() {
         return "Hello";
+    }
+
+    @Query(() => String)
+    @UseMiddleware(isAuth)
+    logedInTest(@Ctx() { payload }: Context) {
+        return `Hi, yout id is : ${payload!.userId}`;
     }
 
     @Mutation(() => UserResponse)
@@ -135,20 +143,12 @@ export class UserResolver {
             };
         }
 
-        res.cookie(
-            COOKIE_NAME,
-            sign({ userId: user.id }, "paSecretCookie", {
-                expiresIn: "1d",
-            }),
-            {
-                httpOnly: true,
-            }
-        );
+        res.cookie(COOKIE_NAME, createRefreshToken(user), {
+            httpOnly: true,
+        });
 
         return {
-            accessToken: sign({ userId: user.id }, "paSecret", {
-                expiresIn: "10m",
-            }),
+            accessToken: createAcessToken(user),
         };
     }
 }
