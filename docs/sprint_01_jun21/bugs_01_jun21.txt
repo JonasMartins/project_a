@@ -8,3 +8,10 @@ solução:
 sudo service postgresql restart
 
 
+conectando pgAdmin com o postgres do wsl:
+
+https://stackoverflow.com/questions/45707319/pgadmin-on-windows-10-with-postgres-when-installed-via-bash-on-ubuntu-on-windows
+
+
+Em conexção colocar 127.0.0.1 ao invés de localhost.
+
