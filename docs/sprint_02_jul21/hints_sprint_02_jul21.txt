@@ -1,0 +1,8 @@
+
+
+1) Criando from com next-js usando o tamplate chakra-ui
+
+
+yarn create next-app --example with-chakra-ui app_name
+
+yarn add -D typescript @types/node
