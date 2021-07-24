@@ -1,9 +1,8 @@
 import React from "react";
-// import { Container } from "../components/Container";
 import DarkModeSwitch from "../components/DarkModeSwitch";
-import { Flex, useColorMode } from "@chakra-ui/react";
-// import { LoginForm } from "./../components/LoginForm";
-import { Form, Formik, FormikValues, Field } from "formik";
+import { Box, Flex, Stack, useColorMode } from "@chakra-ui/react";
+import { Form, Formik, Field } from "formik";
+import ButtonColorMode from "./../components/ButtonColorMode";
 import {
     FormControl,
     Button,
@@ -40,88 +39,108 @@ const Login: React.FC<loginProps> = ({}) => {
     };
 
     return (
-        <>
-            <Flex
-                direction="column"
+        <Flex
+            direction="column"
+            alignItems="center"
+            justifyContent="flex-start"
+            bg={bgColor[colorMode]}
+            color={color[colorMode]}
+            height="100vh"
+        >
+            <ButtonColorMode />
+            <Box
+                display="flex"
+                justifyContent="center"
                 alignItems="center"
-                justifyContent="flex-start"
-                bg={bgColor[colorMode]}
-                color={color[colorMode]}
-                height="100vh"
+                minHeight="100vh"
             >
-                <DarkModeSwitch />
-                {/* <LoginForm /> */}
-                <Formik
-                    initialValues={{ email: "", password: "" }}
-                    onSubmit={(values, actions) => {
-                        setTimeout(() => {
-                            alert(JSON.stringify(values, null, 2));
-                            actions.setSubmitting(false);
-                        }, 1000);
-                    }}
-                >
-                    {(props) => (
-                        <Form>
-                            <Field name="email" validade={validateEmail}>
-                                {({ field, form }) => (
-                                    <FormControl
-                                        isInvalid={
-                                            form.errors.name &&
-                                            form.touched.name
-                                        }
+                <Box boxShadow="xl" p="6" rounded="md" padding={"2em"}>
+                    <Formik
+                        initialValues={{ email: "", password: "" }}
+                        onSubmit={(values, actions) => {
+                            setTimeout(() => {
+                                alert(JSON.stringify(values, null, 2));
+                                actions.setSubmitting(false);
+                            }, 1000);
+                        }}
+                    >
+                        {(props) => (
+                            <Form>
+                                <Stack spacing={3}>
+                                    <Field
+                                        name="email"
+                                        validade={validateEmail}
                                     >
-                                        <FormLabel htmlFor="email">
-                                            Email
-                                        </FormLabel>
-                                        <Input
-                                            {...field}
-                                            id="email"
-                                            placeholder="email"
-                                        />
-                                        <FormErrorMessage>
-                                            {form.errors ? "ERRo" : null}
-                                            {console.log(form.errors)}
-                                        </FormErrorMessage>
-                                    </FormControl>
-                                )}
-                            </Field>
+                                        {({ field, form }) => (
+                                            <FormControl
+                                                isInvalid={
+                                                    form.errors.name &&
+                                                    form.touched.name
+                                                }
+                                            >
+                                                <FormLabel htmlFor="email">
+                                                    Email
+                                                </FormLabel>
+                                                <Input
+                                                    {...field}
+                                                    id="email"
+                                                    placeholder="email"
+                                                    borderRadius="2em"
+                                                    size="lg"
+                                                />
+                                                <FormErrorMessage>
+                                                    {form.errors
+                                                        ? "ERRo"
+                                                        : null}
+                                                    {console.log(form.errors)}
+                                                </FormErrorMessage>
+                                            </FormControl>
+                                        )}
+                                    </Field>
 
-                            <Field name="password">
-                                {({ field, form }) => (
-                                    <FormControl
-                                        isInvalid={
-                                            form.errors.password &&
-                                            form.touched.password
-                                        }
+                                    <Field name="password">
+                                        {({ field, form }) => (
+                                            <FormControl
+                                                isInvalid={
+                                                    form.errors.password &&
+                                                    form.touched.password
+                                                }
+                                            >
+                                                <FormLabel htmlFor="password">
+                                                    password
+                                                </FormLabel>
+                                                <Input
+                                                    {...field}
+                                                    type="password"
+                                                    id="password"
+                                                    placeholder="password"
+                                                    borderRadius="2em"
+                                                    size="lg"
+                                                />
+                                                <FormErrorMessage>
+                                                    {form.errors.password}
+                                                </FormErrorMessage>
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Button
+                                        mt="2em"
+                                        isLoading={props.isSubmitting}
+                                        type="submit"
+                                        variant="cyan-gradient"
+                                        borderRadius="2em"
+                                        size="md"
+                                        flexFlow="row"
                                     >
-                                        <FormLabel htmlFor="password">
-                                            password
-                                        </FormLabel>
-                                        <Input
-                                            {...field}
-                                            type="password"
-                                            id="password"
-                                            placeholder="password"
-                                        />
-                                        <FormErrorMessage>
-                                            {form.errors.password}
-                                        </FormErrorMessage>
-                                    </FormControl>
-                                )}
-                            </Field>
-                            <Button
-                                mt={4}
-                                colorScheme="teal"
-                                isLoading={props.isSubmitting}
-                                type="submit"
-                            >
-                                Submit
-                            </Button>
-                        </Form>
-                    )}
-                </Formik>
-            </Flex>
-        </>
+                                        Login
+                                    </Button>
+                                </Stack>
+                            </Form>
+                        )}
+                    </Formik>
+                </Box>
+            </Box>
+        </Flex>
     );
 };
 export default Login;

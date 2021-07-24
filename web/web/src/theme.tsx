@@ -1,7 +1,12 @@
 import { extendTheme } from "@chakra-ui/react";
 import { createBreakpoints } from "@chakra-ui/theme-tools";
-
-const fonts = { mono: `'Menlo', monospace` };
+import {
+    pallet,
+    fonts,
+    fontWeights,
+    fontSizes,
+    lineHeights,
+} from "./utils/themes/ThemeDefs";
 
 const breakpoints = createBreakpoints({
     sm: "40em",
@@ -11,17 +16,13 @@ const breakpoints = createBreakpoints({
 });
 
 const theme = extendTheme({
-    colors: {
-        black: "#16161D",
-        white: "#FFFFFF",
-        grey: {
-            50: "#f7fafc",
-            100: "#EDF2F7",
-            200: "#E2E8F0",
-            900: "#171923",
-        },
-    },
+    // pallet generator: https://smart-swatch.netlify.app/#48BB78
+    // gradient
+    colors: pallet,
     fonts,
+    fontSizes,
+    fontWeights,
+    lineHeights,
     breakpoints,
     icons: {
         logo: {
@@ -41,6 +42,20 @@ const theme = extendTheme({
                 </svg>
             ),
             viewBox: "0 0 3000 3163",
+        },
+    },
+
+    // costomizing theme
+    components: {
+        Button: {
+            baseStyle: {
+                fontWeight: "semibold", // Normally, it is "semibold"
+            },
+            variants: {
+                "cyan-gradient": {
+                    bgGradient: "linear(to-l, #50dcf8, #0ab9db)",
+                },
+            },
         },
     },
 });

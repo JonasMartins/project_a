@@ -14,6 +14,8 @@ const DarkModeSwitch: React.FC<DarkModeSwitchProps> = ({}) => {
             color="green"
             isChecked={isDark}
             onChange={toggleColorMode}
+            size="lg"
+            colorScheme="cyan"
         />
     );
 };
