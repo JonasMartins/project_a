@@ -1,13 +1,11 @@
 import React from "react";
 import { Flex, useColorMode } from "@chakra-ui/react";
 
-interface ContainerProps {
-    height?: string;
-}
+interface ContainerProps {}
 
-export const Container: React.FC<ContainerProps> = ({ height = "100vh" }) => {
+export const Container: React.FC<ContainerProps> = ({ children }) => {
     const { colorMode } = useColorMode();
-    const bgColor = { light: "gray.50", dark: "gray.900" };
+    const bgColor = { light: "gray.50", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
 
     return (
@@ -17,7 +15,8 @@ export const Container: React.FC<ContainerProps> = ({ height = "100vh" }) => {
             justifyContent="flex-start"
             bg={bgColor[colorMode]}
             color={color[colorMode]}
-            height={height}
-        />
+        >
+            {children}
+        </Flex>
     );
 };

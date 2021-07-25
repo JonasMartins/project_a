@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Stack, useColorMode } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import ButtonColorMode from "./../components/ButtonColorMode";
 import {
@@ -12,12 +12,11 @@ import {
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
+import { Container } from "./../components/Container";
+
 interface loginProps {}
 
 const Login: React.FC<loginProps> = ({}) => {
-    const { colorMode } = useColorMode();
-    const bgColor = { light: "gray.50", dark: "gray.900" };
-    const color = { light: "black", dark: "white" };
     const router = useRouter();
     const [{}, login] = useLoginMutation();
 
@@ -43,14 +42,7 @@ const Login: React.FC<loginProps> = ({}) => {
     };
 
     return (
-        <Flex
-            direction="column"
-            alignItems="center"
-            justifyContent="flex-start"
-            bg={bgColor[colorMode]}
-            color={color[colorMode]}
-            height="100vh"
-        >
+        <Container>
             <ButtonColorMode />
             <Box
                 display="flex"
@@ -141,7 +133,8 @@ const Login: React.FC<loginProps> = ({}) => {
                     </Formik>
                 </Box>
             </Box>
-        </Flex>
+            {/* </Flex> */}
+        </Container>
     );
 };
 export default Login;
