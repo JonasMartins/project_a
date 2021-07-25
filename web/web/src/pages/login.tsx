@@ -1,5 +1,4 @@
 import React from "react";
-import DarkModeSwitch from "../components/DarkModeSwitch";
 import { Box, Flex, Stack, useColorMode } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import ButtonColorMode from "./../components/ButtonColorMode";
@@ -10,12 +9,17 @@ import {
     Input,
     FormErrorMessage,
 } from "@chakra-ui/react";
+import { useLoginMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
+import { useRouter } from "next/dist/client/router";
 interface loginProps {}
 
 const Login: React.FC<loginProps> = ({}) => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.50", dark: "gray.900" };
     const color = { light: "black", dark: "white" };
+    const router = useRouter();
+    const [{}, login] = useLoginMutation();
 
     type errors = {
         email: string;
@@ -57,11 +61,17 @@ const Login: React.FC<loginProps> = ({}) => {
                 <Box boxShadow="xl" p="6" rounded="md" padding={"2em"}>
                     <Formik
                         initialValues={{ email: "", password: "" }}
-                        onSubmit={(values, actions) => {
-                            setTimeout(() => {
-                                alert(JSON.stringify(values, null, 2));
-                                actions.setSubmitting(false);
-                            }, 1000);
+                        onSubmit={async (values, { setErrors }) => {
+                            const response = await login(values);
+
+                            if (response.data?.login.errors) {
+                                setErrors(
+                                    toErrorMap(response.data.login.errors)
+                                );
+                                console.log("errr", response.data.login.errors);
+                            } else if (response.data?.login.accessToken) {
+                                router.push("/");
+                            }
                         }}
                     >
                         {(props) => (
@@ -73,10 +83,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                     >
                                         {({ field, form }) => (
                                             <FormControl
-                                                isInvalid={
-                                                    form.errors.name &&
-                                                    form.touched.name
-                                                }
+                                                isInvalid={form.errors.email}
                                             >
                                                 <FormLabel htmlFor="email">
                                                     Email
@@ -89,10 +96,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                                     size="lg"
                                                 />
                                                 <FormErrorMessage>
-                                                    {form.errors
-                                                        ? "ERRo"
-                                                        : null}
-                                                    {console.log(form.errors)}
+                                                    {form.errors.email}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}
@@ -101,10 +105,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                     <Field name="password">
                                         {({ field, form }) => (
                                             <FormControl
-                                                isInvalid={
-                                                    form.errors.password &&
-                                                    form.touched.password
-                                                }
+                                                isInvalid={form.errors.password}
                                             >
                                                 <FormLabel htmlFor="password">
                                                     password

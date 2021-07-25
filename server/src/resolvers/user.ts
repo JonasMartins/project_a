@@ -111,10 +111,36 @@ export class UserResolver {
 
     @Mutation(() => LoginResponse)
     async login(
-        @Arg("email", () => String) email: string,
-        @Arg("password", () => String) password: string,
+        @Arg("email", () => String!) email: string,
+        @Arg("password", () => String!) password: string,
         @Ctx() { em, res }: Context
     ): Promise<LoginResponse> {
+        if (!email || !password) {
+            let errors: ErrorFieldHandler[] | undefined = [];
+
+            if (!email) {
+                errors = [
+                    {
+                        field: "email",
+                        message: "Email is required",
+                        method: `Method: login, at ${__filename}`,
+                    },
+                ];
+            }
+
+            if (!password) {
+                errors.push({
+                    field: "password",
+                    message: "Password is required",
+                    method: `Method: login, at ${__filename}`,
+                });
+            }
+
+            return {
+                errors,
+            };
+        }
+
         const user = await em.findOne(User, { email: email });
 
         if (!user) {
