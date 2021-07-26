@@ -2,7 +2,6 @@ import React from "react";
 import {
     Icon,
     Box,
-    Button,
     Menu,
     MenuButton,
     MenuItem,
@@ -10,8 +9,10 @@ import {
     IconButton,
     MenuDivider,
     MenuGroup,
+    Link,
 } from "@chakra-ui/react";
 import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
+import NextLink from "next/link";
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = ({}) => {
@@ -26,7 +27,16 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
         >
             <Box>
                 <Icon mr={3} ml={2} as={DragHandleIcon} />
-
+                <NextLink href="/">
+                    <Link textStyle="bold" mr={2}>
+                        Home
+                    </Link>
+                </NextLink>
+                <NextLink href="/">
+                    <Link textStyle="bold" mr={2}>
+                        Projects
+                    </Link>
+                </NextLink>
                 <Box float="right">
                     <Menu>
                         <MenuButton

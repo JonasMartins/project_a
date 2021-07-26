@@ -7,6 +7,17 @@ import { buildSchema } from "type-graphql";
 import { Context } from "./types";
 import { UserResolver } from "./resolvers/user";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import { COOKIE_NAME } from "./utils/cons";
+import { verify } from "jsonwebtoken";
+import { User } from "./entities/User";
+import { sendRefreshToken } from "./utils/sendRefreshToken";
+import { createAcessToken, createRefreshToken } from "./utils/auth";
+
+type failedRefresh = {
+    ok: boolean;
+    accessToken: string;
+};
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig); // connect to
@@ -14,12 +25,47 @@ const main = async () => {
 
     const app = express();
 
+    app.use(cookieParser());
+
     app.use(
         cors({
-            origin: "http://localhost:3000",
+            origin: process.env.DEV_FRONT_URL,
             credentials: true,
         })
     );
+
+    // refresh token
+    app.post("/refresh_token", async (req, res) => {
+        // yarn add cookie-parser
+        // yarn add -D @types/cookie-parser
+        const token = req.cookies[COOKIE_NAME];
+        const failedRefresh: failedRefresh = { ok: false, accessToken: "" };
+        if (!token) {
+            return res.send(failedRefresh);
+        }
+        let payload: any = null;
+        try {
+            payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);
+        } catch (e) {
+            return res.send(failedRefresh);
+        }
+
+        // token is valid
+        const user = await orm.em.findOne(User, { id: payload.userId });
+
+        if (!user) {
+            return res.send(failedRefresh);
+        }
+
+        // compare tokenVersions
+        if (user.tokenVersion !== payload.tokenVersion) {
+            return res.send(failedRefresh);
+        }
+
+        sendRefreshToken(res, createRefreshToken(user));
+
+        return res.send({ ok: true, accessToken: createAcessToken(user) });
+    });
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({

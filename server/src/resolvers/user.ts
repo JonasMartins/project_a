@@ -8,13 +8,14 @@ import {
     Query,
     Resolver,
     UseMiddleware,
+    Int,
 } from "type-graphql";
-import { Context } from "./../types";
 import { User } from "./../entities/User";
 import argon2 from "argon2";
-import { COOKIE_NAME } from "./../utils/cons";
-import { createRefreshToken, createAcessToken } from "../utils/auth";
+import { createAcessToken, createRefreshToken } from "../utils/auth";
 import { isAuth } from "./../utils/isAuth";
+import { sendRefreshToken } from "./../utils/sendRefreshToken";
+import { Context } from "src/types";
 
 @InputType()
 class UserBasicData {
@@ -59,11 +60,49 @@ class UserResponse {
     user?: User;
 }
 
+@ObjectType()
+class RevokeResponse {
+    @Field(() => Boolean)
+    incrementado: true | false;
+    @Field(() => Int, { nullable: true })
+    version: number;
+}
+
 @Resolver()
 export class UserResolver {
     @Query(() => String)
     hello() {
         return "Hello";
+    }
+    // altera a versão do token inpossibilitando
+    // novo acesso se a versão for diferente
+    // usado quando o usuário esqueceu a senha
+    @Mutation(() => RevokeResponse)
+    async revokeRefreshTokensForUser(
+        @Arg("userId", () => Int) userId: number,
+        @Ctx() { em }: Context
+    ): Promise<RevokeResponse> {
+        const user = await em.findOne(User, { id: userId });
+        const result: RevokeResponse = {
+            version: 0,
+            incrementado: false,
+        };
+        try {
+            if (user) {
+                user.tokenVersion = user.tokenVersion + 1;
+                result.version = user.tokenVersion;
+                result.incrementado = true;
+                await em.persistAndFlush(user);
+            } else {
+                result.version = 0;
+                result.incrementado = false;
+            }
+        } catch (_) {
+            result.version = 0;
+            result.incrementado = false;
+        }
+
+        return result;
     }
 
     @Query(() => String)
@@ -168,10 +207,11 @@ export class UserResolver {
                 ],
             };
         }
-
-        res.cookie(COOKIE_NAME, createRefreshToken(user), {
-            httpOnly: true,
-        });
+        localStorage.setItem("currentUserId", `${user.id}`);
+        //localStorage.clear();
+        //localStorage.removeItem("mykey");
+        //localStorage.getItem("mykey");
+        sendRefreshToken(res, createRefreshToken(user));
 
         return {
             accessToken: createAcessToken(user),
