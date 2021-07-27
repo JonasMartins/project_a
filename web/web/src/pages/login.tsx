@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Stack } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
-import ButtonColorMode from "./../components/ButtonColorMode";
+
 import {
     FormControl,
     Button,
@@ -13,6 +13,7 @@ import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
 import { Container } from "./../components/Container";
+import ButtonColorMode from "../components/ButtonColorMode";
 
 interface loginProps {}
 
@@ -40,10 +41,9 @@ const Login: React.FC<loginProps> = ({}) => {
 
         return error;
     };
-
     return (
         <Container>
-            <ButtonColorMode />
+            <ButtonColorMode size="md" position="fixed" right="1em" top="1em" />
             <Box
                 display="flex"
                 justifyContent="center"

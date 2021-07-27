@@ -2,9 +2,19 @@ import React, { useState } from "react";
 import { useColorMode, IconButton, Tooltip } from "@chakra-ui/react";
 import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-interface ButtonColorModeProps {}
+interface ButtonColorModeProps {
+    position?: any;
+    top?: string;
+    right?: string;
+    size?: "lg" | "md" | "sm";
+}
 
-const ButtonColorMode: React.FC<ButtonColorModeProps> = ({}) => {
+const ButtonColorMode: React.FC<ButtonColorModeProps> = ({
+    position,
+    top,
+    right,
+    size,
+}) => {
     const { colorMode, toggleColorMode } = useColorMode();
     const [darkMode, setDarkMode] = useState(true);
     const handleDarkMode = () => {
@@ -20,13 +30,13 @@ const ButtonColorMode: React.FC<ButtonColorModeProps> = ({}) => {
             colorScheme="withe"
         >
             <IconButton
-                position="fixed"
-                top="1rem"
-                right="1rem"
+                position={position}
+                top={top}
+                right={right}
                 color="black"
                 aria-label="Light theme"
                 onClick={handleDarkMode}
-                size="lg"
+                size={size}
                 isRound={true}
                 isActive={darkMode}
                 colorScheme={"yellow"}
@@ -43,13 +53,13 @@ const ButtonColorMode: React.FC<ButtonColorModeProps> = ({}) => {
             colorScheme="withe"
         >
             <IconButton
-                position="fixed"
-                top="1rem"
-                right="1rem"
+                position={position}
+                top={top}
+                right={right}
                 color="black"
                 aria-label="Dark theme"
                 onClick={handleDarkMode}
-                size="lg"
+                size={size}
                 isRound={true}
                 isActive={darkMode}
                 colorScheme={"grey"}

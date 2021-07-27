@@ -1,15 +1,9 @@
-import {
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel,
-    Flex,
-} from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import React from "react";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
-
+import ButtonColorMode from "../components/ButtonColorMode";
+import HomeNotifications from "../components/HomeNotifications";
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
@@ -17,29 +11,13 @@ const Index: React.FC<indexProps> = ({}) => {
         <>
             <Container>
                 <Navbar />
+                <Flex alignSelf="flex-end" p={2} mr={3}>
+                    <ButtonColorMode size="sm" />
+                </Flex>
+                <Flex width="50%" alignSelf="flex-start">
+                    <HomeNotifications />
+                </Flex>
             </Container>
-            <Flex alignSelf="flex-start">
-                <Tabs
-                    size="md"
-                    variant="line"
-                    orientation="horizontal"
-                    align="start"
-                    flexGrow={1}
-                >
-                    <TabList>
-                        <Tab>One</Tab>
-                        <Tab>Two</Tab>
-                    </TabList>
-                    <TabPanels>
-                        <TabPanel>
-                            <p>one!</p>
-                        </TabPanel>
-                        <TabPanel>
-                            <p>two!</p>
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
-            </Flex>
         </>
     );
 };

@@ -21,9 +21,9 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
             overflow="hidden"
             top="0"
             width="100%"
-            bg="gray.900"
             m={0}
             p={[0, 2]}
+            boxShadow="lg"
         >
             <Box>
                 <Icon mr={3} ml={2} as={DragHandleIcon} />

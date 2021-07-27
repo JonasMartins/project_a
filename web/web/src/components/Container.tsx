@@ -5,7 +5,7 @@ interface ContainerProps {}
 
 export const Container: React.FC<ContainerProps> = ({ children }) => {
     const { colorMode } = useColorMode();
-    const bgColor = { light: "gray.50", dark: "gray.800" };
+    const bgColor = { light: "gray.50", dark: "gray.700" };
     const color = { light: "black", dark: "white" };
 
     return (
