@@ -1,0 +1,57 @@
+    * Projetos
+    
+Definição:
+
+    Projetos serão as entidades mais altas do projeto, contendo a maioria das outras
+entidades associadas, cada projeto terá muitos profissionais, no caso uma entidade chamada "Entidade", 
+chamda assim de maneira bem genérica para poder evoluir com a necessidade, a definição desse tipo de entidade,
+terá a sua própria descrição.
+
+    * One to Many Profissionais, entidade, equipe ( A definir nomenclatura adequada ).
+
+    Projetos terão sprints associadas a ele, a sprint será em sua maioria um período que vai servir para
+armazenar todos os dados e alterações daquele projeto noquele perído, conterá dados de entrega de itens criados
+e todos essas informações serão usadas para comparativos de evolução do projeto, cada item terá o sua data de
+criação e sprint de criação, cada item, a sprint agrupará as informações de cad item, determinando a percentagem
+de sucesso de cada sprint.
+
+    * One to Many Sprints
+ 
+    Projetos terão itens associados, cada item pode ser: Task, Bug, Story, cada item terá a sua prioridade, 
+lowest, low, medium, high, highest. O item terá todo o histórico de apontamentos de cada profissional, o criador, 
+o responsável, e o analisador, responsável por aprovar o item.
+
+
+    * Nome
+    * Descrição
+    * Usuários
+    * Data de Criacão
+    * Sprints
+    * Itens
+    * Data de Finalização
+    * Status (ativo, parado, finalizado)
+    * Objetivos
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
