@@ -1,5 +1,12 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import {
+    Collection,
+    Entity,
+    OneToMany,
+    PrimaryKey,
+    Property,
+} from "@mikro-orm/core";
 import { Field, Int, ObjectType } from "type-graphql";
+import { Item } from "./Item";
 
 @ObjectType()
 @Entity()
@@ -29,4 +36,13 @@ export class User {
 
     @Property({ default: 0 })
     tokenVersion: number;
+
+    @OneToMany(() => Item, (item) => item.reporter)
+    itenReporter: Collection<Item> = new Collection<Item>(this);
+
+    @OneToMany(() => Item, (item) => item.responsible)
+    itenResponsible: Collection<Item> = new Collection<Item>(this);
+
+    @OneToMany(() => Item, (item) => item.approver)
+    itenApprover: Collection<Item> = new Collection<Item>(this);
 }
