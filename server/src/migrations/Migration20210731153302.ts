@@ -3,7 +3,11 @@ import { Migration } from "@mikro-orm/migrations";
 export class Migration20210731153302 extends Migration {
     async up(): Promise<void> {
         this.addSql(
-            'create table "item" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "summary" text not null, "description" text not null, "reporter_id" int4 not null, "responsible_id" int4 not null, "approver_id" int4 not null, "status" int2 not null default 1);'
+            'alter table "user" add constraint "publisher_pkey" primary key ("id");'
+        );
+
+        this.addSql(
+            'create table "item" ("id" uuid not null,"created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "summary" text not null, "description" text not null, "reporter_id" uuid not null, "responsible_id" uuid not null, "approver_id" uuid not null, "status" int2 not null default 1);'
         );
 
         this.addSql(

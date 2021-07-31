@@ -10,12 +10,13 @@ import {
     UseMiddleware,
     Int,
 } from "type-graphql";
-import { User } from "./../entities/User";
+import { User } from "../entities/user.entity";
 import argon2 from "argon2";
 import { createAcessToken, createRefreshToken } from "../utils/auth";
-import { isAuth } from "./../utils/isAuth";
-import { sendRefreshToken } from "./../utils/sendRefreshToken";
+import { isAuth } from "../utils/isAuth";
+import { sendRefreshToken } from "../utils/sendRefreshToken";
 import { Context } from "src/types";
+import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 
 @InputType()
 class UserBasicData {
@@ -25,23 +26,6 @@ class UserBasicData {
     password: string;
     @Field()
     email: string;
-}
-/**
- *  @field: field that originated the error
- *  @message: message describing the error and cause
- *  @method: method in which the error occurred
- *
- */
-@ObjectType()
-class ErrorFieldHandler {
-    @Field()
-    field: string;
-
-    @Field()
-    message: string;
-
-    @Field()
-    method: string;
 }
 
 @ObjectType()
@@ -79,7 +63,7 @@ export class UserResolver {
     // usado quando o usuário esqueceu a senha
     @Mutation(() => RevokeResponse)
     async revokeRefreshTokensForUser(
-        @Arg("userId", () => Int) userId: number,
+        @Arg("userId") userId: string,
         @Ctx() { em }: Context
     ): Promise<RevokeResponse> {
         const user = await em.findOne(User, { id: userId });
@@ -109,6 +93,27 @@ export class UserResolver {
     @UseMiddleware(isAuth)
     logedInTest(@Ctx() { payload }: Context) {
         return `Hi, yout id is : ${payload!.userId}`;
+    }
+
+    @Query(() => UserResponse)
+    async getUserById(
+        @Arg("id") id: string,
+        @Ctx() { em }: Context
+    ): Promise<UserResponse> {
+        const user = await em.findOne(User, { id });
+        if (!user) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: "Email is required",
+                        method: `Method: login, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        return { user };
     }
 
     @Mutation(() => UserResponse)

@@ -5,14 +5,15 @@ import microConfig from "./mikro-orm.config";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { Context } from "./types";
-import { UserResolver } from "./resolvers/user";
+import { UserResolver } from "./resolvers/user.resolver";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { COOKIE_NAME } from "./utils/cons";
 import { verify } from "jsonwebtoken";
-import { User } from "./entities/User";
+import { User } from "./entities/user.entity";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
+import { ItemResolver } from "./resolvers/item.resolver";
 
 type failedRefresh = {
     ok: boolean;
@@ -69,7 +70,7 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver],
+            resolvers: [UserResolver, ItemResolver],
             validate: false,
         }),
         // special object accesible for all resolvers
@@ -82,7 +83,7 @@ const main = async () => {
     });
 
     app.listen(4001, () => {
-        console.log("The application is listening on port 4000!");
+        console.log("The application is listening on port 4001!");
     });
 };
 
