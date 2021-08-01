@@ -1,8 +1,8 @@
 import { __prod__ } from "./constants";
 import { Collection, MikroORM } from "@mikro-orm/core";
 import path from "path";
-import { User } from "./entities/user.entity";
 import { Item } from "./entities/item.entity";
+import { User } from "./entities/user.entity";
 
 const microConfig = {
     migrations: {
