@@ -15,7 +15,7 @@ import argon2 from "argon2";
 import { createAcessToken, createRefreshToken } from "../utils/auth";
 import { isAuth } from "../utils/isAuth";
 import { sendRefreshToken } from "../utils/sendRefreshToken";
-import { Context } from "src/types";
+import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 
 @InputType()
@@ -212,11 +212,22 @@ export class UserResolver {
                 ],
             };
         }
-        localStorage.setItem("currentUserId", `${user.id}`);
-        //localStorage.clear();
-        //localStorage.removeItem("mykey");
-        //localStorage.getItem("mykey");
-        sendRefreshToken(res, createRefreshToken(user));
+
+        if (typeof window !== "undefined") {
+            /**
+             *
+             *  When you're rendering on the server, you do not have a
+             *  browser and thus you do not have access to all the APIs
+             *  that the browser provides, including localStorage.
+             *
+             */
+
+            localStorage.setItem("currentUserId", `${user.id}`);
+            //localStorage.clear();
+            //localStorage.removeItem("mykey");
+            //localStorage.getItem("mykey");
+            sendRefreshToken(res, createRefreshToken(user));
+        }
 
         return {
             accessToken: createAcessToken(user),

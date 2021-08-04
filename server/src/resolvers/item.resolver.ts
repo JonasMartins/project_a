@@ -80,6 +80,20 @@ export class ItemResolver {
             const responsible: User = await em.findOneOrFail(User, {
                 id: responsibleId,
             });
+
+            if (!responsible) {
+                return {
+                    errors: [
+                        {
+                            field: "responsible",
+                            message:
+                                "The item's responsible could not be found ",
+                            method: `Method: createItem, at ${__filename}`,
+                        },
+                    ],
+                };
+            }
+
             item.responsible = responsible;
             if (apporverId === responsibleId) {
                 item.approver = responsible;
@@ -96,6 +110,19 @@ export class ItemResolver {
                 const approver: User = await em.findOneOrFail(User, {
                     id: apporverId,
                 });
+
+                if (!approver) {
+                    return {
+                        errors: [
+                            {
+                                field: "approver",
+                                message:
+                                    "The item's approver could not be found ",
+                                method: `Method: createItem, at ${__filename}`,
+                            },
+                        ],
+                    };
+                }
 
                 item.approver = approver;
             }
