@@ -1,0 +1,52 @@
+enum ItemStatus {
+    OPEN
+    IN_PROGRESS
+    REOPENED
+    RESOLVED
+    CLOSED
+    COMPLETED
+}
+
+type Options {
+    summary: String!
+    description: String!
+    status: ItemStatus
+}
+
+mutation CreateItem(
+    $approverId: String!
+    $responsibleId: String!
+    $reporterId: String!
+    $options: Options
+) {
+    createItem(
+        approverId: $approverId
+        responsibleId: $responsibleId
+        reporterId: $reporterId
+        options: $options
+    ) {
+        errors {
+            method
+            message
+        }
+        item {
+            id
+            summary
+            responsible {
+                id
+                name
+                email
+            }
+            approver {
+                id
+                name
+                email
+            }
+            reporter {
+                id
+                name
+                email
+            }
+        }
+    }
+}

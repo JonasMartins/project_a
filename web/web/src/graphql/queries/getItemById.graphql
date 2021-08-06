@@ -1,0 +1,24 @@
+query GetItemById($id: String!) {
+    getItemById(id: $id) {
+        errors {
+            method
+            message
+        }
+        item {
+            id
+            summary
+            description
+            responsible {
+                id
+                name
+                email
+            }
+
+            approver {
+                id
+                name
+                email
+            }
+        }
+    }
+}

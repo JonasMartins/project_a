@@ -24,6 +24,41 @@ export type ErrorFieldHandler = {
   method: Scalars['String'];
 };
 
+export type Item = {
+  __typename?: 'Item';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  summary: Scalars['String'];
+  description: Scalars['String'];
+  reporter: User;
+  responsible: User;
+  approver: User;
+  status: ItemStatus;
+};
+
+export type ItemResponse = {
+  __typename?: 'ItemResponse';
+  errors?: Maybe<Array<ErrorFieldHandler>>;
+  item?: Maybe<Item>;
+};
+
+/** The basic directions */
+export const enum ItemStatus {
+  Open = 'OPEN',
+  InProgress = 'IN_PROGRESS',
+  Reopened = 'REOPENED',
+  Resolved = 'RESOLVED',
+  Closed = 'CLOSED',
+  Completed = 'COMPLETED'
+};
+
+export type ItemValidator = {
+  summary: Scalars['String'];
+  description: Scalars['String'];
+  status: ItemStatus;
+};
+
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   errors?: Maybe<Array<ErrorFieldHandler>>;
@@ -32,8 +67,23 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createItem: ItemResponse;
+  revokeRefreshTokensForUser: RevokeResponse;
   createUser: UserResponse;
   login: LoginResponse;
+};
+
+
+export type MutationCreateItemArgs = {
+  approverId: Scalars['String'];
+  responsibleId: Scalars['String'];
+  reporterId: Scalars['String'];
+  options: ItemValidator;
+};
+
+
+export type MutationRevokeRefreshTokensForUserArgs = {
+  userId: Scalars['String'];
 };
 
 
@@ -49,17 +99,38 @@ export type MutationLoginArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getItemById: ItemResponse;
   hello: Scalars['String'];
   logedInTest: Scalars['String'];
+  getUserById: UserResponse;
+};
+
+
+export type QueryGetItemByIdArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryGetUserByIdArgs = {
+  id: Scalars['String'];
+};
+
+export type RevokeResponse = {
+  __typename?: 'RevokeResponse';
+  incrementado: Scalars['Boolean'];
+  version?: Maybe<Scalars['Int']>;
 };
 
 export type User = {
   __typename?: 'User';
-  id: Scalars['Int'];
+  id: Scalars['ID'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   name: Scalars['String'];
   email: Scalars['String'];
+  itenReporter: Array<Item>;
+  itenResponsible: Array<Item>;
+  itenApprover: Array<Item>;
 };
 
 export type UserBasicData = {
@@ -92,6 +163,32 @@ export type LoginMutation = (
   ) }
 );
 
+export type GetItemByIdQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetItemByIdQuery = (
+  { __typename?: 'Query' }
+  & { getItemById: (
+    { __typename?: 'ItemResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'ErrorFieldHandler' }
+      & Pick<ErrorFieldHandler, 'method' | 'message'>
+    )>>, item?: Maybe<(
+      { __typename?: 'Item' }
+      & Pick<Item, 'id' | 'summary' | 'description'>
+      & { responsible: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'name' | 'email'>
+      ), approver: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'name' | 'email'>
+      ) }
+    )> }
+  ) }
+);
+
 
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
@@ -108,4 +205,33 @@ export const LoginDocument = gql`
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const GetItemByIdDocument = gql`
+    query GetItemById($id: String!) {
+  getItemById(id: $id) {
+    errors {
+      method
+      message
+    }
+    item {
+      id
+      summary
+      description
+      responsible {
+        id
+        name
+        email
+      }
+      approver {
+        id
+        name
+        email
+      }
+    }
+  }
+}
+    `;
+
+export function useGetItemByIdQuery(options: Omit<Urql.UseQueryArgs<GetItemByIdQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<GetItemByIdQuery>({ query: GetItemByIdDocument, ...options });
 };

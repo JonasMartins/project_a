@@ -100,13 +100,13 @@ export class UserResolver {
         @Arg("id") id: string,
         @Ctx() { em }: Context
     ): Promise<UserResponse> {
-        const user = await em.findOne(User, { id });
+        const user = await em.getRepository(User).findOne({ id });
         if (!user) {
             return {
                 errors: [
                     {
-                        field: "email",
-                        message: "Email is required",
+                        field: "id",
+                        message: "User not Fount",
                         method: `Method: login, at ${__filename}`,
                     },
                 ],

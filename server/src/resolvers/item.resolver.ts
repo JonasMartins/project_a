@@ -1,4 +1,12 @@
-import { Arg, Mutation, Resolver, ObjectType, Field, Ctx } from "type-graphql";
+import {
+    Arg,
+    Mutation,
+    Resolver,
+    ObjectType,
+    Field,
+    Ctx,
+    Query,
+} from "type-graphql";
 import { Item } from "../entities/item.entity";
 import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
@@ -129,6 +137,30 @@ export class ItemResolver {
         }
 
         await em.persistAndFlush(item);
+
+        return { item };
+    }
+
+    @Query(() => ItemResponse)
+    async getItemById(
+        @Arg("id") id: string,
+        @Ctx() { em }: Context
+    ): Promise<ItemResponse> {
+        if (!id) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: "An Id must be provided",
+                        method: `Method: getItemById, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        const item: Item = await em.findOneOrFail(Item, {
+            id,
+        });
 
         return { item };
     }
