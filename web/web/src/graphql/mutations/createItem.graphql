@@ -1,23 +1,8 @@
-enum ItemStatus {
-    OPEN
-    IN_PROGRESS
-    REOPENED
-    RESOLVED
-    CLOSED
-    COMPLETED
-}
-
-type Options {
-    summary: String!
-    description: String!
-    status: ItemStatus
-}
-
 mutation CreateItem(
     $approverId: String!
     $responsibleId: String!
     $reporterId: String!
-    $options: Options
+    $options: ItemValidator!
 ) {
     createItem(
         approverId: $approverId

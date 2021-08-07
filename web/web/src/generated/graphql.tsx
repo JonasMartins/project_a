@@ -145,6 +145,38 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type CreateItemMutationVariables = Exact<{
+  approverId: Scalars['String'];
+  responsibleId: Scalars['String'];
+  reporterId: Scalars['String'];
+  options: ItemValidator;
+}>;
+
+
+export type CreateItemMutation = (
+  { __typename?: 'Mutation' }
+  & { createItem: (
+    { __typename?: 'ItemResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'ErrorFieldHandler' }
+      & Pick<ErrorFieldHandler, 'method' | 'message'>
+    )>>, item?: Maybe<(
+      { __typename?: 'Item' }
+      & Pick<Item, 'id' | 'summary'>
+      & { responsible: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'name' | 'email'>
+      ), approver: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'name' | 'email'>
+      ), reporter: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'name' | 'email'>
+      ) }
+    )> }
+  ) }
+);
+
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -190,6 +222,44 @@ export type GetItemByIdQuery = (
 );
 
 
+export const CreateItemDocument = gql`
+    mutation CreateItem($approverId: String!, $responsibleId: String!, $reporterId: String!, $options: ItemValidator!) {
+  createItem(
+    approverId: $approverId
+    responsibleId: $responsibleId
+    reporterId: $reporterId
+    options: $options
+  ) {
+    errors {
+      method
+      message
+    }
+    item {
+      id
+      summary
+      responsible {
+        id
+        name
+        email
+      }
+      approver {
+        id
+        name
+        email
+      }
+      reporter {
+        id
+        name
+        email
+      }
+    }
+  }
+}
+    `;
+
+export function useCreateItemMutation() {
+  return Urql.useMutation<CreateItemMutation, CreateItemMutationVariables>(CreateItemDocument);
+};
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
