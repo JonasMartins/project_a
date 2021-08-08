@@ -1,13 +1,18 @@
 import { Flex } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
 import ButtonColorMode from "../components/ButtonColorMode";
 import HomeNotifications from "../components/HomeNotifications";
+import { GlobalContext } from "./../context/globalContext";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    return (
+    const { loading } = useContext(GlobalContext);
+
+    const content = (
         <>
             <Container>
                 <Navbar />
@@ -20,6 +25,10 @@ const Index: React.FC<indexProps> = ({}) => {
             </Container>
         </>
     );
+
+    const spinner = <FullPageSpinner />;
+
+    return loading ? spinner : content;
 };
 
 export default Index;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     Icon,
     Box,
@@ -14,23 +14,22 @@ import {
 import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import { useRouter } from "next/dist/client/router";
-import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
+import { GlobalContext } from "./../../context/globalContext";
 
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = ({}) => {
     const router = useRouter();
 
-    const [loading, setLoading] = useState(false);
+    const { setIsLoading } = useContext(GlobalContext);
 
     const logout = () => {
-        setLoading(true);
+        setIsLoading(true);
         setTimeout(() => {
             localStorage.clear();
         }, 600);
         router.push("/login");
     };
-    const spinner = <FullPageSpinner />;
 
     const content = (
         <Box
@@ -96,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
         </Box>
     );
 
-    return loading ? spinner : content;
+    return content;
 };
 
 export default Navbar;
