@@ -17,7 +17,7 @@ import { isAuth } from "../utils/isAuth";
 import { sendRefreshToken } from "../utils/sendRefreshToken";
 import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
-
+import { COOKIE_NAME } from "../constants";
 @InputType()
 class UserBasicData {
     @Field()
@@ -29,11 +29,20 @@ class UserBasicData {
 }
 
 @ObjectType()
+class tokenAndId {
+    @Field(() => String, { nullable: true })
+    accessToken?: string;
+
+    @Field(() => String, { nullable: true })
+    userId?: string;
+}
+
+@ObjectType()
 class LoginResponse {
     @Field(() => [ErrorFieldHandler], { nullable: true })
     errors?: ErrorFieldHandler[];
-    @Field(() => String, { nullable: true })
-    accessToken?: string;
+    @Field(() => tokenAndId, { nullable: true })
+    result?: tokenAndId;
 }
 
 @ObjectType()
@@ -153,6 +162,14 @@ export class UserResolver {
         return { user };
     }
 
+    @Mutation(() => Boolean!, { nullable: true })
+    async logout(@Ctx() { res }: Context): Promise<void> {
+        if (typeof window !== "undefined") {
+            localStorage.clear();
+        }
+        res.clearCookie(COOKIE_NAME);
+    }
+
     @Mutation(() => LoginResponse)
     async login(
         @Arg("email", () => String!) email: string,
@@ -212,25 +229,36 @@ export class UserResolver {
                 ],
             };
         }
-
-        if (typeof window !== "undefined") {
+        /*
+        if (typeof window === "undefined") {
             /**
              *
              *  When you're rendering on the server, you do not have a
              *  browser and thus you do not have access to all the APIs
              *  that the browser provides, including localStorage.
              *
-             */
+             /
 
             localStorage.setItem("currentUserId", `${user.id}`);
             //localStorage.clear();
             //localStorage.removeItem("mykey");
             //localStorage.getItem("mykey");
             sendRefreshToken(res, createRefreshToken(user));
+        } 
+        */
+
+        if (typeof window !== "undefined") {
+            localStorage.setItem("currentUserId", `${user.id}`);
         }
+        sendRefreshToken(res, createRefreshToken(user));
+
+        const result: tokenAndId = {
+            accessToken: createAcessToken(user),
+            userId: user.id,
+        };
 
         return {
-            accessToken: createAcessToken(user),
+            result,
         };
     }
 }

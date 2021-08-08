@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Icon,
     Box,
@@ -13,10 +13,26 @@ import {
 } from "@chakra-ui/react";
 import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
+import { useRouter } from "next/dist/client/router";
+import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
+
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = ({}) => {
-    return (
+    const router = useRouter();
+
+    const [loading, setLoading] = useState(false);
+
+    const logout = () => {
+        setLoading(true);
+        setTimeout(() => {
+            localStorage.clear();
+        }, 600);
+        router.push("/login");
+    };
+    const spinner = <FullPageSpinner />;
+
+    const content = (
         <Box
             overflow="hidden"
             top="0"
@@ -64,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
                         ></MenuButton>
                         <MenuList>
                             <MenuGroup title="Profile">
-                                <MenuItem>Download</MenuItem>
+                                <MenuItem onClick={logout}>Logout</MenuItem>
                                 <MenuItem>Create a Copy</MenuItem>
                                 <MenuItem>Mark as Draft</MenuItem>
                             </MenuGroup>
@@ -79,6 +95,8 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
             </Box>
         </Box>
     );
+
+    return loading ? spinner : content;
 };
 
 export default Navbar;

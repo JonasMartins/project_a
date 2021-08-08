@@ -61,7 +61,13 @@ const Login: React.FC<loginProps> = ({}) => {
                                     toErrorMap(response.data.login.errors)
                                 );
                                 console.log("errr", response.data.login.errors);
-                            } else if (response.data?.login.accessToken) {
+                            } else if (
+                                response.data?.login.result.accessToken
+                            ) {
+                                localStorage.setItem(
+                                    "userId",
+                                    response.data?.login.result.userId
+                                );
                                 router.push("/");
                             }
                         }}
