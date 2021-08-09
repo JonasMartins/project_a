@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Stack } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 
@@ -14,12 +14,15 @@ import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
 import { Container } from "./../components/Container";
 import ButtonColorMode from "../components/ButtonColorMode";
+import { GlobalContext } from "./../context/globalContext";
 
 interface loginProps {}
 
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
+
+    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
 
     type errors = {
         email: string;
@@ -68,7 +71,12 @@ const Login: React.FC<loginProps> = ({}) => {
                                     "userId",
                                     response.data?.login.result.userId
                                 );
+
                                 router.push("/");
+                                setIsLoading(false);
+                                setCurrentUserId(
+                                    response.data?.login.result.userId
+                                );
                             }
                         }}
                     >

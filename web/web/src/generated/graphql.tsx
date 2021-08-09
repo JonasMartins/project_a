@@ -248,6 +248,45 @@ export type GetItemByIdQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetUserByIdQueryVariables = Exact<{
+    id: Scalars["String"];
+}>;
+
+export type GetUserByIdQuery = { __typename?: "Query" } & {
+    getUserById: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<User, "id" | "name" | "email"> & {
+                    itenReporter: Array<
+                        { __typename?: "Item" } & Pick<
+                            Item,
+                            "id" | "createdAt" | "updatedAt" | "status"
+                        >
+                    >;
+                    itenApprover: Array<
+                        { __typename?: "Item" } & Pick<
+                            Item,
+                            "id" | "createdAt" | "updatedAt" | "status"
+                        >
+                    >;
+                    itenResponsible: Array<
+                        { __typename?: "Item" } & Pick<
+                            Item,
+                            "id" | "createdAt" | "updatedAt" | "status"
+                        >
+                    >;
+                }
+        >;
+    };
+};
+
 export const CreateItemDocument = gql`
     mutation CreateItem(
         $approverId: String!
@@ -354,6 +393,48 @@ export function useGetItemByIdQuery(
 ) {
     return Urql.useQuery<GetItemByIdQuery>({
         query: GetItemByIdDocument,
+        ...options,
+    });
+}
+export const GetUserByIdDocument = gql`
+    query GetUserById($id: String!) {
+        getUserById(id: $id) {
+            errors {
+                message
+                method
+            }
+            user {
+                id
+                name
+                email
+                itenReporter {
+                    id
+                    createdAt
+                    updatedAt
+                    status
+                }
+                itenApprover {
+                    id
+                    createdAt
+                    updatedAt
+                    status
+                }
+                itenResponsible {
+                    id
+                    createdAt
+                    updatedAt
+                    status
+                }
+            }
+        }
+    }
+`;
+
+export function useGetUserByIdQuery(
+    options: Omit<Urql.UseQueryArgs<GetUserByIdQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetUserByIdQuery>({
+        query: GetUserByIdDocument,
         ...options,
     });
 }

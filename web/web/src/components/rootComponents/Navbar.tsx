@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import {
     Icon,
     Box,
@@ -21,13 +21,14 @@ interface NavbarProps {}
 const Navbar: React.FC<NavbarProps> = ({}) => {
     const router = useRouter();
 
-    const { setIsLoading } = useContext(GlobalContext);
+    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
 
     const logout = () => {
         setIsLoading(true);
         setTimeout(() => {
             localStorage.clear();
         }, 600);
+        setCurrentUserId("");
         router.push("/login");
     };
 

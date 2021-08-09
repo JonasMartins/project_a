@@ -22,15 +22,17 @@ export class User extends Base<User> {
     tokenVersion: number;
 
     @Field(() => [Item])
-    @OneToMany(() => Item, (item: Item) => item.reporter)
+    @OneToMany(() => Item, (item: Item) => item.reporter, { lazy: true })
     public itenReporter: Collection<Item> = new Collection<Item>(this);
 
+    // very important, eager true is the only way to get the itens, in which this
+    // user si responsible of, in this example
     @Field(() => [Item])
-    @OneToMany(() => Item, (item: Item) => item.responsible)
+    @OneToMany(() => Item, (item: Item) => item.responsible, { eager: true })
     public itenResponsible: Collection<Item> = new Collection<Item>(this);
 
     @Field(() => [Item])
-    @OneToMany(() => Item, (item: Item) => item.approver)
+    @OneToMany(() => Item, (item: Item) => item.approver, { lazy: true })
     public itenApprover: Collection<Item> = new Collection<Item>(this);
 
     constructor(body: UserValidator) {

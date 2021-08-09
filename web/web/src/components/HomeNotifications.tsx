@@ -1,23 +1,42 @@
-import { Box, Text } from "@chakra-ui/react";
-import React from "react";
+import { Box, Text, Button } from "@chakra-ui/react";
+import React, { useContext, useEffect } from "react";
+import { GlobalContext } from "./../context/globalContext";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+import { useGetUserByIdQuery } from "./../generated/graphql";
 
 interface HomeNotificationsProps {}
 
 const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
-    return (
+    const { userId, loading, setIsLoading } = useContext(GlobalContext);
+
+    //setIsLoading(true);
+
+    const [{ data }] = useGetUserByIdQuery({
+        variables: {
+            id: userId,
+        },
+    });
+
+    useEffect(() => {
+        if (userId) {
+            setIsLoading(false);
+        }
+    }, [userId]);
+
+    console.log("data ", data);
+
+    const spinner = <FullPageSpinner />;
+    const content = (
         <Box p="6" m={3}>
-            <Text fontSize="xl">Your Work</Text>
+            <Text fontSize="xl">
+                Welcome {data ? data.getUserById?.user?.name : ""}
+            </Text>
             <Box boxShadow="xl" rounded="md">
-                <Text>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Repudiandae excepturi sint natus inventore recusandae autem
-                    sequi totam ipsa culpa ex numquam laboriosam assumenda
-                    doloribus quod consequatur, facere eveniet fuga!
-                    Dignissimos.
-                </Text>
+                <Text>{data ? data.getUserById?.user?.email : null}</Text>
             </Box>
         </Box>
     );
+    return loading ? spinner : content;
 };
 
 export default HomeNotifications;
