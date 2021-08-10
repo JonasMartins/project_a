@@ -22,7 +22,7 @@ const Index: React.FC<indexProps> = ({}) => {
                 <Flex alignSelf="flex-end" p={2} mr={3}>
                     <ButtonColorMode size="sm" />
                 </Flex>
-                <Flex width="50%" alignSelf="flex-start">
+                <Flex alignSelf="flex-start" flexGrow={1}>
                     <HomeNotifications />
                 </Flex>
             </Container>
