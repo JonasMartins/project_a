@@ -5,14 +5,12 @@ import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { useGetUserByIdQuery } from "./../generated/graphql";
 import { FcDocument } from "react-icons/fc";
 import NextLink from "next/link";
-import { PhoneIcon } from "@chakra-ui/icons";
+import Notifications from "./../components/layout/Notifications";
 
 interface HomeNotificationsProps {}
 
 const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
     const { userId, loading, setIsLoading } = useContext(GlobalContext);
-
-    //setIsLoading(true);
 
     const [{ data }] = useGetUserByIdQuery({
         variables: {
@@ -53,22 +51,23 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                         </NextLink>
                     </Flex>
                 </Flex>
-                <Flex boxShadow="xl" p="2" m="2" rounded="md" flexDir="column">
+                <Flex
+                    boxShadow="xl"
+                    p="2"
+                    m="2"
+                    rounded="md"
+                    flexDir="column"
+                    flexGrow={1}
+                >
                     <Flex flexDir="row" alignItems="center">
                         <Circle m="1" size="1.5em" bg="red.500">
-                            <Text color="white">1</Text>
+                            <Text color="white">99</Text>
                         </Circle>
                         <Text fontSize="l" ml="1">
                             Notifications
                         </Text>
                     </Flex>
-                    <Text fontSize="m" m="2">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Eum, modi deleniti. Ut blanditiis, dolorem
-                        pariatur quae necessitatibus officia minus rem quasi,
-                        ducimus cumque impedit nesciunt, nobis omnis autem
-                        dolorum. Nostrum?
-                    </Text>
+                    <Notifications />
                 </Flex>
             </Flex>
         </Flex>

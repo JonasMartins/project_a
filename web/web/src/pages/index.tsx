@@ -11,10 +11,16 @@ import Login from "./../pages/login";
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    const { loading, userId } = useContext(GlobalContext);
-
-    useEffect(() => {});
-
+    const { loading, userId, setCurrentUserId } = useContext(GlobalContext);
+    useEffect(() => {
+        try {
+            localStorage.userId
+                ? setCurrentUserId(localStorage.userId)
+                : setCurrentUserId("");
+        } catch (e) {
+            console.error("err", e);
+        }
+    }, []);
     const content = userId ? (
         <>
             <Container>
@@ -22,7 +28,7 @@ const Index: React.FC<indexProps> = ({}) => {
                 <Flex alignSelf="flex-end" p={2} mr={3}>
                     <ButtonColorMode size="sm" />
                 </Flex>
-                <Flex alignSelf="flex-start" flexGrow={1}>
+                <Flex alignSelf="normal" flexGrow={1}>
                     <HomeNotifications />
                 </Flex>
             </Container>

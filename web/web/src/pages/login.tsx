@@ -23,7 +23,6 @@ const Login: React.FC<loginProps> = ({}) => {
     const [{}, login] = useLoginMutation();
 
     const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
-
     type errors = {
         email: string;
         password: string;
