@@ -11,8 +11,6 @@ export const Container: React.FC<ContainerProps> = ({ children }) => {
     return (
         <Flex
             direction="column"
-            alignItems="center"
-            justifyContent="flex-start"
             bg={bgColor[colorMode]}
             color={color[colorMode]}
         >

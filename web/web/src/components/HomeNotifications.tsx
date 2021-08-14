@@ -6,6 +6,7 @@ import { useGetUserByIdQuery } from "./../generated/graphql";
 import { FcDocument } from "react-icons/fc";
 import NextLink from "next/link";
 import Notifications from "./../components/layout/Notifications";
+import ItensHome from "./../components/layout/ItensHome";
 
 interface HomeNotificationsProps {}
 
@@ -39,7 +40,7 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     </Text>
                 </Flex>
             </Box>
-            <Flex justifyContent="flex-start">
+            <Flex justifyContent="flex-start" alignItems="stretch">
                 <Flex boxShadow="xl" rounded="md" p="2" flexDir="column">
                     {/* <Text fontSize="l">Your Work</Text> */}
                     <Flex p="1" alignItems="center">
@@ -70,6 +71,9 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     <Notifications />
                 </Flex>
             </Flex>
+            <Box mt="3">
+                <ItensHome />
+            </Box>
         </Flex>
     );
     return loading ? spinner : content;
