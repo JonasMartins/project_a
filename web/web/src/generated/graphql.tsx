@@ -38,6 +38,7 @@ export type Item = {
     responsible: User;
     approver: User;
     status: ItemStatus;
+    type: ItemType;
 };
 
 export type ItemResponse = {
@@ -56,10 +57,18 @@ export enum ItemStatus {
     Completed = "COMPLETED",
 }
 
+/** The basic directions */
+export enum ItemType {
+    Bug = "BUG",
+    Task = "TASK",
+    Story = "STORY",
+}
+
 export type ItemValidator = {
     summary: Scalars["String"];
     description: Scalars["String"];
     status: ItemStatus;
+    type: ItemType;
 };
 
 export type LoginResponse = {

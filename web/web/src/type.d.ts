@@ -1,8 +1,10 @@
 type GlobalContext = {
     loading: Boolean;
     userId: string;
+    colorMode: "dark" | "light";
     setIsLoading: (isLoading: boolean) => void;
     setCurrentUserId: (currentUserId: string) => void;
+    setTheme: (theme: "dark" | "light") => void;
 };
 
 interface Item {

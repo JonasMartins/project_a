@@ -28,7 +28,7 @@ export class User extends Base<User> {
     // very important, eager true is the only way to get the itens, in which this
     // user si responsible of, in this example
     @Field(() => [Item])
-    @OneToMany(() => Item, (item: Item) => item.responsible, { eager: true })
+    @OneToMany(() => Item, (item: Item) => item.responsible, { lazy: true })
     public itenResponsible: Collection<Item> = new Collection<Item>(this);
 
     @Field(() => [Item])

@@ -12,6 +12,8 @@ import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import ItemValidator from "./../validators/item.validator";
 import { User } from "./../entities/user.entity";
+import { genericError } from "./../utils/generalAuxiliaryMethods";
+import { EntityManager } from "@mikro-orm/postgresql"; // or any other driver package
 
 @ObjectType()
 class ItemResponse {
@@ -19,6 +21,14 @@ class ItemResponse {
     errors?: ErrorFieldHandler[];
     @Field(() => Item, { nullable: true })
     item?: Item;
+}
+
+@ObjectType()
+class ItensResponse {
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => [Item], { nullable: true })
+    itens?: Item[];
 }
 
 @Resolver()
@@ -33,14 +43,12 @@ export class ItemResolver {
     ): Promise<ItemResponse> {
         if (options.summary.length <= 1) {
             return {
-                errors: [
-                    {
-                        field: "summary",
-                        message:
-                            "A summary must have length greater than 1 charachters.",
-                        method: `Method: createItem, at ${__filename}`,
-                    },
-                ],
+                errors: genericError(
+                    "summary",
+                    "createItem",
+                    __filename,
+                    "A summary must have length greater than 1 charachters."
+                ),
             };
         }
 
@@ -139,6 +147,44 @@ export class ItemResolver {
         await em.persistAndFlush(item);
 
         return { item };
+    }
+
+    @Query(() => ItensResponse)
+    async getItensRelatedToUserByPeriod(
+        @Arg("userId") userId: string,
+        @Arg("limit", () => Number, { nullable: true }) limit: number,
+        @Arg("createdAfter", () => Date, { nullable: true }) createdAfter: Date,
+        @Arg("createdLater", () => Date, { nullable: true }) createdLater: Date,
+        @Ctx() { em }: Context
+    ): Promise<ItensResponse> {
+        const max = Math.min(10, limit);
+
+        if (!userId) {
+            return {
+                errors: genericError(
+                    "userId",
+                    "getItensRelatedToUserByPeriod",
+                    __filename,
+                    "A user Id must be passed as argument"
+                ),
+            };
+        }
+
+        const qb = (em as EntityManager).createQueryBuilder(Item);
+
+        qb.select("*")
+            .where({
+                reporter_id: userId,
+                created_at: { $gte: createdAfter, $lte: createdLater },
+            })
+            // .orderBy({ ['"created_at"']: "DESC" })
+            .limit(max);
+
+        console.log(qb.getQuery());
+
+        const itens = await qb.execute();
+
+        return { itens };
     }
 
     @Query(() => ItemResponse)

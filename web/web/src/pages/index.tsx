@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
@@ -32,7 +32,9 @@ const Index: React.FC<indexProps> = ({}) => {
                 <Flex alignSelf="normal" flexGrow={1}>
                     <HomeNotifications />
                 </Flex>
-                <Footer />
+                <Box id="footer">
+                    <Footer />
+                </Box>
             </Container>
         </>
     ) : (
