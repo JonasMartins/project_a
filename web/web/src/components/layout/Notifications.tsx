@@ -25,19 +25,13 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
                 </Thead>
                 <Tbody>
                     <Tr>
-                        <Td>inches</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>feet</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
+                        <Td>...</Td>
                     </Tr>
                 </Tbody>
                 <Tfoot>
-                    <Tr>
+                    {/* <Tr>
                         <Th>To convert</Th>
-                    </Tr>
+                    </Tr> */}
                 </Tfoot>
             </Table>
         </Box>

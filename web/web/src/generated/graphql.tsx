@@ -71,6 +71,12 @@ export type ItemValidator = {
     type: ItemType;
 };
 
+export type ItensResponse = {
+    __typename?: "ItensResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    itens?: Maybe<Array<Item>>;
+};
+
 export type LoginResponse = {
     __typename?: "LoginResponse";
     errors?: Maybe<Array<ErrorFieldHandler>>;
@@ -108,10 +114,18 @@ export type MutationLoginArgs = {
 
 export type Query = {
     __typename?: "Query";
+    getItensRelatedToUserByPeriod: ItensResponse;
     getItemById: ItemResponse;
     hello: Scalars["String"];
     logedInTest: Scalars["String"];
     getUserById: UserResponse;
+};
+
+export type QueryGetItensRelatedToUserByPeriodArgs = {
+    createdLater?: Maybe<Scalars["DateTime"]>;
+    createdAfter?: Maybe<Scalars["DateTime"]>;
+    limit?: Maybe<Scalars["Float"]>;
+    userId: Scalars["String"];
 };
 
 export type QueryGetItemByIdArgs = {
@@ -253,6 +267,29 @@ export type GetItemByIdQuery = { __typename?: "Query" } & {
                         "id" | "name" | "email"
                     >;
                 }
+        >;
+    };
+};
+
+export type GetItensRelatedToUserByPeriodQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    userId: Scalars["String"];
+    createdAfter?: Maybe<Scalars["DateTime"]>;
+    createdLater?: Maybe<Scalars["DateTime"]>;
+}>;
+
+export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
+    getItensRelatedToUserByPeriod: { __typename?: "ItensResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message"
+                >
+            >
+        >;
+        itens?: Maybe<
+            Array<{ __typename?: "Item" } & Pick<Item, "id" | "summary">>
         >;
     };
 };
@@ -402,6 +439,41 @@ export function useGetItemByIdQuery(
 ) {
     return Urql.useQuery<GetItemByIdQuery>({
         query: GetItemByIdDocument,
+        ...options,
+    });
+}
+export const GetItensRelatedToUserByPeriodDocument = gql`
+    query GetItensRelatedToUserByPeriod(
+        $limit: Float
+        $userId: String!
+        $createdAfter: DateTime
+        $createdLater: DateTime
+    ) {
+        getItensRelatedToUserByPeriod(
+            limit: $limit
+            userId: $userId
+            createdAfter: $createdAfter
+            createdLater: $createdLater
+        ) {
+            errors {
+                message
+            }
+            itens {
+                id
+                summary
+            }
+        }
+    }
+`;
+
+export function useGetItensRelatedToUserByPeriodQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetItensRelatedToUserByPeriodQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetItensRelatedToUserByPeriodQuery>({
+        query: GetItensRelatedToUserByPeriodDocument,
         ...options,
     });
 }

@@ -1,8 +1,25 @@
 import React from "react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-interface ItensHomeProps {}
+import { useGetItensRelatedToUserByPeriodQuery } from "./../../generated/graphql";
+import { getPastOrFutureDate } from "./../../helpers/generalUtilitiesFunctions";
 
-const ItensHome: React.FC<ItensHomeProps> = ({}) => {
+interface ItensHomeProps {
+    userId: string;
+}
+
+const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
+    const today = new Date();
+    const lastWeek = getPastOrFutureDate(today, 7, "past");
+
+    const [{ data }] = useGetItensRelatedToUserByPeriodQuery({
+        variables: {
+            limit: 5,
+            userId,
+            createdAfter: lastWeek,
+            createdLater: today,
+        },
+    });
+
     return (
         <Tabs>
             <TabList>
@@ -13,7 +30,12 @@ const ItensHome: React.FC<ItensHomeProps> = ({}) => {
 
             <TabPanels>
                 <TabPanel>
-                    <p>one!</p>
+                    <p>
+                        {data
+                            ? data.getItensRelatedToUserByPeriod.itens[0]
+                                  .summary
+                            : "..."}
+                    </p>
                 </TabPanel>
                 <TabPanel>
                     <p>two!</p>

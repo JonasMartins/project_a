@@ -1,4 +1,4 @@
-import { Box, Text, Link, Flex, Circle } from "@chakra-ui/react";
+import { Box, Text, Link, Flex /*Circle*/ } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import { GlobalContext } from "./../context/globalContext";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
@@ -6,7 +6,7 @@ import { useGetUserByIdQuery } from "./../generated/graphql";
 import { FcDocument } from "react-icons/fc";
 import NextLink from "next/link";
 import Notifications from "./../components/layout/Notifications";
-import ItensHome from "./../components/layout/ItensHome";
+// import ItensHome from "./../components/layout/ItensHome";
 
 interface HomeNotificationsProps {}
 
@@ -61,9 +61,9 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     flexGrow={1}
                 >
                     <Flex flexDir="row" alignItems="center">
-                        <Circle m="1" size="1.5em" bg="red.500">
+                        {/* <Circle m="1" size="1.5em" bg="red.500">
                             <Text color="white">99</Text>
-                        </Circle>
+                        </Circle> */}
                         <Text fontSize="l" ml="1">
                             Notifications
                         </Text>
@@ -71,9 +71,9 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     <Notifications />
                 </Flex>
             </Flex>
-            <Box mt="3">
-                <ItensHome />
-            </Box>
+            {/* <Box mt="3">
+                <ItensHome userId={userId} />
+            </Box> */}
         </Flex>
     );
     return loading ? spinner : content;
