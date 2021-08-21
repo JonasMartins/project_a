@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { useGetItensRelatedToUserByPeriodQuery } from "./../../generated/graphql";
 import { getPastOrFutureDate } from "./../../helpers/generalUtilitiesFunctions";
@@ -9,18 +9,37 @@ interface ItensHomeProps {
 
 const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
     const today = new Date();
-    const lastWeek = getPastOrFutureDate(today, 7, "past");
+    const lastYear = getPastOrFutureDate(today, 365, "past");
 
-    const [{ data }] = useGetItensRelatedToUserByPeriodQuery({
-        variables: {
-            limit: 5,
-            userId,
-            createdAfter: lastWeek,
-            createdLater: today,
-        },
-    });
+    const [{ data, fetching, error }, reexecuteQuery] =
+        useGetItensRelatedToUserByPeriodQuery({
+            variables: {
+                limit: 5,
+                userId,
+                createdAfter: lastYear.toDateString(),
+                createdLater: today.toDateString(),
+            },
+            pause: true,
+        });
 
-    return (
+    useEffect(() => {
+        if (fetching) return;
+
+        // Set up to refetch in one second, if the query is idle
+        // const timerId = setTimeout(() => {
+        //     reexecuteQuery({ requestPolicy: "cache-only" });
+        // }, 1000);
+
+        // return () => clearTimeout(timerId);
+        reexecuteQuery({ requestPolicy: "cache-first" });
+    }, [fetching, reexecuteQuery]);
+
+    if (error) return <p>Oh no... {error.message}</p>;
+
+    console.log("data", data);
+
+    const loading = <></>;
+    const content = (
         <Tabs>
             <TabList>
                 <Tab>Itens workd</Tab>
@@ -46,6 +65,8 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
             </TabPanels>
         </Tabs>
     );
+
+    return fetching ? loading : content;
 };
 
 export default ItensHome;

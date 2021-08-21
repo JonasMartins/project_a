@@ -1,31 +1,38 @@
 import { Box, Text, Link, Flex /*Circle*/ } from "@chakra-ui/react";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { GlobalContext } from "./../context/globalContext";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { useGetUserByIdQuery } from "./../generated/graphql";
 import { FcDocument } from "react-icons/fc";
 import NextLink from "next/link";
 import Notifications from "./../components/layout/Notifications";
-// import ItensHome from "./../components/layout/ItensHome";
+import ItensHome from "./../components/layout/ItensHome";
 
 interface HomeNotificationsProps {}
 
 const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
-    const { userId, loading, setIsLoading } = useContext(GlobalContext);
+    const { userId } = useContext(GlobalContext);
 
-    const [{ data }] = useGetUserByIdQuery({
+    const [{ data, fetching, error }] = useGetUserByIdQuery({
         variables: {
             id: userId,
         },
+        // context: useMemo(() => data, []),
+        pause: true,
     });
 
-    useEffect(() => {
-        if (userId) {
-            setIsLoading(false);
-        }
-    }, [userId]);
+    // useEffect(() => {
+    //     if (fetching) return;
 
-    console.log("data ", data);
+    //     // Set up to refetch in one second, if the query is idle
+    //     const timerId = setTimeout(() => {
+    //         reexecuteQuery({ requestPolicy: "cache-only" });
+    //     }, 1000);
+
+    //     return () => clearTimeout(timerId);
+    // }, [fetching, reexecuteQuery]);
+
+    if (error) return <p>Oh no... {error.message}</p>;
 
     const spinner = <FullPageSpinner />;
     const content = (
@@ -71,12 +78,12 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     <Notifications />
                 </Flex>
             </Flex>
-            {/* <Box mt="3">
+            <Box mt="3">
                 <ItensHome userId={userId} />
-            </Box> */}
+            </Box>
         </Flex>
     );
-    return loading ? spinner : content;
+    return fetching ? spinner : content;
 };
 
 export default HomeNotifications;
