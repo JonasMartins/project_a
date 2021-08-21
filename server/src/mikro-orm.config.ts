@@ -1,7 +1,8 @@
 import { __prod__ } from "./constants";
-import { MikroORM } from "@mikro-orm/core";
+import { Collection, MikroORM } from "@mikro-orm/core";
 import path from "path";
-import { User } from "./entities/User";
+import { Item } from "./entities/item.entity";
+import { User } from "./entities/user.entity";
 
 const microConfig = {
     migrations: {
@@ -9,7 +10,7 @@ const microConfig = {
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
 
-    entities: [User],
+    entities: [User, Item, Collection],
     dbName: "pa_dev",
     user: "postgres",
     password: "postgres",

@@ -1,0 +1,13 @@
+
+Forma correta de rodar migrations:
+
+após alterar o eschema e rodar
+npx mikro-orm migration:create para criar, 
+npx mikro-orm migration:list
+rodar
+npx mikro-orm migration:up --only 20210801181529
+
+cujo numero é o nome do arquivo migrations que deve ser
+gerado, pegando o ultimo, por algum motivo nesse ambiente, 
+o migration up, sempre tenta rodar todas as migrações e gera
+erro pois as tabelas já existem

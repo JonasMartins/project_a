@@ -1,0 +1,21 @@
+query GetItensRelatedToUserByPeriod(
+    $limit: Float
+    $userId: String!
+    $createdAfter: DateTime
+    $createdLater: DateTime
+) {
+    getItensRelatedToUserByPeriod(
+        limit: $limit
+        userId: $userId
+        createdAfter: $createdAfter
+        createdLater: $createdLater
+    ) {
+        errors {
+            message
+        }
+        itens {
+            id
+            summary
+        }
+    }
+}

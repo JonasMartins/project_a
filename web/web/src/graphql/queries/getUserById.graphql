@@ -1,0 +1,31 @@
+query GetUserById($id: String!) {
+    getUserById(id: $id) {
+        errors {
+            message
+            method
+        }
+        user {
+            id
+            name
+            email
+            itenReporter {
+                id
+                createdAt
+                updatedAt
+                status
+            }
+            itenApprover {
+                id
+                createdAt
+                updatedAt
+                status
+            }
+            itenResponsible {
+                id
+                createdAt
+                updatedAt
+                status
+            }
+        }
+    }
+}

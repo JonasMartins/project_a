@@ -1,0 +1,37 @@
+mutation CreateItem(
+    $approverId: String!
+    $responsibleId: String!
+    $reporterId: String!
+    $options: ItemValidator!
+) {
+    createItem(
+        approverId: $approverId
+        responsibleId: $responsibleId
+        reporterId: $reporterId
+        options: $options
+    ) {
+        errors {
+            method
+            message
+        }
+        item {
+            id
+            summary
+            responsible {
+                id
+                name
+                email
+            }
+            approver {
+                id
+                name
+                email
+            }
+            reporter {
+                id
+                name
+                email
+            }
+        }
+    }
+}
