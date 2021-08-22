@@ -173,14 +173,15 @@ export class ItemResolver {
         const qb = (em as EntityManager).createQueryBuilder(Item);
 
         qb.select("*")
-            .where({
-                reporter_id: userId,
+            .where({ reporter_id: userId })
+            .orWhere({ responsible_id: userId })
+            .orWhere({ reporter_id: userId })
+            .andWhere({
                 created_at: { $gte: createdAfter, $lte: createdLater },
             })
-            // .orderBy({ ['"created_at"']: "DESC" })
             .limit(max);
 
-        console.log(qb.getQuery());
+        // console.log(qb.getQuery());
 
         const itens = await qb.execute();
 

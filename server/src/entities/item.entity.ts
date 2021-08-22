@@ -37,6 +37,18 @@ export class Item extends Base<Item> {
     @Enum(() => ItemType)
     public type: ItemType;
 
+    @Field()
+    @Property({ type: "text" })
+    responsible_id: string;
+
+    @Field()
+    @Property({ type: "text" })
+    reporter_id: string;
+
+    @Field()
+    @Property({ type: "text" })
+    approver_id: string;
+
     constructor(body: ItemValidator) {
         super(body);
     }
