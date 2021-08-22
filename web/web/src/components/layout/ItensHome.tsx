@@ -1,15 +1,58 @@
-import React, { useEffect } from "react";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import {
+    Box,
+    Flex,
+    IconButton,
+    Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
+    Text,
+    Tooltip,
+    useDisclosure,
+} from "@chakra-ui/react";
+import React, { useContext, useEffect, useState } from "react";
+import { BsSearch } from "react-icons/bs";
+import { GlobalContext } from "./../../context/globalContext";
 import { useGetItensRelatedToUserByPeriodQuery } from "./../../generated/graphql";
 import { getPastOrFutureDate } from "./../../helpers/generalUtilitiesFunctions";
+import {
+    getItemTypeIcon,
+    enumItemPriority,
+    enumItemType,
+} from "./../../helpers/items/ItemFunctinHelpers";
+import ModalitemDetail from "./../modal/ModalitemDetail";
+import FlexSpinner from "./../rootComponents/FlexSpinner";
 
 interface ItensHomeProps {
     userId: string;
 }
 
 const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
-    const today = new Date();
+    const [summary, setSummary] = useState("");
+    const [description, setDescription] = useState("");
+    const [itemType, setItemType] = useState<enumItemType | null>(null);
+    const [itemPriority, setItemPriority] = useState<enumItemPriority | null>(
+        null
+    );
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const today = getPastOrFutureDate(new Date(), 1, "future");
     const lastYear = getPastOrFutureDate(today, 365, "past");
+
+    const customOnOpen = (
+        summary: string,
+        description: string,
+        type: enumItemType,
+        priority: enumItemPriority
+    ): void => {
+        setDescription(description);
+        setSummary(summary);
+        setItemType(type);
+        setItemPriority(priority);
+        onOpen();
+    };
 
     const [{ data, fetching, error }, reexecuteQuery] =
         useGetItensRelatedToUserByPeriodQuery({
@@ -36,34 +79,179 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
 
     if (error) return <p>Oh no... {error.message}</p>;
 
-    console.log("data", data);
+    // console.log("data", data);
 
-    const loading = <></>;
+    const loading = <FlexSpinner />;
     const content = (
-        <Tabs>
-            <TabList>
-                <Tab>Itens workd</Tab>
-                <Tab>Attributed to me</Tab>
-                <Tab>Created By Me</Tab>
-            </TabList>
+        <>
+            <Tabs>
+                <TabList>
+                    <Tab>
+                        <Text fontSize="lg">Itens workd</Text>
+                    </Tab>
+                    <Tab>
+                        <Text fontSize="lg">Attributed to me</Text>
+                    </Tab>
+                    <Tab>
+                        <Text fontSize="lg">Created By Me</Text>
+                    </Tab>
+                </TabList>
 
-            <TabPanels>
-                <TabPanel>
-                    <p>
-                        {data
-                            ? data.getItensRelatedToUserByPeriod.itens[0]
-                                  .summary
-                            : "..."}
-                    </p>
-                </TabPanel>
-                <TabPanel>
-                    <p>two!</p>
-                </TabPanel>
-                <TabPanel>
-                    <p>three!</p>
-                </TabPanel>
-            </TabPanels>
-        </Tabs>
+                <TabPanels>
+                    <TabPanel>
+                        {data &&
+                            data.getItensRelatedToUserByPeriod.itens.map(
+                                (item) =>
+                                    item.status !== "COMPLETED" &&
+                                    item.status !== "CLOSED" ? (
+                                        <Flex alignItems="center">
+                                            {getItemTypeIcon(item.type)}
+                                            <Text fontSize="lg" key={item.id}>
+                                                {item.summary}
+                                            </Text>
+                                            <Box ml="1em">
+                                                <Tooltip
+                                                    hasArrow
+                                                    aria-label="Open Details"
+                                                    label="Open Details"
+                                                    colorScheme="withe"
+                                                    placement="right"
+                                                >
+                                                    <IconButton
+                                                        rounded="full"
+                                                        aria-label="See Item Details"
+                                                        onClick={() =>
+                                                            customOnOpen(
+                                                                item.summary,
+                                                                item.description,
+                                                                enumItemType[
+                                                                    item.type
+                                                                ],
+                                                                enumItemPriority[
+                                                                    item
+                                                                        .priority
+                                                                ]
+                                                            )
+                                                        }
+                                                        variant="outline"
+                                                        size="lg"
+                                                        icon={<BsSearch />}
+                                                    />
+                                                </Tooltip>
+                                            </Box>
+                                        </Flex>
+                                    ) : (
+                                        <></>
+                                    )
+                            )}
+                    </TabPanel>
+                    <TabPanel>
+                        {data &&
+                            data.getItensRelatedToUserByPeriod.itens.map(
+                                (item) =>
+                                    item.status !== "COMPLETED" &&
+                                    item.status !== "CLOSED" &&
+                                    item.responsible_id === userId ? (
+                                        <Flex alignItems="center">
+                                            {getItemTypeIcon(item.type)}
+                                            <Text fontSize="lg" key={item.id}>
+                                                {item.summary}
+                                            </Text>
+                                            <Box ml="1em">
+                                                <Tooltip
+                                                    hasArrow
+                                                    aria-label="Open Details"
+                                                    label="Open Details"
+                                                    colorScheme="withe"
+                                                    placement="right"
+                                                >
+                                                    <IconButton
+                                                        rounded="full"
+                                                        aria-label="See Item Details"
+                                                        onClick={() =>
+                                                            customOnOpen(
+                                                                item.summary,
+                                                                item.description,
+                                                                enumItemType[
+                                                                    item.type
+                                                                ],
+                                                                enumItemPriority[
+                                                                    item
+                                                                        .priority
+                                                                ]
+                                                            )
+                                                        }
+                                                        variant="outline"
+                                                        size="lg"
+                                                        icon={<BsSearch />}
+                                                    />
+                                                </Tooltip>
+                                            </Box>
+                                        </Flex>
+                                    ) : (
+                                        <></>
+                                    )
+                            )}
+                    </TabPanel>
+                    <TabPanel>
+                        {data &&
+                            data.getItensRelatedToUserByPeriod.itens.map(
+                                (item) =>
+                                    item.status !== "COMPLETED" &&
+                                    item.status !== "CLOSED" &&
+                                    item.reporter_id === userId ? (
+                                        <Flex alignItems="center">
+                                            {getItemTypeIcon(item.type)}
+                                            <Text fontSize="lg" key={item.id}>
+                                                {item.summary}
+                                            </Text>
+                                            <Box ml="1em">
+                                                <Tooltip
+                                                    hasArrow
+                                                    aria-label="Open Details"
+                                                    label="Open Details"
+                                                    colorScheme="withe"
+                                                    placement="right"
+                                                >
+                                                    <IconButton
+                                                        rounded="full"
+                                                        aria-label="See Item Details"
+                                                        onClick={() =>
+                                                            customOnOpen(
+                                                                item.summary,
+                                                                item.description,
+                                                                enumItemType[
+                                                                    item.type
+                                                                ],
+                                                                enumItemPriority[
+                                                                    item
+                                                                        .priority
+                                                                ]
+                                                            )
+                                                        }
+                                                        variant="outline"
+                                                        size="lg"
+                                                        icon={<BsSearch />}
+                                                    />
+                                                </Tooltip>
+                                            </Box>
+                                        </Flex>
+                                    ) : (
+                                        <></>
+                                    )
+                            )}
+                    </TabPanel>
+                </TabPanels>
+            </Tabs>
+            <ModalitemDetail
+                isOpen={isOpen}
+                onClose={onClose}
+                summary={summary}
+                description={description}
+                type={itemType}
+                priority={itemPriority}
+            />
+        </>
     );
 
     return fetching ? loading : content;

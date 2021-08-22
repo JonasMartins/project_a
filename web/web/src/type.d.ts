@@ -29,3 +29,16 @@ interface User {
     itemResponsible: [Item];
     itemRepporter: [Item];
 }
+enum enumItemPriority {
+    HIGHEST = "HIGHEST",
+    HIGH = "HIGH",
+    MEDIUM = "MEDIUM",
+    LOW = "LOW",
+    LOWEST = "LOWEST",
+}
+
+enum enumItemType {
+    TASK = "TASK",
+    BUG = "BUG",
+    STORY = "STORY",
+}

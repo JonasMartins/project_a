@@ -39,7 +39,20 @@ export type Item = {
     approver: User;
     status: ItemStatus;
     type: ItemType;
+    priority: ItemPriority;
+    responsible_id: Scalars["String"];
+    reporter_id: Scalars["String"];
+    approver_id: Scalars["String"];
 };
+
+/** The basic directions */
+export enum ItemPriority {
+    Highest = "HIGHEST",
+    High = "HIGH",
+    Medium = "MEDIUM",
+    Low = "LOW",
+    Lowest = "LOWEST",
+}
 
 export type ItemResponse = {
     __typename?: "ItemResponse";
@@ -69,6 +82,7 @@ export type ItemValidator = {
     description: Scalars["String"];
     status: ItemStatus;
     type: ItemType;
+    priority: ItemPriority;
 };
 
 export type ItensResponse = {
@@ -289,7 +303,20 @@ export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
             >
         >;
         itens?: Maybe<
-            Array<{ __typename?: "Item" } & Pick<Item, "id" | "summary">>
+            Array<
+                { __typename?: "Item" } & Pick<
+                    Item,
+                    | "id"
+                    | "summary"
+                    | "description"
+                    | "status"
+                    | "type"
+                    | "priority"
+                    | "responsible_id"
+                    | "reporter_id"
+                    | "approver_id"
+                >
+            >
         >;
     };
 };
@@ -461,6 +488,13 @@ export const GetItensRelatedToUserByPeriodDocument = gql`
             itens {
                 id
                 summary
+                description
+                status
+                type
+                priority
+                responsible_id
+                reporter_id
+                approver_id
             }
         }
     }

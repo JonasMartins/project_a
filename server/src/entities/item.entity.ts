@@ -2,6 +2,7 @@ import { Entity, Enum, ManyToOne, Property } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { User } from "./user.entity";
 import { ItemStatus } from "../enums/itemStatus.enum";
+import { ItemPriority } from "../enums/itemPriority.enum";
 import { ItemType } from "../enums/itemType.enum";
 import { Base } from "./../utils/entities/base.entity";
 import ItemValidator from "./../validators/item.validator";
@@ -36,6 +37,10 @@ export class Item extends Base<Item> {
     @Field(() => ItemType)
     @Enum(() => ItemType)
     public type: ItemType;
+
+    @Field(() => ItemPriority)
+    @Enum(() => ItemPriority)
+    public priority: ItemPriority;
 
     @Field()
     @Property({ type: "text" })
