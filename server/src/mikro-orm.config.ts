@@ -4,6 +4,7 @@ import path from "path";
 import { Item } from "./entities/item.entity";
 import { User } from "./entities/user.entity";
 import { Role } from "./entities/role.entity";
+import { Team } from "./entities/team.entity";
 
 const microConfig = {
     migrations: {
@@ -11,7 +12,7 @@ const microConfig = {
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
 
-    entities: [User, Item, Role, Collection],
+    entities: [User, Item, Role, Team, Collection],
     dbName: "pa_dev",
     user: "postgres",
     password: "postgres",
