@@ -1,6 +1,5 @@
 import { IsString } from "class-validator";
 import { Field, InputType } from "type-graphql";
-import { User } from "./../entities/user.entity";
 
 @InputType()
 class TeamValidator {
@@ -12,7 +11,8 @@ class TeamValidator {
     @IsString()
     public description: string;
 
-    @Field(() => User, { nullable: false })
-    public leader: User;
+    @Field()
+    @IsString()
+    public leader_id: string;
 }
 export default TeamValidator;

@@ -1,6 +1,6 @@
 //var assert = require("assert");
 import { Connection, EntityManager, IDatabaseDriver } from "@mikro-orm/core";
-import Application from "./../aplication";
+import Application from "../application";
 import { SuperTest, Test } from "supertest";
 import supertest = require("supertest");
 /*

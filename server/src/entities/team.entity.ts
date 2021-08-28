@@ -18,6 +18,10 @@ export class Team extends Base<Team> {
     @Field(() => User)
     public leader!: User;
 
+    @Field()
+    @Property({ type: "text" })
+    leader_id: string;
+
     @Field(() => [User])
     @ManyToMany(() => User, (user: User) => user.teams, { owner: true })
     public members: Collection<User> = new Collection<User>(this);

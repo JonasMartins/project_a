@@ -1,5 +1,5 @@
 import { Connection, EntityManager, IDatabaseDriver } from "@mikro-orm/core";
-import Application from "./../aplication";
+import Application from "../application";
 import createSimpleUuid from "./../utils/helpers/createSimpleUuid.helper";
 import { expect } from "chai";
 import { SuperTest, Test } from "supertest";

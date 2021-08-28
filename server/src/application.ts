@@ -12,6 +12,7 @@ import microConfig from "./mikro-orm.config";
 import { ItemResolver } from "./resolvers/item.resolver";
 import { UserResolver } from "./resolvers/user.resolver";
 import { RoleResolver } from "./resolvers/role.resolver";
+import { TeamResolver } from "./resolvers/team.resolvers";
 import { Context } from "./types";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
@@ -82,7 +83,12 @@ export default class Application {
 
         const apolloServer = new ApolloServer({
             schema: await buildSchema({
-                resolvers: [UserResolver, RoleResolver, ItemResolver],
+                resolvers: [
+                    UserResolver,
+                    RoleResolver,
+                    ItemResolver,
+                    TeamResolver,
+                ],
                 validate: false,
             }),
             // special object accesible for all resolvers
