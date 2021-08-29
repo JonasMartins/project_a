@@ -15,13 +15,15 @@ import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import { useRouter } from "next/dist/client/router";
 import { GlobalContext } from "./../../context/globalContext";
+import Avatar from "react-avatar";
 
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = ({}) => {
     const router = useRouter();
 
-    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
+    const { setIsLoading, setCurrentUserId, userName } =
+        useContext(GlobalContext);
 
     const logout = () => {
         setIsLoading(true);
@@ -55,6 +57,14 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
                 </NextLink>
                 <Box float="right">
                     <Menu>
+                        <Box mr={2} display="inline">
+                            <Avatar
+                                name={userName ? userName : "Foo Bar"}
+                                size="32px"
+                                round={true}
+                            />
+                        </Box>
+
                         <MenuButton
                             mr={2}
                             borderRadius={"full"}

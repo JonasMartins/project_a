@@ -11,15 +11,14 @@ import {
     Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
-import { GlobalContext } from "./../../context/globalContext";
 import { useGetItensRelatedToUserByPeriodQuery } from "./../../generated/graphql";
 import { getPastOrFutureDate } from "./../../helpers/generalUtilitiesFunctions";
 import {
-    getItemTypeIcon,
     enumItemPriority,
     enumItemType,
+    getItemTypeIcon,
 } from "./../../helpers/items/ItemFunctinHelpers";
 import ModalitemDetail from "./../modal/ModalitemDetail";
 import FlexSpinner from "./../rootComponents/FlexSpinner";

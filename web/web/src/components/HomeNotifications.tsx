@@ -1,5 +1,5 @@
 import { Box, Text, Link, Flex /*Circle*/ } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { GlobalContext } from "./../context/globalContext";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { useGetUserByIdQuery } from "./../generated/graphql";
@@ -11,9 +11,9 @@ import ItensHome from "./../components/layout/ItensHome";
 interface HomeNotificationsProps {}
 
 const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
-    const { userId } = useContext(GlobalContext);
+    const { userId, setCurrentUserName } = useContext(GlobalContext);
 
-    const [{ data, fetching, error }] = useGetUserByIdQuery({
+    const [{ data, fetching, error }, reexecuteQuery] = useGetUserByIdQuery({
         variables: {
             id: userId,
         },
@@ -31,6 +31,16 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
 
     //     return () => clearTimeout(timerId);
     // }, [fetching, reexecuteQuery]);
+
+    useEffect(() => {
+        if (fetching) return;
+
+        if (data?.getUserById?.user) {
+            setCurrentUserName(data.getUserById.user.name);
+        }
+
+        reexecuteQuery({ requestPolicy: "cache-first" });
+    }, [fetching, reexecuteQuery]);
 
     if (error) return <p>Oh no... {error.message}</p>;
 
