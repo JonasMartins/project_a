@@ -1,0 +1,17 @@
+Sprint
+
+- Sprint terá, opções de comprimento, 1,2,3,4 weeks, serão essas as opções
+Todo item só será criado estando anexado a uma sprint, existirá um campo de
+sprint de inicio, cada sprint será fechada automaticamente.
+
+Node cron package para rodar jobs:
+https://www.npmjs.com/package/cron
+
+
+- Todo item que não for finalizado na sprint atual será realocado para próxima
+sprint, isso será apenas uma alteração do campo, currentSprint do item, quando
+o status do item for de concluido, isso será feito pelo leder do time ou adimin
+ou aprovador, a sprint atual será também replicada para o campo closingSprint.
+
+- Terá um nome e descrição
+
