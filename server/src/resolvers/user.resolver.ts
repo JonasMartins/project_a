@@ -18,6 +18,7 @@ import { sendRefreshToken } from "../utils/sendRefreshToken";
 import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { COOKIE_NAME } from "../constants";
+import { Role } from "./../entities/role.entity";
 @InputType()
 class UserBasicData {
     @Field()
@@ -26,6 +27,8 @@ class UserBasicData {
     password: string;
     @Field()
     email: string;
+    @Field()
+    role_id: string;
 }
 
 @ObjectType()
@@ -156,7 +159,37 @@ export class UserResolver {
         }
         const hashedPassword = await argon2.hash(options.password);
         options.password = hashedPassword;
-        const user = em.create(User, options);
+
+        const role = await em.findOne(Role, {
+            id: options.role_id,
+        });
+
+        if (!role) {
+            return {
+                errors: [
+                    {
+                        field: "role_id",
+                        message: "Could not find role, from role_id provided.",
+                        method: `Method: createUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+        /*
+            name: options.name,
+            hashedPassword: options.password,
+            role: role,
+            email: options.email
+        */
+        const user = em.create(User, {
+            name: options.name,
+            password: options.password,
+            role_id: options.role_id,
+            email: options.email,
+        });
+
+        user.role = role;
+
         await em.persistAndFlush(user);
 
         return { user };

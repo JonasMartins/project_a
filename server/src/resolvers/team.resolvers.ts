@@ -44,6 +44,12 @@ export class TeamResolver {
             id,
         });
 
+        const leader: User = await em.findOneOrFail(User, {
+            id: team.leader_id,
+        });
+
+        team.leader = leader;
+
         return { team };
     }
 
