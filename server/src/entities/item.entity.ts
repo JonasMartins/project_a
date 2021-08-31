@@ -1,6 +1,7 @@
 import { Entity, Enum, ManyToOne, Property } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { User } from "./user.entity";
+import { Sprint } from "./sprint.entity";
 import { ItemStatus } from "../enums/itemStatus.enum";
 import { ItemPriority } from "../enums/itemPriority.enum";
 import { ItemType } from "../enums/itemType.enum";
@@ -53,6 +54,14 @@ export class Item extends Base<Item> {
     @Field()
     @Property({ type: "text" })
     approver_id: string;
+
+    @Field(() => Sprint)
+    @ManyToOne(() => Sprint)
+    public sprint: Sprint;
+
+    @Field()
+    @Property()
+    sprint_id: string;
 
     constructor(body: ItemValidator) {
         super(body);
