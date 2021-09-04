@@ -25,3 +25,5 @@ npm run dev // para startar o servidor
 
 
 No MacOs: psql pa_dev para entrar no banco pa_dev e rodar as consultas desejadas
+
+\dt para listar todas as tabelas

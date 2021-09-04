@@ -11,59 +11,55 @@ import ItemValidator from "./../validators/item.validator";
 @ObjectType()
 @Entity()
 export class Item extends Base<Item> {
-    @Field()
-    @Property({ type: "text" })
-    summary!: string;
+  @Field()
+  @Property({ type: "text" })
+  summary!: string;
 
-    @Field()
-    @Property({ type: "text" })
-    description!: string;
+  @Field()
+  @Property({ type: "text" })
+  description!: string;
 
-    @Field(() => User)
-    @ManyToOne(() => User)
-    public reporter: User;
+  @Field(() => User)
+  @ManyToOne(() => User)
+  public reporter: User;
 
-    @Field(() => User)
-    @ManyToOne(() => User)
-    public responsible: User;
+  @Field(() => User)
+  @ManyToOne(() => User)
+  public responsible: User;
 
-    @Field(() => User)
-    @ManyToOne(() => User)
-    public approver: User;
+  @Field(() => User)
+  @ManyToOne(() => User)
+  public approver: User;
 
-    @Field(() => ItemStatus)
-    @Enum(() => ItemStatus)
-    public status: ItemStatus;
+  @Field(() => ItemStatus)
+  @Enum(() => ItemStatus)
+  public status: ItemStatus;
 
-    @Field(() => ItemType)
-    @Enum(() => ItemType)
-    public type: ItemType;
+  @Field(() => ItemType)
+  @Enum(() => ItemType)
+  public type: ItemType;
 
-    @Field(() => ItemPriority)
-    @Enum(() => ItemPriority)
-    public priority: ItemPriority;
+  @Field(() => ItemPriority)
+  @Enum(() => ItemPriority)
+  public priority: ItemPriority;
 
-    @Field()
-    @Property({ type: "text" })
-    responsible_id: string;
+  @Field()
+  @Property({ type: "text" })
+  responsible_id: string;
 
-    @Field()
-    @Property({ type: "text" })
-    reporter_id: string;
+  @Field()
+  @Property({ type: "text" })
+  reporter_id: string;
 
-    @Field()
-    @Property({ type: "text" })
-    approver_id: string;
+  @Field()
+  @Property({ type: "text" })
+  approver_id: string;
 
-    @Field(() => Sprint)
-    @ManyToOne(() => Sprint)
-    public sprint: Sprint;
+  @Field(() => Sprint)
+  @ManyToOne(() => Sprint)
+  public sprint: Sprint;
 
-    @Field()
-    @Property()
-    sprint_id: string;
-
-    constructor(body: ItemValidator) {
-        super(body);
-    }
+  constructor(body: ItemValidator) {
+    super(body);
+  }
 }
