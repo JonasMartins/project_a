@@ -17,6 +17,7 @@ import { Context } from "./types";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
+require("dotenv").config();
 
 type failedRefresh = {
     ok: boolean;

@@ -1,8 +1,16 @@
-import { Entity, Collection, Enum, Property, OneToMany } from "@mikro-orm/core";
+import {
+    Entity,
+    Collection,
+    Enum,
+    Property,
+    OneToMany,
+    ManyToOne,
+} from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { Base } from "./../utils/entities/base.entity";
 import { SprintLength } from "./../enums/sprintLength.enum";
 import { Item } from "./item.entity";
+import { Project } from "./project.entity";
 
 @ObjectType()
 @Entity()
@@ -26,4 +34,8 @@ export class Sprint extends Base<Sprint> {
     @Field(() => [Item])
     @OneToMany(() => Item, (item: Item) => item.sprint, { lazy: true })
     public itens: Collection<Item> = new Collection<Item>(this);
+
+    @Field(() => Project)
+    @ManyToOne(() => Project)
+    public project: Project;
 }

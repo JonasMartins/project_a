@@ -6,6 +6,7 @@ import { User } from "./entities/user.entity";
 import { Role } from "./entities/role.entity";
 import { Team } from "./entities/team.entity";
 import { Sprint } from "./entities/sprint.entity";
+import { Project } from "./entities/project.entity";
 
 const microConfig = {
     migrations: {
@@ -13,10 +14,10 @@ const microConfig = {
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
 
-    entities: [User, Item, Role, Team, Collection, Sprint],
-    dbName: "pa_dev",
-    user: "postgres",
-    password: "postgres",
+    entities: [User, Item, Role, Team, Collection, Sprint, Project],
+    dbName: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     port: 5432,
     debug: !__prod__,
     type: "postgresql",
