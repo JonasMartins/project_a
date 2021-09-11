@@ -1,0 +1,15 @@
+mutation {
+    createProject(
+        options: { name: "chessEngine", description: "A simple chess engine" }
+    ) {
+        errors {
+            message
+        }
+        project {
+            id
+            name
+            description
+        }
+    }
+}
+

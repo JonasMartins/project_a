@@ -13,6 +13,7 @@ import {
     getPastOrFutureDate,
 } from "./../utils/generalAuxiliaryMethods";
 import { Sprint } from "../entities/sprint.entity";
+import { Project } from "../entities/project.entity";
 import SprintValidator from "./../validators/sprint.validator";
 import { Context } from "../types";
 import { SprintLength } from "../enums/sprintLength.enum";
@@ -49,6 +50,20 @@ export class SprintResolver {
         }
 
         const sprint = await em.create(Sprint, options);
+        const project = await em.findOne(Project, { id: options.project_id });
+
+        if (!project) {
+            return {
+                errors: genericError(
+                    "project_id",
+                    "createSprint",
+                    __filename,
+                    `A projetc with id ${options.project_id} could not been found.`
+                ),
+            };
+        }
+
+        sprint.project = project;
 
         let finalDate = sprint.createdAt;
 
