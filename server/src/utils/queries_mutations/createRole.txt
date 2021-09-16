@@ -1,48 +1,20 @@
 mutation {
-  createRole(options: {
-    name: "Developer Jr 2",
-    code: "002",
-    description: "Developer Jr 1",
-    wage: 3970.90
-  }){
-    errors {
-      message
+    createRole(
+        options: {
+            name: "Tech Leader"
+            code: "004"
+            wage: 8570.66
+            description: ""
+        }
+    ) {
+        errors {
+            message
+        }
+        role {
+            id
+            name
+            wage
+            code
+        }
     }
-    role {
-      id
-      wage
-    }
-  }
-}
-mutation {
-  createRole(options: {
-    name: "Tech Leader",
-    code: "003",
-    description: "Tech Leader",
-    wage: 7680.90
-  }){
-    errors {
-      message
-    }
-    role {
-      id
-      wage
-    }
-  }
-}
-mutation {
-  createRole(options: {
-    name: "Admin",
-    code: "999",
-    description: "Admin",
-    wage: 3000.90
-  }){
-    errors {
-      message
-    }
-    role {
-      id
-      wage
-    }
-  }
 }

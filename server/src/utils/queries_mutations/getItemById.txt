@@ -1,0 +1,24 @@
+{
+    getItemById(id: "cd7062b7-3039-44da-8240-be7896745a14") {
+        errors {
+            method
+            message
+        }
+        item {
+            id
+            summary
+            description
+            responsible {
+                id
+                name
+                email
+            }
+
+            approver {
+                id
+                name
+                email
+            }
+        }
+    }
+}

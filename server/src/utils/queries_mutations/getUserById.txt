@@ -1,0 +1,36 @@
+# Write your query or mutation here
+query {
+    getUserById(id: "6b8eade3-15d5-4961-a86b-4302cb235118") {
+        errors {
+            message
+            method
+        }
+        user {
+            id
+            name
+            email
+            itenReporter {
+                id
+                createdAt
+                updatedAt
+                status
+            }
+            itenApprover {
+                id
+                createdAt
+                updatedAt
+                status
+            }
+            itenResponsible {
+                id
+                createdAt
+                updatedAt
+                status
+            }
+            role {
+                id
+                name
+            }
+        }
+    }
+}

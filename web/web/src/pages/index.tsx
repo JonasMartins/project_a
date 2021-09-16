@@ -3,7 +3,6 @@ import React, { useContext, useEffect } from "react";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
-import ButtonColorMode from "../components/ButtonColorMode";
 import HomeNotifications from "../components/HomeNotifications";
 import { GlobalContext } from "./../context/globalContext";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
@@ -26,9 +25,6 @@ const Index: React.FC<indexProps> = ({}) => {
         <>
             <Container>
                 <Navbar />
-                <Flex alignSelf="flex-end" p={2} mr={3}>
-                    <ButtonColorMode size="sm" />
-                </Flex>
                 <Flex alignSelf="normal" flexGrow={1}>
                     <HomeNotifications />
                 </Flex>

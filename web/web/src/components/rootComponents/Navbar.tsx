@@ -1,5 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
+    useColorMode,
     Icon,
     Box,
     Menu,
@@ -16,14 +17,24 @@ import NextLink from "next/link";
 import { useRouter } from "next/dist/client/router";
 import { GlobalContext } from "./../../context/globalContext";
 import Avatar from "react-avatar";
+import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = ({}) => {
     const router = useRouter();
 
-    const { setIsLoading, setCurrentUserId, userName } =
+    const { setIsLoading, setCurrentUserId, setTheme, userName } =
         useContext(GlobalContext);
+
+    const { toggleColorMode } = useColorMode();
+    const [darkMode, setDarkMode] = useState(true);
+
+    const handleDarkMode = () => {
+        setDarkMode(!darkMode);
+        setTheme(darkMode ? "dark" : "light");
+        toggleColorMode();
+    };
 
     const logout = () => {
         setIsLoading(true);
@@ -50,7 +61,7 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
                         Home
                     </Link>
                 </NextLink>
-                <NextLink href="/">
+                <NextLink href="/project">
                     <Link textStyle="bold" mr={2}>
                         Projects
                     </Link>
@@ -62,6 +73,16 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
                                 name={userName ? userName : "Foo Bar"}
                                 size="32px"
                                 round={true}
+                            />
+                        </Box>
+                        <Box mr={2} display="inline">
+                            <IconButton
+                                aria-label="Switch Theme"
+                                isRound={true}
+                                isActive={darkMode}
+                                onClick={handleDarkMode}
+                                colorScheme={darkMode ? "grey" : "yellow"}
+                                icon={darkMode ? <MoonIcon /> : <SunIcon />}
                             />
                         </Box>
 

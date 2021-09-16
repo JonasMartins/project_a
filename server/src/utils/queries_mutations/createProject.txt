@@ -13,3 +13,33 @@ mutation {
     }
 }
 
+mutation {
+    createProject(
+        options: { name: "Sun Browser", description: "A fast and secure web browser" }
+    ) {
+        errors {
+            message
+        }
+        project {
+            id
+            name
+            description
+        }
+    }
+}
+
+mutation {
+    createProject(
+        options: { name: "JS Games", description: "A list of simple games made with javascript." }
+    ) {
+        errors {
+            message
+        }
+        project {
+            id
+            name
+            description
+        }
+    }
+}
+

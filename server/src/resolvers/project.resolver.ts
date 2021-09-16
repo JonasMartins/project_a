@@ -1,53 +1,65 @@
 import {
-  Mutation,
-  Query,
-  Resolver,
-  ObjectType,
-  Field,
-  Arg,
-  Ctx,
+    Mutation,
+    Query,
+    Resolver,
+    ObjectType,
+    Field,
+    Arg,
+    Ctx,
 } from "type-graphql";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { Project } from "./../entities/project.entity";
+import { Sprint } from "./../entities/sprint.entity";
 import ProjectValidator from "./../validators/project.validator";
 import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 
 @ObjectType()
 class ProjectResponse {
-  @Field(() => [ErrorFieldHandler], { nullable: true })
-  errors?: ErrorFieldHandler[];
-  @Field(() => Project, { nullable: true })
-  project?: Project;
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => Project, { nullable: true })
+    project?: Project;
 }
 
 @Resolver()
 export class ProjectResolver {
-  @Query(() => String)
-  helloProjectResolver() {
-    return "Hello";
-  }
-
-  @Mutation(() => ProjectResponse)
-  async createProject(
-    @Arg("options") options: ProjectValidator,
-    @Ctx() { em }: Context
-  ): Promise<ProjectResponse> {
-    if (options.description.length <= 3) {
-      return {
-        errors: genericError(
-          "description",
-          "createProject",
-          __filename,
-          "A description must have length greater than 3 charachters."
-        ),
-      };
+    @Query(() => String)
+    helloProjectResolver() {
+        return "Hello";
     }
 
-    const project = await em.create(Project, options);
+    @Mutation(() => ProjectResponse)
+    async createProject(
+        @Arg("options") options: ProjectValidator,
+        @Ctx() { em }: Context
+    ): Promise<ProjectResponse> {
+        if (options.description.length <= 3) {
+            return {
+                errors: genericError(
+                    "description",
+                    "createProject",
+                    __filename,
+                    "A description must have length greater than 3 charachters."
+                ),
+            };
+        }
 
-    await em.persistAndFlush(project);
+        const project = await em.create(Project, options);
 
-    return { project };
-  }
+        await em.persistAndFlush(project);
+
+        return { project };
+    }
+    @Query(() => [Project], { nullable: true })
+    async getProjects(
+        @Arg("limit", () => Number, { nullable: true }) limit: number,
+        @Ctx() { em }: Context
+    ): Promise<Project[]> {
+        const max = Math.min(5, limit);
+
+        const projects = await em.find(Project, {}, { limit: max });
+
+        return projects;
+    }
 }

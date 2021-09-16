@@ -15,6 +15,8 @@ export class Project extends Base<Project> {
     description!: string;
 
     @Field(() => [Sprint])
-    @OneToMany(() => Sprint, (sprint: Sprint) => sprint.project, { lazy: true })
+    @OneToMany(() => Sprint, (sprint: Sprint) => sprint.project, {
+        lazy: true,
+    })
     public sprints: Collection<Sprint> = new Collection<Sprint>(this);
 }

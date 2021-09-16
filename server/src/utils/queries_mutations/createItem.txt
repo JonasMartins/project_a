@@ -1,0 +1,29 @@
+mutation {
+    createItem(
+        approverId: "9e55ba38-5590-40e8-a389-534513b0adcc"
+        responsibleId: "97a444c2-c1ef-4a0f-962f-47d3c1266b59"
+        reporterId: "9e55ba38-5590-40e8-a389-534513b0adcc"
+        options: {
+            summary: "Summary test 5"
+            description: "Description Test 5"
+            status: OPEN
+            type: BUG
+            priority: LOW
+        }
+    ) {
+        errors {
+            method
+            message
+        }
+        item {
+            id
+            summary
+            status
+            responsible {
+                id
+                name
+                email
+            }
+        }
+    }
+}
