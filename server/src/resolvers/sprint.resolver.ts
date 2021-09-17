@@ -28,11 +28,6 @@ class SprintResponse {
 
 @Resolver()
 export class SprintResolver {
-    @Query(() => String)
-    hello() {
-        return "Hello";
-    }
-
     @Mutation(() => SprintResponse)
     async createSprint(
         @Arg("options") options: SprintValidator,
@@ -83,8 +78,14 @@ export class SprintResolver {
 
         sprint.final = finalDate;
 
+        sprint.active = new Date() <= finalDate;
+
         await em.persistAndFlush(sprint);
 
         return { sprint };
     }
+
+    /**
+     *      Retorna os itens de uma sprint pelo id
+     */
 }

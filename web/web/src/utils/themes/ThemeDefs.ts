@@ -102,7 +102,7 @@ export const pallet: object = {
 };
 export const fonts: object = {
     body: "system-ui, sans-serif",
-    heading: "Georgia, serif",
+    heading: "system-ui, sans-serif",
     mono: "Menlo, monospace",
 };
 

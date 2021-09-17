@@ -9,7 +9,6 @@ import {
 } from "type-graphql";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { Project } from "./../entities/project.entity";
-import { Sprint } from "./../entities/sprint.entity";
 import ProjectValidator from "./../validators/project.validator";
 import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
@@ -24,11 +23,6 @@ class ProjectResponse {
 
 @Resolver()
 export class ProjectResolver {
-    @Query(() => String)
-    helloProjectResolver() {
-        return "Hello";
-    }
-
     @Mutation(() => ProjectResponse)
     async createProject(
         @Arg("options") options: ProjectValidator,
@@ -61,5 +55,39 @@ export class ProjectResolver {
         const projects = await em.find(Project, {}, { limit: max });
 
         return projects;
+    }
+
+    @Query(() => ProjectResponse)
+    async getProjectById(
+        @Arg("id") id: string,
+        @Ctx() { em }: Context
+    ): Promise<ProjectResponse> {
+        if (!id) {
+            return {
+                errors: genericError(
+                    "id",
+                    "getProjectById",
+                    __filename,
+                    "The project Id is required"
+                ),
+            };
+        }
+
+        const project = await em.findOne(Project, id);
+
+        if (!project) {
+            return {
+                errors: genericError(
+                    "id",
+                    "getProjectById",
+                    __filename,
+                    `Could not found the project with id = ${id}`
+                ),
+            };
+        }
+
+        project.sprints.loadItems(); // magic, load the sprints on the object
+
+        return { project };
     }
 }

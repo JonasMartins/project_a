@@ -177,8 +177,8 @@ export type Query = {
     getUserById: UserResponse;
     getRoleById: RoleRespnse;
     getTeamById: TeamResponse;
-    helloProjectResolver: Scalars["String"];
     getProjects?: Maybe<Array<Project>>;
+    getProjectById: ProjectResponse;
 };
 
 export type QueryGetItensRelatedToUserByPeriodArgs = {
@@ -206,6 +206,10 @@ export type QueryGetTeamByIdArgs = {
 
 export type QueryGetProjectsArgs = {
     limit?: Maybe<Scalars["Float"]>;
+};
+
+export type QueryGetProjectByIdArgs = {
+    id: Scalars["String"];
 };
 
 export type RevokeResponse = {
@@ -250,6 +254,7 @@ export type Sprint = {
     final: Scalars["DateTime"];
     itens: Array<Item>;
     project: Project;
+    active: Scalars["Boolean"];
 };
 
 /** The basic directions */
@@ -465,6 +470,41 @@ export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetProjectByIdQueryVariables = Exact<{
+    id: Scalars["String"];
+}>;
+
+export type GetProjectByIdQuery = { __typename?: "Query" } & {
+    getProjectById: { __typename?: "ProjectResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message"
+                >
+            >
+        >;
+        project?: Maybe<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "description"
+            > & {
+                    sprints: Array<
+                        { __typename?: "Sprint" } & Pick<
+                            Sprint,
+                            | "id"
+                            | "code"
+                            | "final"
+                            | "length"
+                            | "description"
+                            | "active"
+                        >
+                    >;
+                }
+        >;
+    };
+};
+
 export type GetProjectsQueryVariables = Exact<{
     limit?: Maybe<Scalars["Float"]>;
 }>;
@@ -667,6 +707,37 @@ export function useGetItensRelatedToUserByPeriodQuery(
 ) {
     return Urql.useQuery<GetItensRelatedToUserByPeriodQuery>({
         query: GetItensRelatedToUserByPeriodDocument,
+        ...options,
+    });
+}
+export const GetProjectByIdDocument = gql`
+    query getProjectById($id: String!) {
+        getProjectById(id: $id) {
+            errors {
+                message
+            }
+            project {
+                id
+                name
+                description
+                sprints {
+                    id
+                    code
+                    final
+                    length
+                    description
+                    active
+                }
+            }
+        }
+    }
+`;
+
+export function useGetProjectByIdQuery(
+    options: Omit<Urql.UseQueryArgs<GetProjectByIdQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetProjectByIdQuery>({
+        query: GetProjectByIdDocument,
         ...options,
     });
 }

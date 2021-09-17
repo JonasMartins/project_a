@@ -10,13 +10,19 @@ import {
     Td,
     Flex,
     Text,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    Link,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import FlexSpinner from "./../../components/rootComponents/FlexSpinner";
+import NextLink from "next/link";
+import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import { Container } from "./../../components/Container";
 import Navbar from "./../../components/rootComponents/Navbar";
 import Footer from "./../../components/rootComponents/Footer";
-import { FaCodeBranch } from "react-icons/fa";
+import { FcWorkflow } from "react-icons/fc";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 
 interface projectsProps {}
 
@@ -35,14 +41,27 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     if (error) return <p>Oh no... {error.message}</p>;
 
-    const loading = <FlexSpinner />;
+    const loading = <FullPageSpinner />;
     const content = (
         <>
             <Container>
                 <Navbar />
-
+                <Flex p={2} margin="1em 2em 1em">
+                    <Breadcrumb
+                        separator={<ChevronRightIcon color="gray.500" />}
+                    >
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/project">
+                                Projects
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </Breadcrumb>
+                </Flex>
                 <Flex p={2} m={2}>
-                    <Table size="lg">
+                    <Table size="lg" variant="striped">
                         <Thead>
                             <Tr>
                                 <Th>Name</Th>
@@ -55,10 +74,19 @@ const Project: React.FC<projectsProps> = ({}) => {
                                     <Tr key={project.id}>
                                         <Td>
                                             <Flex>
-                                                <FaCodeBranch size={"20px"} />
-                                                <Text fontSize="lg" pl={2}>
-                                                    {project.name}
-                                                </Text>
+                                                <FcWorkflow size={"20px"} />
+                                                <NextLink
+                                                    href={`/project/${project.id}`}
+                                                >
+                                                    <Link>
+                                                        <Text
+                                                            fontSize="lg"
+                                                            pl={2}
+                                                        >
+                                                            {project.name}
+                                                        </Text>
+                                                    </Link>
+                                                </NextLink>
                                             </Flex>
                                         </Td>
                                         <Td>

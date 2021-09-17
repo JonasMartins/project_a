@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
     useColorMode,
     Icon,
@@ -30,6 +30,8 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
     const { toggleColorMode } = useColorMode();
     const [darkMode, setDarkMode] = useState(true);
 
+    useEffect(() => {}, [userName]);
+
     const handleDarkMode = () => {
         setDarkMode(!darkMode);
         setTheme(darkMode ? "dark" : "light");
@@ -53,6 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
             m={0}
             p={[0, 2]}
             boxShadow="lg"
+            zIndex="2"
         >
             <Box>
                 <Icon mr={3} ml={2} as={DragHandleIcon} />
