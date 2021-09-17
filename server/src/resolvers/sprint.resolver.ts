@@ -86,6 +86,22 @@ export class SprintResolver {
     }
 
     /**
-     *      Retorna os itens de uma sprint pelo id
+     *      Retorna sprints com um certo limte
      */
+    @Query(() => [Sprint], { nullable: true })
+    async getSprints(
+        @Arg("limit", () => Number, { nullable: true }) limit: number,
+        @Arg("active", () => Boolean, { nullable: true }) active: boolean,
+        @Ctx() { em }: Context
+    ): Promise<Sprint[]> {
+        const max = Math.min(5, limit);
+
+        const sprints = await em.find(
+            Sprint,
+            { active: active },
+            { limit: max }
+        );
+
+        return sprints;
+    }
 }
