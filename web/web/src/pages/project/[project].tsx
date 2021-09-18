@@ -9,7 +9,6 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
-    useColorMode,
 } from "@chakra-ui/react";
 import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import Navbar from "./../../components/rootComponents/Navbar";
@@ -18,17 +17,17 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { useGetProjectByIdQuery } from "./../../generated/graphql";
 import SideBar from "./../../components/layout/SideBar";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import StatusItemDraggable from "./../../components/layout/StatusItemDraggable";
+import ItemSprintBox from "./../../components/layout/ItemSprintBox";
+
 interface projectsProps {}
 
 const Project: React.FC<projectsProps> = ({}) => {
     const router = useRouter();
 
     const [expand, setExpand] = useState(true);
-    const [sideBarWidth, setSideBarWidth] = useState("215px");
-    const [pageWidth, setPageWidth] = useState("20em");
-    const { colorMode } = useColorMode();
-    const bgColor = { light: "gray.200", dark: "gray.800" };
-    const color = { light: "black", dark: "white" };
+    const [sideBarWidth, setSideBarWidth] = useState("0px");
+    const [pageWidth, setPageWidth] = useState("3em");
 
     const { project } = router.query;
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
@@ -121,39 +120,24 @@ const Project: React.FC<projectsProps> = ({}) => {
                 overflowX="hidden"
                 transition="0.3s"
             >
-                <Flex
-                    minH="100px"
-                    flexGrow={1}
-                    boxShadow="lg"
-                    p={3}
-                    m="2em 2em 20em 0"
-                    bg={bgColor[colorMode]}
-                    color={color[colorMode]}
-                >
+                <StatusItemDraggable>
                     <Text size="lg">PEDNDING</Text>
-                </Flex>
-                <Flex
-                    minH="100px"
-                    flexGrow={1}
-                    boxShadow="lg"
-                    p={3}
-                    m="2em 2em 20em 0"
-                    bg={bgColor[colorMode]}
-                    color={color[colorMode]}
-                >
+                    {data &&
+                        data.getProjectById.project.sprints[0].itens.map(
+                            (iten) => (
+                                <ItemSprintBox
+                                    key={iten.id}
+                                    summary={iten.summary}
+                                />
+                            )
+                        )}
+                </StatusItemDraggable>
+                <StatusItemDraggable>
                     <Text size="lg">IN PROGRESS</Text>
-                </Flex>
-                <Flex
-                    minH="100px"
-                    flexGrow={1}
-                    boxShadow="lg"
-                    p={3}
-                    m="2em 2em 20em 0"
-                    bg={bgColor[colorMode]}
-                    color={color[colorMode]}
-                >
+                </StatusItemDraggable>
+                <StatusItemDraggable>
                     <Text size="lg">DONE</Text>
-                </Flex>
+                </StatusItemDraggable>
             </Flex>
             <Box id="footer">
                 <Footer />

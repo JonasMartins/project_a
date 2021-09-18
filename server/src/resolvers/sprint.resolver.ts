@@ -104,4 +104,37 @@ export class SprintResolver {
 
         return sprints;
     }
+
+    @Query(() => SprintResponse)
+    async getSprintById(
+        @Arg("id") id: string,
+        @Ctx() { em }: Context
+    ): Promise<SprintResponse> {
+        const sprint = await em.findOne(
+            Sprint,
+            { id },
+            {
+                populate: ["itens"],
+            }
+        );
+
+        if (!sprint) {
+            return {
+                errors: genericError(
+                    "id",
+                    "getSprintById",
+                    __filename,
+                    `Could not found the sprint with id ${id}`
+                ),
+            };
+        }
+
+        // const b = 1;
+
+        // const itens = await sprint.itens.init();
+
+        // const a = 1;
+
+        return { sprint };
+    }
 }

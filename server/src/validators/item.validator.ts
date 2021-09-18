@@ -25,6 +25,10 @@ class ItemValidator {
     @Field(() => ItemPriority)
     @IsEnum(ItemPriority)
     public priority: ItemPriority;
+
+    @Field()
+    @IsString()
+    public sprint_id: string;
 }
 
 export default ItemValidator;

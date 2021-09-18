@@ -84,6 +84,7 @@ export type ItemValidator = {
     status: ItemStatus;
     type: ItemType;
     priority: ItemPriority;
+    sprint_id: Scalars["String"];
 };
 
 export type ItensResponse = {
@@ -177,6 +178,8 @@ export type Query = {
     getUserById: UserResponse;
     getRoleById: RoleRespnse;
     getTeamById: TeamResponse;
+    getSprints?: Maybe<Array<Sprint>>;
+    getSprintById: SprintResponse;
     getProjects?: Maybe<Array<Project>>;
     getProjectById: ProjectResponse;
 };
@@ -201,6 +204,15 @@ export type QueryGetRoleByIdArgs = {
 };
 
 export type QueryGetTeamByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetSprintsArgs = {
+    active?: Maybe<Scalars["Boolean"]>;
+    limit?: Maybe<Scalars["Float"]>;
+};
+
+export type QueryGetSprintByIdArgs = {
     id: Scalars["String"];
 };
 
@@ -498,7 +510,19 @@ export type GetProjectByIdQuery = { __typename?: "Query" } & {
                             | "length"
                             | "description"
                             | "active"
-                        >
+                        > & {
+                                itens: Array<
+                                    { __typename?: "Item" } & Pick<
+                                        Item,
+                                        | "id"
+                                        | "summary"
+                                        | "description"
+                                        | "status"
+                                        | "priority"
+                                        | "type"
+                                    >
+                                >;
+                            }
                     >;
                 }
         >;
@@ -727,6 +751,14 @@ export const GetProjectByIdDocument = gql`
                     length
                     description
                     active
+                    itens {
+                        id
+                        summary
+                        description
+                        status
+                        priority
+                        type
+                    }
                 }
             }
         }

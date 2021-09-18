@@ -103,9 +103,9 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                 (item) =>
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" ? (
-                                        <Flex alignItems="center">
+                                        <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
-                                            <Text fontSize="lg" key={item.id}>
+                                            <Text fontSize="lg">
                                                 {item.summary}
                                             </Text>
                                             <Box ml="1em">
@@ -151,9 +151,9 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" &&
                                     item.responsible_id === userId ? (
-                                        <Flex alignItems="center">
+                                        <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
-                                            <Text fontSize="lg" key={item.id}>
+                                            <Text fontSize="lg">
                                                 {item.summary}
                                             </Text>
                                             <Box ml="1em">
@@ -199,9 +199,9 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" &&
                                     item.reporter_id === userId ? (
-                                        <Flex alignItems="center">
+                                        <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
-                                            <Text fontSize="lg" key={item.id}>
+                                            <Text fontSize="lg">
                                                 {item.summary}
                                             </Text>
                                             <Box ml="1em">

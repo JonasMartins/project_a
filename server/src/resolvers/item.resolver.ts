@@ -8,6 +8,7 @@ import {
     Query,
 } from "type-graphql";
 import { Item } from "../entities/item.entity";
+import { Sprint } from "../entities/sprint.entity";
 import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import ItemValidator from "./../validators/item.validator";
@@ -66,6 +67,23 @@ export class ItemResolver {
         }
 
         const item = await em.create(Item, options);
+
+        const sprint = await em.findOne(Sprint, { id: options.sprint_id });
+
+        if (!sprint) {
+            return {
+                errors: [
+                    {
+                        field: "sprint_id",
+                        message: `Could not found a valid sprint with id ${options.sprint_id}`,
+                        method: `Method: createItem, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        item.sprint = sprint;
+
         item.createdAt = new Date();
         const reporter: User = await em.findOneOrFail(User, { id: reporterId });
 
