@@ -129,12 +129,6 @@ export class SprintResolver {
             };
         }
 
-        // const b = 1;
-
-        // const itens = await sprint.itens.init();
-
-        // const a = 1;
-
         return { sprint };
     }
 }

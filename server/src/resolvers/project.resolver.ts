@@ -9,9 +9,12 @@ import {
 } from "type-graphql";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { Project } from "./../entities/project.entity";
+import { Sprint } from "./../entities/sprint.entity";
 import ProjectValidator from "./../validators/project.validator";
 import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
+import { EntityManager } from "@mikro-orm/postgresql";
+import { Collection } from "@mikro-orm/core";
 
 @ObjectType()
 class ProjectResponse {
@@ -86,7 +89,17 @@ export class ProjectResolver {
             };
         }
 
-        project.sprints.loadItems(); // magic, load the sprints on the object
+        /**/
+        const sprint = await em.findOneOrFail(
+            Sprint,
+
+            { project, active: true },
+            {
+                populate: ["itens"],
+            }
+        );
+
+        project.sprints.add(sprint);
 
         return { project };
     }

@@ -123,7 +123,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                 <StatusItemDraggable>
                     <Text size="lg">PEDNDING</Text>
                     {data &&
-                        data.getProjectById.project.sprints[0].itens.map(
+                        data.getProjectById?.project?.sprints[0]?.itens?.map(
                             (iten) => (
                                 <ItemSprintBox
                                     key={iten.id}

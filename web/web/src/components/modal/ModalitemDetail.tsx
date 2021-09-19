@@ -9,16 +9,14 @@ import {
     ModalHeader,
     ModalOverlay,
     Text,
+    useColorMode,
 } from "@chakra-ui/react";
-import React, { useContext, useState } from "react";
+import React from "react";
 import {
     returnHeaderGradient,
     returnIconHeaderLabel,
     returnPriorityIconHeaderModal,
 } from "./../../helpers/items/ItemFunctinHelpers";
-import { GlobalContext } from "./../../context/globalContext";
-import { useEffect } from "react";
-
 interface ModalitemDetailProps {
     summary: string;
     description: string;
@@ -36,12 +34,8 @@ const ModalitemDetail: React.FC<ModalitemDetailProps> = ({
     type,
     priority,
 }) => {
-    const { colorMode } = useContext(GlobalContext);
-    const [color, setColor] = useState<"white" | "black" | null>(null);
-
-    useEffect(() => {
-        setColor(colorMode == "light" ? "white" : "black");
-    }, [colorMode]);
+    const { colorMode } = useColorMode();
+    const color = { light: "black", dark: "white" };
 
     return (
         <Modal
@@ -66,17 +60,17 @@ const ModalitemDetail: React.FC<ModalitemDetailProps> = ({
                             alignItems="center"
                             justifyContent="space-between"
                         >
-                            <Text color={color} fontSize="lg">
+                            <Text color={color[colorMode]} fontSize="lg">
                                 Summary:
                             </Text>
                             {returnPriorityIconHeaderModal(priority)}
                         </Flex>
-                        <Text color={color}>{summary}</Text>
+                        <Text color={color[colorMode]}>{summary}</Text>
 
-                        <Text mt={3} color={color}>
+                        <Text mt={3} color={color[colorMode]}>
                             Description:
                         </Text>
-                        <Text color={color}>{description}</Text>
+                        <Text color={color[colorMode]}>{description}</Text>
                     </Flex>
                 </ModalBody>
 
