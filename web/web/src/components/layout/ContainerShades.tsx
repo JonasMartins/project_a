@@ -6,6 +6,7 @@ interface ContainerShadesProps {
     flexGrow?: number;
     boxShadow?: string;
     flexDir?: ResponsiveValue<"column" | "row">;
+    justifyContent?: string;
     p?: number | string;
     m?: number | string;
     mt?: number | string;

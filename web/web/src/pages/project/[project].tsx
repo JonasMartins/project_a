@@ -14,7 +14,7 @@ import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import Navbar from "./../../components/rootComponents/Navbar";
 import Footer from "./../../components/rootComponents/Footer";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { useGetProjectByIdQuery } from "./../../generated/graphql";
+import { ItemStatus, useGetProjectByIdQuery } from "./../../generated/graphql";
 import SideBar from "./../../components/layout/SideBar";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import StatusItemDraggable from "./../../components/layout/StatusItemDraggable";
@@ -124,19 +124,54 @@ const Project: React.FC<projectsProps> = ({}) => {
                     <Text size="lg">PEDNDING</Text>
                     {data &&
                         data.getProjectById?.project?.sprints[0]?.itens?.map(
-                            (iten) => (
-                                <ItemSprintBox
-                                    key={iten.id}
-                                    summary={iten.summary}
-                                />
-                            )
+                            (item) =>
+                                item.status === ItemStatus.Open ||
+                                item.status === ItemStatus.Reopened ? (
+                                    <ItemSprintBox
+                                        key={item.id}
+                                        summary={item.summary}
+                                        type={item.type}
+                                        priority={item.priority}
+                                    />
+                                ) : (
+                                    <></>
+                                )
                         )}
                 </StatusItemDraggable>
                 <StatusItemDraggable>
                     <Text size="lg">IN PROGRESS</Text>
+                    {data &&
+                        data.getProjectById?.project?.sprints[0]?.itens?.map(
+                            (item) =>
+                                item.status === ItemStatus.InProgress ? (
+                                    <ItemSprintBox
+                                        key={item.id}
+                                        summary={item.summary}
+                                        type={item.type}
+                                        priority={item.priority}
+                                    />
+                                ) : (
+                                    <></>
+                                )
+                        )}
                 </StatusItemDraggable>
                 <StatusItemDraggable>
                     <Text size="lg">DONE</Text>
+                    {data &&
+                        data.getProjectById?.project?.sprints[0]?.itens?.map(
+                            (item) =>
+                                item.status === ItemStatus.Completed ||
+                                item.status === ItemStatus.Resolved ? (
+                                    <ItemSprintBox
+                                        key={item.id}
+                                        summary={item.summary}
+                                        type={item.type}
+                                        priority={item.priority}
+                                    />
+                                ) : (
+                                    <></>
+                                )
+                        )}
                 </StatusItemDraggable>
             </Flex>
             <Box id="footer">

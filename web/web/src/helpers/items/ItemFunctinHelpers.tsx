@@ -10,6 +10,8 @@ import {
     CgArrowBottomLeftO,
     CgArrowDownO,
 } from "react-icons/cg";
+import { ItemPriority } from "./../../generated/graphql";
+
 export const getItemTypeIcon = (type: string): JSX.Element => {
     let componentType: JSX.Element | null = null;
 
@@ -104,7 +106,7 @@ export const returnIconHeaderLabel = (type: enumItemType): JSX.Element => {
 };
 
 export const returnPriorityIconHeaderModal = (
-    type: enumItemPriority
+    type: ItemPriority
 ): JSX.Element => {
     let componentType: JSX.Element | null = null;
 

@@ -28,7 +28,7 @@ const SideBar: React.FC<SideBarProps> = ({
             color={color[colorMode]}
             boxShadow="lg"
             position="fixed"
-            mt="43px"
+            mt="0px"
         >
             <Flex
                 visibility={visibility}
