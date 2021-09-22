@@ -106,7 +106,7 @@ export const returnIconHeaderLabel = (type: enumItemType): JSX.Element => {
 };
 
 export const returnPriorityIconHeaderModal = (
-    type: ItemPriority
+    type: ItemPriority | enumItemPriority
 ): JSX.Element => {
     let componentType: JSX.Element | null = null;
 
@@ -142,7 +142,7 @@ export const returnPriorityIconHeaderModal = (
         case "LOWEST":
             componentType = (
                 <Box ml={2}>
-                    <CgArrowDownO color="white" size="35px" />
+                    <CgArrowDownO color="#ced8e4" size="35px" />
                 </Box>
             );
             break;

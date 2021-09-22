@@ -9,18 +9,30 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
+    useColorMode,
 } from "@chakra-ui/react";
 import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import Navbar from "./../../components/rootComponents/Navbar";
 import Footer from "./../../components/rootComponents/Footer";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { ItemStatus, useGetProjectByIdQuery } from "./../../generated/graphql";
+import { useDrop } from "react-dnd";
+import {
+    ItemStatus,
+    useGetProjectByIdQuery,
+    Item,
+} from "./../../generated/graphql";
 import SideBar from "./../../components/layout/SideBar";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import StatusItemDraggable from "./../../components/layout/StatusItemDraggable";
 import ItemSprintBox from "./../../components/layout/ItemSprintBox";
 
 interface projectsProps {}
+
+type itemQuery = {
+    __typename?: "Item";
+} & Pick<
+    Item,
+    "id" | "description" | "summary" | "status" | "priority" | "type"
+>;
 
 const Project: React.FC<projectsProps> = ({}) => {
     const router = useRouter();
@@ -28,6 +40,14 @@ const Project: React.FC<projectsProps> = ({}) => {
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
+
+    const [pendingItens, setPendingItens] = useState<Array<itemQuery>>([]);
+    const [progressItens, setProgressItens] = useState<Array<itemQuery>>([]);
+    const [doneItens, setDoneItens] = useState<Array<itemQuery>>([]);
+
+    const { colorMode } = useColorMode();
+    const bgColor = { light: "gray.200", dark: "gray.800" };
+    const color = { light: "black", dark: "white" };
 
     const { project } = router.query;
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
@@ -37,13 +57,52 @@ const Project: React.FC<projectsProps> = ({}) => {
         pause: true,
     });
 
+    const [{}, dropRefPending] = useDrop({
+        accept: "item",
+        drop: (item: itemQuery) => {
+            setPendingItens((prevItens) => [...prevItens, item]);
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
+    const [{}, dropRefProgress] = useDrop({
+        accept: "item",
+        drop: (item: itemQuery) => {
+            setProgressItens((prevItens) => [...prevItens, item]);
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
+    const [{}, dropRefDone] = useDrop({
+        accept: "item",
+        drop: (item: itemQuery) => {
+            setDoneItens((prevItens) => [...prevItens, item]);
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
     useEffect(() => {
         if (fetching) return;
+        loadItensByTypes();
         reexecuteQuery({ requestPolicy: "cache-and-network" });
     }, [fetching, reexecuteQuery]);
 
     // if (data && data.getProjectById.errors)
     //     return  ( data.getProjectById.errors.map((erro) => <p>{erro.message}</p>) );
+
+    useEffect(() => {
+        return () => {
+            setDoneItens([]);
+            setPendingItens([]);
+            setProgressItens([]);
+        };
+    }, []);
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -55,6 +114,32 @@ const Project: React.FC<projectsProps> = ({}) => {
             setSideBarWidth("0px");
             setPageWidth("3em");
         }
+    };
+
+    const loadItensByTypes = (): void => {
+        if (!(data && data.getProjectById?.project?.sprints[0]?.itens)) {
+            return;
+        }
+
+        data.getProjectById?.project?.sprints[0]?.itens?.map((item) => {
+            switch (item.status) {
+                case ItemStatus.Open:
+                    setPendingItens((prevItens) => [...prevItens, item]);
+                    break;
+                case ItemStatus.Reopened:
+                    setPendingItens((prevItens) => [...prevItens, item]);
+                    break;
+                case ItemStatus.InProgress:
+                    setProgressItens((prevItens) => [...prevItens, item]);
+                    break;
+                case ItemStatus.Completed:
+                    setDoneItens((prevItens) => [...prevItens, item]);
+                    break;
+                case ItemStatus.Resolved:
+                    setDoneItens((prevItens) => [...prevItens, item]);
+                    break;
+            }
+        });
     };
 
     if (error) return <p>Oh no... {error.message}</p>;
@@ -120,59 +205,70 @@ const Project: React.FC<projectsProps> = ({}) => {
                 overflowX="hidden"
                 transition="0.3s"
             >
-                <StatusItemDraggable>
+                <Flex
+                    minH="150px"
+                    flexGrow={1}
+                    boxShadow="lg"
+                    flexDir="column"
+                    p={3}
+                    m="2em 2em 20em 0"
+                    bg={bgColor[colorMode]}
+                    color={color[colorMode]}
+                    ref={dropRefPending}
+                >
                     <Text size="lg">PEDNDING</Text>
-                    {data &&
-                        data.getProjectById?.project?.sprints[0]?.itens?.map(
-                            (item) =>
-                                item.status === ItemStatus.Open ||
-                                item.status === ItemStatus.Reopened ? (
-                                    <ItemSprintBox
-                                        key={item.id}
-                                        summary={item.summary}
-                                        type={item.type}
-                                        priority={item.priority}
-                                    />
-                                ) : (
-                                    <></>
-                                )
-                        )}
-                </StatusItemDraggable>
-                <StatusItemDraggable>
+                    {pendingItens.length &&
+                        pendingItens.map((item) => (
+                            <ItemSprintBox
+                                draggable
+                                key={item.id}
+                                item={item}
+                            />
+                        ))}
+                </Flex>
+
+                <Flex
+                    minH="150px"
+                    flexGrow={1}
+                    boxShadow="lg"
+                    flexDir="column"
+                    p={3}
+                    m="2em 2em 20em 0"
+                    bg={bgColor[colorMode]}
+                    color={color[colorMode]}
+                    ref={dropRefProgress}
+                >
                     <Text size="lg">IN PROGRESS</Text>
-                    {data &&
-                        data.getProjectById?.project?.sprints[0]?.itens?.map(
-                            (item) =>
-                                item.status === ItemStatus.InProgress ? (
-                                    <ItemSprintBox
-                                        key={item.id}
-                                        summary={item.summary}
-                                        type={item.type}
-                                        priority={item.priority}
-                                    />
-                                ) : (
-                                    <></>
-                                )
-                        )}
-                </StatusItemDraggable>
-                <StatusItemDraggable>
+                    {progressItens.length &&
+                        progressItens.map((item) => (
+                            <ItemSprintBox
+                                draggable
+                                key={item.id}
+                                item={item}
+                            />
+                        ))}
+                </Flex>
+                <Flex
+                    minH="150px"
+                    flexGrow={1}
+                    boxShadow="lg"
+                    flexDir="column"
+                    p={3}
+                    m="2em 2em 20em 0"
+                    bg={bgColor[colorMode]}
+                    color={color[colorMode]}
+                    ref={dropRefDone}
+                >
                     <Text size="lg">DONE</Text>
-                    {data &&
-                        data.getProjectById?.project?.sprints[0]?.itens?.map(
-                            (item) =>
-                                item.status === ItemStatus.Completed ||
-                                item.status === ItemStatus.Resolved ? (
-                                    <ItemSprintBox
-                                        key={item.id}
-                                        summary={item.summary}
-                                        type={item.type}
-                                        priority={item.priority}
-                                    />
-                                ) : (
-                                    <></>
-                                )
-                        )}
-                </StatusItemDraggable>
+                    {doneItens.length &&
+                        doneItens.map((item) => (
+                            <ItemSprintBox
+                                draggable
+                                key={item.id}
+                                item={item}
+                            />
+                        ))}
+                </Flex>
             </Flex>
             <Box id="footer">
                 <Footer />

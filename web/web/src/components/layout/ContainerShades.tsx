@@ -13,6 +13,7 @@ interface ContainerShadesProps {
     mb?: number | string;
     ml?: number | string;
     mr?: number | string;
+    ref?: any;
 }
 
 export const Primary: React.FC<ContainerShadesProps> = ({

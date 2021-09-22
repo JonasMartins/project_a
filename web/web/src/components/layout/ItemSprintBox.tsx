@@ -1,37 +1,52 @@
 import React from "react";
-import { Text, Flex } from "@chakra-ui/react";
+import { Text, Flex, Box } from "@chakra-ui/react";
 import { Primary } from "./../layout/ContainerShades";
-import { ItemType, ItemPriority } from "./../../generated/graphql";
 import {
     getItemTypeIcon,
     returnPriorityIconHeaderModal,
 } from "./../../helpers/items/ItemFunctinHelpers";
+import { Item } from "./../../generated/graphql";
+
+import { useDrag } from "react-dnd";
+
+type itemQuery = {
+    __typename?: "Item";
+} & Pick<
+    Item,
+    "id" | "description" | "summary" | "status" | "priority" | "type"
+>;
+
 interface ItemSprintBoxProps {
-    summary: string;
-    type: ItemType;
-    priority: ItemPriority;
+    item: itemQuery;
+    draggable?: boolean;
 }
 
-const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({
-    summary,
-    type,
-    priority,
-}) => {
+const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
+    const [{ isDragging }, dragRef] = useDrag({
+        type: "item",
+        item: item,
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    });
+
     return (
-        <Primary
-            minH="100px"
-            mt="20px"
-            mb="10px"
-            p={2}
-            flexDir="column"
-            justifyContent="space-between"
-        >
-            <Text size="md">{summary}</Text>
-            <Flex flexDir="row">
-                {getItemTypeIcon(type)}
-                {returnPriorityIconHeaderModal(priority)}
-            </Flex>
-        </Primary>
+        <Box ref={dragRef}>
+            <Primary
+                minH="100px"
+                mt="20px"
+                mb="10px"
+                p={2}
+                flexDir="column"
+                justifyContent="space-between"
+            >
+                <Text size="md">{item.summary}</Text>
+                <Flex flexDir="row">
+                    {getItemTypeIcon(item.type)}
+                    {returnPriorityIconHeaderModal(item.priority)}
+                </Flex>
+            </Primary>
+        </Box>
     );
 };
 
