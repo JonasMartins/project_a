@@ -1,4 +1,4 @@
-import { Box, Square } from "@chakra-ui/react";
+import { Box, Square, Tooltip } from "@chakra-ui/react";
 import React from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { BsFillBookmarkFill } from "react-icons/bs";
@@ -18,41 +18,47 @@ export const getItemTypeIcon = (type: string): JSX.Element => {
     switch (type) {
         case "BUG":
             componentType = (
-                <Square
-                    size="30px"
-                    mr="1em"
-                    mt="0.5"
-                    bg="red.500"
-                    color="white"
-                >
-                    <IoMdBug />
-                </Square>
+                <Tooltip hasArrow aria-label="Bug Item" label="Bug Item">
+                    <Square
+                        size="30px"
+                        mr="1em"
+                        mt="0.5"
+                        bg="red.500"
+                        color="white"
+                    >
+                        <IoMdBug />
+                    </Square>
+                </Tooltip>
             );
             break;
         case "TASK":
             componentType = (
-                <Square
-                    size="30px"
-                    mr="1em"
-                    mt="0.5"
-                    bg="blue.500"
-                    color="white"
-                >
-                    <AiFillCheckCircle />
-                </Square>
+                <Tooltip hasArrow aria-label="Task Item" label="Task Item">
+                    <Square
+                        size="30px"
+                        mr="1em"
+                        mt="0.5"
+                        bg="blue.500"
+                        color="white"
+                    >
+                        <AiFillCheckCircle />
+                    </Square>
+                </Tooltip>
             );
             break;
         case "STORY":
             componentType = (
-                <Square
-                    size="30px"
-                    mr="1em"
-                    mt="0.5"
-                    bg="green.500"
-                    color="white"
-                >
-                    <BsFillBookmarkFill />
-                </Square>
+                <Tooltip hasArrow aria-label="Story Item" label="Story Item">
+                    <Square
+                        size="30px"
+                        mr="1em"
+                        mt="0.5"
+                        bg="green.500"
+                        color="white"
+                    >
+                        <BsFillBookmarkFill />
+                    </Square>
+                </Tooltip>
             );
             break;
     }
@@ -113,37 +119,67 @@ export const returnPriorityIconHeaderModal = (
     switch (type) {
         case "HIGHEST":
             componentType = (
-                <Box ml={2}>
-                    <CgArrowUpO color="#ad032c" size="35px" />
-                </Box>
+                <Tooltip
+                    hasArrow
+                    aria-label="Highest Priority"
+                    label="Highest Priority"
+                >
+                    <Box ml={2}>
+                        <CgArrowUpO color="#ad032c" size="35px" />
+                    </Box>
+                </Tooltip>
             );
             break;
         case "HIGH":
             componentType = (
-                <Box ml={2}>
-                    <CgArrowTopRightO color="#d36a13" size="35px" />
-                </Box>
+                <Tooltip
+                    hasArrow
+                    aria-label="High Priority"
+                    label="High Priority"
+                >
+                    <Box ml={2}>
+                        <CgArrowTopRightO color="#d36a13" size="35px" />
+                    </Box>
+                </Tooltip>
             );
             break;
         case "MEDIUM":
             componentType = (
-                <Box ml={2}>
-                    <CgArrowRightO color="#f6de56" size="35px" />
-                </Box>
+                <Tooltip
+                    hasArrow
+                    aria-label="Medium Priority"
+                    label="Medium Priority"
+                >
+                    <Box ml={2}>
+                        <CgArrowRightO color="#f6de56" size="35px" />
+                    </Box>
+                </Tooltip>
             );
             break;
         case "LOW":
             componentType = (
-                <Box ml={2}>
-                    <CgArrowBottomLeftO color="#63ace8" size="35px" />
-                </Box>
+                <Tooltip
+                    hasArrow
+                    aria-label="Low Priority"
+                    label="Low Priority"
+                >
+                    <Box ml={2}>
+                        <CgArrowBottomLeftO color="#63ace8" size="35px" />
+                    </Box>
+                </Tooltip>
             );
             break;
         case "LOWEST":
             componentType = (
-                <Box ml={2}>
-                    <CgArrowDownO color="#ced8e4" size="35px" />
-                </Box>
+                <Tooltip
+                    hasArrow
+                    aria-label="Lowest Priority"
+                    label="Lowest Priority"
+                >
+                    <Box ml={2}>
+                        <CgArrowDownO color="#ced8e4" size="35px" />
+                    </Box>
+                </Tooltip>
             );
             break;
     }

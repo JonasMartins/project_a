@@ -61,6 +61,10 @@ const Project: React.FC<projectsProps> = ({}) => {
         accept: "item",
         drop: (item: itemQuery) => {
             setPendingItens((prevItens) => [...prevItens, item]);
+            // Ação de update no item
+
+            // Remoção do item no array anterior dele.
+            removeItemFromStatusArray(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -71,6 +75,7 @@ const Project: React.FC<projectsProps> = ({}) => {
         accept: "item",
         drop: (item: itemQuery) => {
             setProgressItens((prevItens) => [...prevItens, item]);
+            removeItemFromStatusArray(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -81,11 +86,54 @@ const Project: React.FC<projectsProps> = ({}) => {
         accept: "item",
         drop: (item: itemQuery) => {
             setDoneItens((prevItens) => [...prevItens, item]);
+            removeItemFromStatusArray(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
     });
+
+    const removeItemFromStatusArray = (item: itemQuery): void => {
+        switch (item.status) {
+            case ItemStatus.Open:
+                if (pendingItens.length) {
+                    setPendingItens(
+                        pendingItens.filter((_item) => item.id !== _item.id)
+                    );
+                }
+                break;
+            case ItemStatus.Reopened:
+                if (pendingItens.length) {
+                    setPendingItens(
+                        pendingItens.filter((_item) => item.id !== _item.id)
+                    );
+                }
+                break;
+            case ItemStatus.InProgress:
+                if (progressItens.length) {
+                    setProgressItens(
+                        progressItens.filter((_item) => item.id !== _item.id)
+                    );
+                }
+                break;
+            case ItemStatus.Completed:
+                if (doneItens.length) {
+                    setDoneItens(
+                        doneItens.filter((_item) => item.id !== _item.id)
+                    );
+                }
+                break;
+            case ItemStatus.Resolved:
+                if (doneItens.length) {
+                    setDoneItens(
+                        doneItens.filter((_item) => item.id !== _item.id)
+                    );
+                }
+                break;
+            default:
+                return;
+        }
+    };
 
     useEffect(() => {
         if (fetching) return;
