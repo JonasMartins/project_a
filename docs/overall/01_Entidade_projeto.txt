@@ -14,21 +14,15 @@ armazenar todos os dados e alterações daquele projeto noquele perído, conter�
 e todos essas informações serão usadas para comparativos de evolução do projeto, cada item terá o sua data de
 criação e sprint de criação, cada item, a sprint agrupará as informações de cad item, determinando a percentagem
 de sucesso de cada sprint.
-
-    * One to Many Sprints
  
     Projetos terão itens associados, cada item pode ser: Task, Bug, Story, cada item terá a sua prioridade, 
 lowest, low, medium, high, highest. O item terá todo o histórico de apontamentos de cada profissional, o criador, 
 o responsável, e o analisador, responsável por aprovar o item.
 
-    * One to Many Itens
-
     * Nome
     * Descrição
     * Usuários
     * Data de Criacão
-    * Sprints
-    * Itens
     * Data de Finalização
     * Status (ativo, parado, finalizado)
     * Objetivos

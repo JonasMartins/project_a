@@ -2,6 +2,7 @@ import { Field, InputType } from "type-graphql";
 import { IsString, IsEnum } from "class-validator";
 import { ItemStatus } from "./../enums/itemStatus.enum";
 import { ItemType } from "./../enums/itemType.enum";
+import { ItemPriority } from "./../enums/itemPriority.enum";
 
 @InputType()
 class ItemValidator {
@@ -20,6 +21,14 @@ class ItemValidator {
     @Field(() => ItemType)
     @IsEnum(ItemType)
     public type: ItemType;
+
+    @Field(() => ItemPriority)
+    @IsEnum(ItemPriority)
+    public priority: ItemPriority;
+
+    @Field()
+    @IsString()
+    public sprint_id: string;
 }
 
 export default ItemValidator;

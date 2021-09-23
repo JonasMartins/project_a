@@ -73,10 +73,36 @@ export const pallet: object = {
         800: "#003f4c",
         900: "#00171c",
     },
+
+    blue: {
+        50: "#e0f4ff",
+        100: "#b8dcfa",
+        200: "#8ec4f1",
+        300: "#63ace8",
+        400: "#3994e0",
+        500: "#1f7bc6",
+        600: "#135f9b",
+        700: "#084470",
+        800: "#002946",
+        900: "#000f1d",
+    },
+
+    yellow: {
+        50: "#fffadd",
+        100: "#fcf1b3",
+        200: "#f8e885",
+        300: "#f6de56",
+        400: "#f3d529",
+        500: "#d9bc11",
+        600: "#a99209",
+        700: "#796804",
+        800: "#483f00",
+        900: "#1a1500",
+    },
 };
 export const fonts: object = {
     body: "system-ui, sans-serif",
-    heading: "Georgia, serif",
+    heading: "system-ui, sans-serif",
     mono: "Menlo, monospace",
 };
 

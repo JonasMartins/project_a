@@ -8,6 +8,7 @@ import {
     Query,
 } from "type-graphql";
 import { Item } from "../entities/item.entity";
+import { Sprint } from "../entities/sprint.entity";
 import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import ItemValidator from "./../validators/item.validator";
@@ -66,6 +67,23 @@ export class ItemResolver {
         }
 
         const item = await em.create(Item, options);
+
+        const sprint = await em.findOne(Sprint, { id: options.sprint_id });
+
+        if (!sprint) {
+            return {
+                errors: [
+                    {
+                        field: "sprint_id",
+                        message: `Could not found a valid sprint with id ${options.sprint_id}`,
+                        method: `Method: createItem, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        item.sprint = sprint;
+
         item.createdAt = new Date();
         const reporter: User = await em.findOneOrFail(User, { id: reporterId });
 
@@ -173,14 +191,15 @@ export class ItemResolver {
         const qb = (em as EntityManager).createQueryBuilder(Item);
 
         qb.select("*")
-            .where({
-                reporter_id: userId,
+            .where({ reporter_id: userId })
+            .orWhere({ responsible_id: userId })
+            .orWhere({ reporter_id: userId })
+            .andWhere({
                 created_at: { $gte: createdAfter, $lte: createdLater },
             })
-            // .orderBy({ ['"created_at"']: "DESC" })
             .limit(max);
 
-        console.log(qb.getQuery());
+        // console.log(qb.getQuery());
 
         const itens = await qb.execute();
 

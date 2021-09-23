@@ -1,0 +1,20 @@
+mutation {
+    createRole(
+        options: {
+            name: "Tech Leader"
+            code: "004"
+            wage: 8570.66
+            description: ""
+        }
+    ) {
+        errors {
+            message
+        }
+        role {
+            id
+            name
+            wage
+            code
+        }
+    }
+}

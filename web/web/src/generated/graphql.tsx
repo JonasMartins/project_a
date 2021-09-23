@@ -39,7 +39,21 @@ export type Item = {
     approver: User;
     status: ItemStatus;
     type: ItemType;
+    priority: ItemPriority;
+    responsible_id: Scalars["String"];
+    reporter_id: Scalars["String"];
+    approver_id: Scalars["String"];
+    sprint: Sprint;
 };
+
+/** The basic directions */
+export enum ItemPriority {
+    Highest = "HIGHEST",
+    High = "HIGH",
+    Medium = "MEDIUM",
+    Low = "LOW",
+    Lowest = "LOWEST",
+}
 
 export type ItemResponse = {
     __typename?: "ItemResponse";
@@ -69,6 +83,8 @@ export type ItemValidator = {
     description: Scalars["String"];
     status: ItemStatus;
     type: ItemType;
+    priority: ItemPriority;
+    sprint_id: Scalars["String"];
 };
 
 export type ItensResponse = {
@@ -90,6 +106,10 @@ export type Mutation = {
     createUser: UserResponse;
     logout?: Maybe<Scalars["Boolean"]>;
     login: LoginResponse;
+    createRole: RoleRespnse;
+    createTeam: TeamResponse;
+    createSprint: SprintResponse;
+    createProject: ProjectResponse;
 };
 
 export type MutationCreateItemArgs = {
@@ -112,6 +132,43 @@ export type MutationLoginArgs = {
     email: Scalars["String"];
 };
 
+export type MutationCreateRoleArgs = {
+    options: RoleValidator;
+};
+
+export type MutationCreateTeamArgs = {
+    options: TeamValidator;
+};
+
+export type MutationCreateSprintArgs = {
+    options: SprintValidator;
+};
+
+export type MutationCreateProjectArgs = {
+    options: ProjectValidator;
+};
+
+export type Project = {
+    __typename?: "Project";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    name: Scalars["String"];
+    description: Scalars["String"];
+    sprints: Array<Sprint>;
+};
+
+export type ProjectResponse = {
+    __typename?: "ProjectResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    project?: Maybe<Project>;
+};
+
+export type ProjectValidator = {
+    name: Scalars["String"];
+    description: Scalars["String"];
+};
+
 export type Query = {
     __typename?: "Query";
     getItensRelatedToUserByPeriod: ItensResponse;
@@ -119,6 +176,12 @@ export type Query = {
     hello: Scalars["String"];
     logedInTest: Scalars["String"];
     getUserById: UserResponse;
+    getRoleById: RoleRespnse;
+    getTeamById: TeamResponse;
+    getSprints?: Maybe<Array<Sprint>>;
+    getSprintById: SprintResponse;
+    getProjects?: Maybe<Array<Project>>;
+    getProjectById: ProjectResponse;
 };
 
 export type QueryGetItensRelatedToUserByPeriodArgs = {
@@ -136,10 +199,119 @@ export type QueryGetUserByIdArgs = {
     id: Scalars["String"];
 };
 
+export type QueryGetRoleByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetTeamByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetSprintsArgs = {
+    active?: Maybe<Scalars["Boolean"]>;
+    limit?: Maybe<Scalars["Float"]>;
+};
+
+export type QueryGetSprintByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetProjectsArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+};
+
+export type QueryGetProjectByIdArgs = {
+    id: Scalars["String"];
+};
+
 export type RevokeResponse = {
     __typename?: "RevokeResponse";
     incrementado: Scalars["Boolean"];
     version?: Maybe<Scalars["Int"]>;
+};
+
+export type Role = {
+    __typename?: "Role";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    name: Scalars["String"];
+    code: Scalars["String"];
+    description: Scalars["String"];
+    wage: Scalars["Float"];
+    professionals: Array<User>;
+};
+
+export type RoleRespnse = {
+    __typename?: "RoleRespnse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    role?: Maybe<Role>;
+};
+
+export type RoleValidator = {
+    name: Scalars["String"];
+    code: Scalars["String"];
+    description: Scalars["String"];
+    wage: Scalars["Float"];
+};
+
+export type Sprint = {
+    __typename?: "Sprint";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    code: Scalars["String"];
+    description: Scalars["String"];
+    length: SprintLength;
+    final: Scalars["DateTime"];
+    itens: Array<Item>;
+    project: Project;
+    active: Scalars["Boolean"];
+};
+
+/** The basic directions */
+export enum SprintLength {
+    One = "ONE",
+    Two = "TWO",
+    Three = "THREE",
+    Four = "FOUR",
+}
+
+export type SprintResponse = {
+    __typename?: "SprintResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    sprint?: Maybe<Sprint>;
+};
+
+export type SprintValidator = {
+    code: Scalars["String"];
+    description: Scalars["String"];
+    length: SprintLength;
+    project_id: Scalars["String"];
+};
+
+export type Team = {
+    __typename?: "Team";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    name: Scalars["String"];
+    description: Scalars["String"];
+    leader: User;
+    leader_id: Scalars["String"];
+    members: Array<User>;
+};
+
+export type TeamResponse = {
+    __typename?: "TeamResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    team?: Maybe<Team>;
+};
+
+export type TeamValidator = {
+    name: Scalars["String"];
+    description: Scalars["String"];
+    leader_id: Scalars["String"];
 };
 
 export type User = {
@@ -152,12 +324,15 @@ export type User = {
     itenReporter: Array<Item>;
     itenResponsible: Array<Item>;
     itenApprover: Array<Item>;
+    teams: Array<Team>;
+    role: Role;
 };
 
 export type UserBasicData = {
     name: Scalars["String"];
     password: Scalars["String"];
     email: Scalars["String"];
+    role_id: Scalars["String"];
 };
 
 export type UserResponse = {
@@ -289,9 +464,84 @@ export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
             >
         >;
         itens?: Maybe<
-            Array<{ __typename?: "Item" } & Pick<Item, "id" | "summary">>
+            Array<
+                { __typename?: "Item" } & Pick<
+                    Item,
+                    | "id"
+                    | "summary"
+                    | "description"
+                    | "status"
+                    | "type"
+                    | "priority"
+                    | "responsible_id"
+                    | "reporter_id"
+                    | "approver_id"
+                >
+            >
         >;
     };
+};
+
+export type GetProjectByIdQueryVariables = Exact<{
+    id: Scalars["String"];
+}>;
+
+export type GetProjectByIdQuery = { __typename?: "Query" } & {
+    getProjectById: { __typename?: "ProjectResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message"
+                >
+            >
+        >;
+        project?: Maybe<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "description"
+            > & {
+                    sprints: Array<
+                        { __typename?: "Sprint" } & Pick<
+                            Sprint,
+                            | "id"
+                            | "code"
+                            | "final"
+                            | "length"
+                            | "description"
+                            | "active"
+                        > & {
+                                itens: Array<
+                                    { __typename?: "Item" } & Pick<
+                                        Item,
+                                        | "id"
+                                        | "summary"
+                                        | "description"
+                                        | "status"
+                                        | "priority"
+                                        | "type"
+                                    >
+                                >;
+                            }
+                    >;
+                }
+        >;
+    };
+};
+
+export type GetProjectsQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+}>;
+
+export type GetProjectsQuery = { __typename?: "Query" } & {
+    getProjects?: Maybe<
+        Array<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "createdAt" | "description"
+            >
+        >
+    >;
 };
 
 export type GetUserByIdQueryVariables = Exact<{
@@ -461,6 +711,13 @@ export const GetItensRelatedToUserByPeriodDocument = gql`
             itens {
                 id
                 summary
+                description
+                status
+                type
+                priority
+                responsible_id
+                reporter_id
+                approver_id
             }
         }
     }
@@ -474,6 +731,64 @@ export function useGetItensRelatedToUserByPeriodQuery(
 ) {
     return Urql.useQuery<GetItensRelatedToUserByPeriodQuery>({
         query: GetItensRelatedToUserByPeriodDocument,
+        ...options,
+    });
+}
+export const GetProjectByIdDocument = gql`
+    query getProjectById($id: String!) {
+        getProjectById(id: $id) {
+            errors {
+                message
+            }
+            project {
+                id
+                name
+                description
+                sprints {
+                    id
+                    code
+                    final
+                    length
+                    description
+                    active
+                    itens {
+                        id
+                        summary
+                        description
+                        status
+                        priority
+                        type
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export function useGetProjectByIdQuery(
+    options: Omit<Urql.UseQueryArgs<GetProjectByIdQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetProjectByIdQuery>({
+        query: GetProjectByIdDocument,
+        ...options,
+    });
+}
+export const GetProjectsDocument = gql`
+    query getProjects($limit: Float) {
+        getProjects(limit: $limit) {
+            id
+            name
+            createdAt
+            description
+        }
+    }
+`;
+
+export function useGetProjectsQuery(
+    options: Omit<Urql.UseQueryArgs<GetProjectsQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetProjectsQuery>({
+        query: GetProjectsDocument,
         ...options,
     });
 }

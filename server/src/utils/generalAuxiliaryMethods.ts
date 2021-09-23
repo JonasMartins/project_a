@@ -37,3 +37,19 @@ export const genericError = (
 
     return arrError;
 };
+
+export const getPastOrFutureDate = (
+    begin: Date,
+    days: number,
+    type: "future" | "past"
+): Date => {
+    const futureOrPastDate = new Date();
+
+    if (type === "past") {
+        futureOrPastDate.setDate(begin.getDate() - days);
+    } else {
+        futureOrPastDate.setDate(begin.getDate() + days);
+    }
+
+    return futureOrPastDate;
+};

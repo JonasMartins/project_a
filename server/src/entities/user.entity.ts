@@ -1,8 +1,17 @@
-import { Collection, Entity, OneToMany, Property } from "@mikro-orm/core";
+import {
+    Collection,
+    Entity,
+    OneToMany,
+    Property,
+    ManyToMany,
+    ManyToOne,
+} from "@mikro-orm/core";
 import UserValidator from "./../validators/user.validator";
 import { Field, ObjectType } from "type-graphql";
 import { Item } from "./item.entity";
 import { Base } from "./../utils/entities/base.entity";
+import { Team } from "./team.entity";
+import { Role } from "./role.entity";
 
 @ObjectType()
 @Entity()
@@ -34,6 +43,16 @@ export class User extends Base<User> {
     @Field(() => [Item])
     @OneToMany(() => Item, (item: Item) => item.approver, { lazy: true })
     public itenApprover: Collection<Item> = new Collection<Item>(this);
+
+    @Field(() => [Team])
+    @ManyToMany(() => Team, (team: Team) => team.members, {
+        mappedBy: "members",
+    })
+    public teams: Collection<Team> = new Collection<Team>(this);
+
+    @Field(() => Role)
+    @ManyToOne(() => Role, { eager: true })
+    public role: Role;
 
     constructor(body: UserValidator) {
         super(body);

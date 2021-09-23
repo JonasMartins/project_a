@@ -1,10 +1,12 @@
 type GlobalContext = {
     loading: Boolean;
     userId: string;
+    userName: string;
     colorMode: "dark" | "light";
     setIsLoading: (isLoading: boolean) => void;
     setCurrentUserId: (currentUserId: string) => void;
     setTheme: (theme: "dark" | "light") => void;
+    setCurrentUserName: (currentUserName: string) => void;
 };
 
 interface Item {
@@ -28,4 +30,26 @@ interface User {
     itemReporter: [Item];
     itemResponsible: [Item];
     itemRepporter: [Item];
+}
+enum enumItemPriority {
+    HIGHEST = "HIGHEST",
+    HIGH = "HIGH",
+    MEDIUM = "MEDIUM",
+    LOW = "LOW",
+    LOWEST = "LOWEST",
+}
+
+enum enumItemType {
+    TASK = "TASK",
+    BUG = "BUG",
+    STORY = "STORY",
+}
+
+enum ItemStatus {
+    OPEN = "OPEN",
+    IN_PROGRESS = "IN_PROGRESS",
+    REOPENED = "REOPENED",
+    RESOLVED = "RESOLVED",
+    CLOSED = "CLOSED",
+    COMPLETED = "COMPLETED",
 }

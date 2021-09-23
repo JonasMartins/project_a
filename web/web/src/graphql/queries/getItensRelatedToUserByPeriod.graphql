@@ -16,6 +16,13 @@ query GetItensRelatedToUserByPeriod(
         itens {
             id
             summary
+            description
+            status
+            type
+            priority
+            responsible_id
+            reporter_id
+            approver_id
         }
     }
 }

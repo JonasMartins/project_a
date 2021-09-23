@@ -5,8 +5,8 @@
     "license": "MIT",
     "scripts": {
         "watch": "tsc -w",
-        "dev": "nodemon dist/index.js",
-        "start": "node dist/index.js",
+        "dev": "nodemon -r dotenv/config dist/index.js",
+        "start": "node -r dotenv/config dist/index.js",
         "create:migration": "npx mikro-orm migration:create",
         "test": "cross-env NODE_DEV=true NODE_ENV=test ts-mocha src/tests/**/*.test.ts --package package.json"
     },
@@ -68,5 +68,8 @@
             "./src/mikro-orm.config.ts",
             "./dist/mikro-orm.config.js"
         ]
+    },
+    "prettier": {
+        "tabWidth": 4
     }
 }

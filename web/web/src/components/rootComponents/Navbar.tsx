@@ -1,5 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
+    useColorMode,
     Icon,
     Box,
     Menu,
@@ -15,13 +16,27 @@ import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import { useRouter } from "next/dist/client/router";
 import { GlobalContext } from "./../../context/globalContext";
+import Avatar from "react-avatar";
+import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 
 interface NavbarProps {}
 
 const Navbar: React.FC<NavbarProps> = ({}) => {
     const router = useRouter();
 
-    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
+    const { setIsLoading, setCurrentUserId, setTheme, userName } =
+        useContext(GlobalContext);
+
+    const { toggleColorMode } = useColorMode();
+    const [darkMode, setDarkMode] = useState(true);
+
+    useEffect(() => {}, [userName]);
+
+    const handleDarkMode = () => {
+        setDarkMode(!darkMode);
+        setTheme(darkMode ? "dark" : "light");
+        toggleColorMode();
+    };
 
     const logout = () => {
         setIsLoading(true);
@@ -40,6 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
             m={0}
             p={[0, 2]}
             boxShadow="lg"
+            zIndex="2"
         >
             <Box>
                 <Icon mr={3} ml={2} as={DragHandleIcon} />
@@ -48,13 +64,31 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
                         Home
                     </Link>
                 </NextLink>
-                <NextLink href="/">
+                <NextLink href="/project">
                     <Link textStyle="bold" mr={2}>
                         Projects
                     </Link>
                 </NextLink>
                 <Box float="right">
                     <Menu>
+                        <Box mr={2} display="inline">
+                            <Avatar
+                                name={userName ? userName : "Foo Bar"}
+                                size="32px"
+                                round={true}
+                            />
+                        </Box>
+                        <Box mr={2} display="inline">
+                            <IconButton
+                                aria-label="Switch Theme"
+                                isRound={true}
+                                isActive={darkMode}
+                                onClick={handleDarkMode}
+                                colorScheme={darkMode ? "grey" : "yellow"}
+                                icon={darkMode ? <MoonIcon /> : <SunIcon />}
+                            />
+                        </Box>
+
                         <MenuButton
                             mr={2}
                             borderRadius={"full"}

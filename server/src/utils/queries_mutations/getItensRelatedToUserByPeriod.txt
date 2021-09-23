@@ -1,0 +1,23 @@
+{
+    getItensRelatedToUserByPeriod(
+        limit: 5
+        userId: "97a444c2-c1ef-4a0f-962f-47d3c1266b59"
+        createdAfter: "2021-01-01"
+        createdLater: "2022-01-01"
+    ) {
+        errors {
+            message
+        }
+        itens {
+            id
+            summary
+            status
+            description
+            type
+            priority
+            responsible_id
+            reporter_id
+            approver_id
+        }
+    }
+}

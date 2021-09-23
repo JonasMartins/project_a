@@ -1,0 +1,5 @@
+Times contem um agrupamento de Usuários, profissionais.
+
+- Um time pode ser editado para alterar os participantes.
+um time tem nome, status ( ativo, desativado ), tem muitos usuários.
+um usuario em particular, que será o lider

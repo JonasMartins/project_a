@@ -17,14 +17,10 @@ const Footer: React.FC<FooterProps> = ({}) => {
             flexGrow={1}
             bg={bgColor[colorMode]}
             color={color[colorMode]}
+            zIndex="2"
         >
             <Box p="3">
-                <Text>
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                    In, voluptas. Suscipit illum deleniti perferendis dolores
-                    error! A voluptates porro molestiae recusandae pariatur eum
-                    rem asperiores totam dolore placeat, repellat cumque?
-                </Text>
+                <Text>@Copyright 2021</Text>
             </Box>
         </Flex>
     );

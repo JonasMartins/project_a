@@ -1,0 +1,2 @@
+Cargos, são as os cargos de cada usuário, profissional.
+cargos podem ser adicionados, removidos, editados, tem nome, um campo salario, uma descrição

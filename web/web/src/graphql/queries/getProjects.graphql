@@ -1,0 +1,8 @@
+query getProjects($limit: Float) {
+    getProjects(limit: $limit) {
+        id
+        name
+        createdAt
+        description
+    }
+}

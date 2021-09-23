@@ -5,13 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "type": "firefox",
             "request": "launch",
-            "name": "Launch via NPM",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["run-script", "debug"],
-            "port": 9229,
-            "skipFiles": ["<node_internals>/**"]
+            "reAttach": true,
+            "name": "Launch localhost FireFox",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
         }
+
+        // {
+        //     "type": "node",
+        //     "request": "launch",
+        //     "name": "Launch via NPM",
+        //     "runtimeExecutable": "npm",
+        //     "runtimeArgs": ["run-script", "debug"],
+        //     "port": 9229,
+        //     "skipFiles": ["<node_internals>/**"]
+        // }
     ]
 }

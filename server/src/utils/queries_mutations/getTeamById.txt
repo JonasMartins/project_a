@@ -1,0 +1,21 @@
+{
+    getTeamById(id: "c94a1e88-22ad-4727-991b-8e0e571a656a") {
+        errors {
+            message
+        }
+        team {
+            name
+            description
+            leader_id
+            leader {
+                name
+                role {
+                    name
+                }
+            }
+            members {
+                name
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import Application from "./aplication";
+import Application from "./application";
 
 const main = async () => {
     const application = new Application();

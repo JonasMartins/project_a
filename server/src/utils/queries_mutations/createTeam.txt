@@ -1,0 +1,21 @@
+mutation {
+    createTeam(
+        options: {
+            name: "Production"
+            description: "Team production description"
+            leader_id: "a7f0205f-e9dc-4de6-a107-f6835fb5205d"
+        }
+    ) {
+        errors {
+            message
+        }
+        team {
+            id
+            name
+            leader {
+                name
+                email
+            }
+        }
+    }
+}

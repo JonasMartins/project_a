@@ -1,0 +1,27 @@
+mutation {
+    createItem(
+        options: {
+            summary: "Test Item"
+            description: "Test Description"
+            status: OPEN
+            type: STORY
+            sprint_id: "db2deaea-40a6-43ec-9167-ff70b367435b"
+            priority: MEDIUM
+        }
+        approverId: "6b8eade3-15d5-4961-a86b-4302cb235118"
+        reporterId: "6b8eade3-15d5-4961-a86b-4302cb235118"
+        responsibleId: "6b8eade3-15d5-4961-a86b-4302cb235118"
+    ) {
+        errors {
+            message
+        }
+        item {
+            id
+      		status
+      		type
+      		priority
+        }
+    }
+}
+
+// macOs admin user id b1549769-8c2d-4617-a3ec-cdc19d23e68e
