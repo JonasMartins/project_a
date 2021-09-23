@@ -124,7 +124,7 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Highest Priority"
                     label="Highest Priority"
                 >
-                    <Box ml={2}>
+                    <Box ml={2} bg="black" rounded="full">
                         <CgArrowUpO color="#ad032c" size="35px" />
                     </Box>
                 </Tooltip>
@@ -137,7 +137,7 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="High Priority"
                     label="High Priority"
                 >
-                    <Box ml={2}>
+                    <Box ml={2} bg="black" rounded="full">
                         <CgArrowTopRightO color="#d36a13" size="35px" />
                     </Box>
                 </Tooltip>
@@ -150,7 +150,7 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Medium Priority"
                     label="Medium Priority"
                 >
-                    <Box ml={2}>
+                    <Box ml={2} bg="black" rounded="full">
                         <CgArrowRightO color="#f6de56" size="35px" />
                     </Box>
                 </Tooltip>
@@ -163,7 +163,7 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Low Priority"
                     label="Low Priority"
                 >
-                    <Box ml={2}>
+                    <Box ml={2} bg="black" rounded="full">
                         <CgArrowBottomLeftO color="#63ace8" size="35px" />
                     </Box>
                 </Tooltip>
@@ -176,8 +176,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Lowest Priority"
                     label="Lowest Priority"
                 >
-                    <Box ml={2}>
-                        <CgArrowDownO color="#ced8e4" size="35px" />
+                    <Box ml={2} bg="black" rounded="full">
+                        <CgArrowDownO color="white" size="35px" />
                     </Box>
                 </Tooltip>
             );

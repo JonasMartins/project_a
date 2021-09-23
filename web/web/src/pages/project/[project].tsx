@@ -37,6 +37,8 @@ type itemQuery = {
 const Project: React.FC<projectsProps> = ({}) => {
     const router = useRouter();
 
+    let previousItemStatus: string = "";
+
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
@@ -57,44 +59,84 @@ const Project: React.FC<projectsProps> = ({}) => {
         pause: true,
     });
 
-    const [{}, dropRefPending] = useDrop({
+    const [{ canDropPending }, dropRefPending] = useDrop({
         accept: "item",
+        canDrop: (item: itemQuery) => {
+            return !!!pendingItens.find((element) => element.id === item.id);
+        },
+
         drop: (item: itemQuery) => {
+            previousItemStatus = item.status;
+
+            // firts update item status
+            if (item.status === ItemStatus.InProgress) {
+                item.status = ItemStatus.Open;
+            } else {
+                item.status = ItemStatus.Reopened;
+            }
+
             setPendingItens((prevItens) => [...prevItens, item]);
-            // Ação de update no item
 
             // Remoção do item no array anterior dele.
             removeItemFromStatusArray(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
+            canDropPending: monitor.canDrop(),
         }),
     });
 
-    const [{}, dropRefProgress] = useDrop({
+    const [{ candropProgress }, dropRefProgress] = useDrop({
         accept: "item",
+
+        canDrop: (item: itemQuery) => {
+            return !!!progressItens.find((element) => element.id === item.id);
+        },
+
         drop: (item: itemQuery) => {
+            previousItemStatus = item.status;
+
+            // firts update item status
+            item.status = ItemStatus.InProgress;
+
             setProgressItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
         },
+
+        hover: (_, monitor) => {
+            monitor.isOver({ shallow: true });
+        },
+
         collect: (monitor) => ({
             isOver: monitor.isOver(),
+            candropProgress: monitor.canDrop(),
         }),
     });
 
-    const [{}, dropRefDone] = useDrop({
+    const [{ canDropDone }, dropRefDone] = useDrop({
         accept: "item",
+
+        canDrop: (item: itemQuery) => {
+            return !!!doneItens.find((element) => element.id === item.id);
+        },
+
         drop: (item: itemQuery) => {
+            previousItemStatus = item.status;
+
+            // firts update item status
+            item.status = ItemStatus.Resolved;
+
             setDoneItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
+            canDropDone: monitor.canDrop(),
         }),
     });
 
     const removeItemFromStatusArray = (item: itemQuery): void => {
-        switch (item.status) {
+        switch (previousItemStatus) {
             case ItemStatus.Open:
                 if (pendingItens.length) {
                     setPendingItens(
@@ -254,6 +296,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                 transition="0.3s"
             >
                 <Flex
+                    border={canDropPending ? "1px dashed" : "none"}
                     minH="150px"
                     flexGrow={1}
                     boxShadow="lg"
@@ -276,6 +319,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                 </Flex>
 
                 <Flex
+                    border={candropProgress ? "1px dashed" : "none"}
                     minH="150px"
                     flexGrow={1}
                     boxShadow="lg"
@@ -297,6 +341,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                         ))}
                 </Flex>
                 <Flex
+                    border={canDropDone ? "1px dashed" : "none"}
                     minH="150px"
                     flexGrow={1}
                     boxShadow="lg"

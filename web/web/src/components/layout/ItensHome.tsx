@@ -105,10 +105,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                     item.status !== "CLOSED" ? (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
-                                            <Text fontSize="lg">
-                                                {item.summary}
-                                            </Text>
-                                            <Box ml="1em">
+                                            <Box ml="1em" mr="1em">
                                                 <Tooltip
                                                     hasArrow
                                                     aria-label="Open Details"
@@ -138,6 +135,9 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                     />
                                                 </Tooltip>
                                             </Box>
+                                            <Text fontSize="lg">
+                                                {item.summary}
+                                            </Text>
                                         </Flex>
                                     ) : (
                                         <></>
@@ -153,10 +153,8 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                     item.responsible_id === userId ? (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
-                                            <Text fontSize="lg">
-                                                {item.summary}
-                                            </Text>
-                                            <Box ml="1em">
+
+                                            <Box ml="1em" mr="1em">
                                                 <Tooltip
                                                     hasArrow
                                                     aria-label="Open Details"
@@ -186,6 +184,9 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                     />
                                                 </Tooltip>
                                             </Box>
+                                            <Text fontSize="lg">
+                                                {item.summary}
+                                            </Text>
                                         </Flex>
                                     ) : (
                                         <></>
@@ -201,10 +202,8 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                     item.reporter_id === userId ? (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
-                                            <Text fontSize="lg">
-                                                {item.summary}
-                                            </Text>
-                                            <Box ml="1em">
+
+                                            <Box ml="1em" mr="1em">
                                                 <Tooltip
                                                     hasArrow
                                                     aria-label="Open Details"
@@ -234,6 +233,9 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                     />
                                                 </Tooltip>
                                             </Box>
+                                            <Text fontSize="lg">
+                                                {item.summary}
+                                            </Text>
                                         </Flex>
                                     ) : (
                                         <></>
