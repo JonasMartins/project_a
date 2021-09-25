@@ -7,7 +7,7 @@ após alterar o eschema e rodar
 npx mikro-orm migration:create para criar, 
 npx mikro-orm migration:list
 rodar
-npx mikro-orm migration:up --only 20210917173536 
+npx mikro-orm migration:up --only 20210924191434 
 
 cujo numero é o nome do arquivo migrations que deve ser
 gerado, pegando o ultimo, por algum motivo nesse ambiente, 

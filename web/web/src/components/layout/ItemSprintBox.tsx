@@ -1,5 +1,12 @@
 import React from "react";
-import { Text, Flex, Box, IconButton, Tooltip } from "@chakra-ui/react";
+import {
+    Text,
+    Flex,
+    Box,
+    IconButton,
+    Tooltip,
+    useDisclosure,
+} from "@chakra-ui/react";
 import { Primary } from "./../layout/ContainerShades";
 import {
     getItemTypeIcon,
@@ -7,6 +14,7 @@ import {
 } from "./../../helpers/items/ItemFunctinHelpers";
 import { Item } from "./../../generated/graphql";
 import { MdDragHandle, MdBuild } from "react-icons/md";
+import ModalItemManagment from "./../../components/modal/ModalItemManagment";
 
 import { useDrag } from "react-dnd";
 
@@ -31,6 +39,12 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
             opacity: 1,
         }),
     });
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const customOnOpenModal = (): void => {
+        onOpen();
+    };
 
     return (
         <Box
@@ -63,12 +77,16 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                     >
                         <IconButton
                             rounded="full"
+                            onClick={() => {
+                                customOnOpenModal();
+                            }}
                             aria-label="Manage appointments"
                             icon={<MdBuild />}
                         />
                     </Tooltip>
                 </Flex>
             </Primary>
+            <ModalItemManagment isOpen={isOpen} onClose={onClose} />
         </Box>
     );
 };
