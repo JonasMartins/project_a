@@ -1,16 +1,9 @@
-import {
-    Collection,
-    Entity,
-    OneToMany,
-    Property,
-    ManyToMany,
-    ManyToOne,
-} from "@mikro-orm/core";
+import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
-import { User } from "./user.entity";
-import { Item } from "./item.entity";
 import { Base } from "../utils/entities/base.entity";
 import AppointmentValidator from "../validators/appointment.validator";
+import { Item } from "./item.entity";
+import { User } from "./user.entity";
 
 @ObjectType()
 @Entity()
