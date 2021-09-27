@@ -93,36 +93,67 @@ export class AppointmentResolver {
     // on appointment variable with specifc data
     @Mutation(() => AppointmentResponse)
     async createAppointment(
-        @Arg("userId") userId: string,
-        @Arg("itemId") itemId: string,
-        @Arg("start") start: Date,
+        @Arg("options") options: AppointmentValidator,
         @Ctx() { em }: Context
     ): Promise<AppointmentResponse> {
+        const user = await em.findOne(User, { id: options.user_id });
+
+        if (!user) {
+            return {
+                errors: genericError(
+                    "UserId",
+                    "createAppointment",
+                    __filename,
+                    `Could not found the user with this id: ${options.user_id}`
+                ),
+            };
+        }
+
+        const item = await em.findOne(Item, { id: options.item_id });
+
+        if (!item) {
+            return {
+                errors: genericError(
+                    "ItemId",
+                    "createAppointment",
+                    __filename,
+                    `Could not found the item with this id: ${options.item_id}`
+                ),
+            };
+        }
+
         const qb = (em as EntityManager).createQueryBuilder(Appointment);
 
-        const appointmentValidator: AppointmentValidator =
-            new AppointmentValidator();
+        qb.select("COUNT(*)")
+            .where({ end: null })
+            .orWhere({ end: { $gte: options.start } })
+            .andWhere({ user_id: options.user_id });
 
-        appointmentValidator.item_id = itemId;
-        appointmentValidator.user_id = userId;
-        appointmentValidator.start = start;
+        // qb.getFormattedQuery() => como será a query
 
-        const appointment: Appointment = new Appointment(appointmentValidator);
+        const previousAppointments = await qb.execute();
 
-        qb.insert(appointment);
-
-        try {
-            await qb.execute();
-            return { appointment };
-        } catch (e) {
+        if (
+            previousAppointments[0].count &&
+            Number(previousAppointments[0].count)
+        ) {
             return {
                 errors: genericError(
                     "-",
                     "createAppointment",
                     __filename,
-                    `message: ${e.message}`
+                    `Could not save appointment, there is another appointment for this user active, or with intersection periods.`
                 ),
             };
         }
+
+        const appointment = await em.create(Appointment, options);
+
+        appointment.user = user;
+        appointment.item = item;
+
+        await em.persistAndFlush(appointment);
+
+        return { appointment };
     }
 }

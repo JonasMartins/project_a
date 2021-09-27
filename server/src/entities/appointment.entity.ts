@@ -17,11 +17,11 @@ import AppointmentValidator from "../validators/appointment.validator";
 export class Appointment extends Base<Appointment> {
     @Field()
     @Property()
-    public start: Date = new Date();
+    public start: Date;
 
-    @Field()
-    @Property()
-    public end: Date = new Date();
+    @Field(() => Date, { nullable: true })
+    @Property({ nullable: true })
+    public end: Date;
 
     @Field(() => User)
     @ManyToOne(() => User, { lazy: true })

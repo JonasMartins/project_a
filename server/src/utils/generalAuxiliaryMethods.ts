@@ -19,7 +19,7 @@ export const genericError = (
         method: "",
     };
 
-    if (!field || !method || path) {
+    if (!field || !method) {
         err = {
             field: "-",
             message: "Must pass field, method and path, as arguments",
@@ -28,12 +28,12 @@ export const genericError = (
     } else {
         err = {
             field,
-            message,
-            method: `Field: ${field} at, ${path}`,
+            message: message + ` Field: ( ${field} ) at, ${path}`,
+            method,
         };
     }
 
-    arrError.push;
+    arrError.push(err);
 
     return arrError;
 };
