@@ -4,10 +4,12 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
     [K in keyof T]: T[K];
 };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-    { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-    { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+    [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+    [SubKey in K]: Maybe<T[SubKey]>;
+};
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -18,6 +20,35 @@ export type Scalars = {
     Float: number;
     /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
     DateTime: any;
+};
+
+export type Appointment = {
+    __typename?: "Appointment";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    start: Scalars["DateTime"];
+    end?: Maybe<Scalars["DateTime"]>;
+    user: User;
+    item: Item;
+};
+
+export type AppointmentResponse = {
+    __typename?: "AppointmentResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    appointment?: Maybe<Appointment>;
+};
+
+export type AppointmentValidator = {
+    start: Scalars["DateTime"];
+    item_id: Scalars["String"];
+    user_id: Scalars["String"];
+};
+
+export type AppointmentsResponse = {
+    __typename?: "AppointmentsResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    appointments?: Maybe<Array<Appointment>>;
 };
 
 export type ErrorFieldHandler = {
@@ -44,6 +75,7 @@ export type Item = {
     reporter_id: Scalars["String"];
     approver_id: Scalars["String"];
     sprint: Sprint;
+    appointments: Array<Appointment>;
 };
 
 /** The basic directions */
@@ -108,6 +140,7 @@ export type Mutation = {
     login: LoginResponse;
     createRole: RoleRespnse;
     createTeam: TeamResponse;
+    createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
     createProject: ProjectResponse;
 };
@@ -138,6 +171,10 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateTeamArgs = {
     options: TeamValidator;
+};
+
+export type MutationCreateAppointmentArgs = {
+    options: AppointmentValidator;
 };
 
 export type MutationCreateSprintArgs = {
@@ -178,6 +215,8 @@ export type Query = {
     getUserById: UserResponse;
     getRoleById: RoleRespnse;
     getTeamById: TeamResponse;
+    getAppointmentsByItem: AppointmentsResponse;
+    getAppointmentsByUser: AppointmentsResponse;
     getSprints?: Maybe<Array<Sprint>>;
     getSprintById: SprintResponse;
     getProjects?: Maybe<Array<Project>>;
@@ -205,6 +244,16 @@ export type QueryGetRoleByIdArgs = {
 
 export type QueryGetTeamByIdArgs = {
     id: Scalars["String"];
+};
+
+export type QueryGetAppointmentsByItemArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    itemId: Scalars["String"];
+};
+
+export type QueryGetAppointmentsByUserArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    userId: Scalars["String"];
 };
 
 export type QueryGetSprintsArgs = {
@@ -326,6 +375,7 @@ export type User = {
     itenApprover: Array<Item>;
     teams: Array<Team>;
     role: Role;
+    appointments: Array<Appointment>;
 };
 
 export type UserBasicData = {
@@ -413,6 +463,37 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
     Mutation,
     "logout"
 >;
+
+export type GetAppointmentsByItemQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    itemId: Scalars["String"];
+}>;
+
+export type GetAppointmentsByItemQuery = { __typename?: "Query" } & {
+    getAppointmentsByItem: { __typename?: "AppointmentsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        appointments?: Maybe<
+            Array<
+                { __typename?: "Appointment" } & Pick<
+                    Appointment,
+                    "id" | "start" | "end"
+                > & {
+                        user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "name"
+                        >;
+                    }
+            >
+        >;
+    };
+};
 
 export type GetItemByIdQueryVariables = Exact<{
     id: Scalars["String"];
@@ -657,6 +738,38 @@ export const Document = gql`
 
 export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
+}
+export const GetAppointmentsByItemDocument = gql`
+    query getAppointmentsByItem($limit: Float, $itemId: String!) {
+        getAppointmentsByItem(itemId: $itemId, limit: $limit) {
+            errors {
+                method
+                message
+                field
+            }
+            appointments {
+                id
+                start
+                end
+                user {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useGetAppointmentsByItemQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetAppointmentsByItemQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetAppointmentsByItemQuery>({
+        query: GetAppointmentsByItemDocument,
+        ...options,
+    });
 }
 export const GetItemByIdDocument = gql`
     query GetItemById($id: String!) {

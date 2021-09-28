@@ -1,28 +1,24 @@
-import { useGetProjectsQuery } from "./../../generated/graphql";
 import {
     Box,
-    Table,
-    Thead,
-    Tbody,
-    Tfoot,
-    Tr,
-    Th,
-    Td,
     Flex,
-    Text,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
     Link,
+    Table,
+    Tbody,
+    Td,
+    Text,
+    Tfoot,
+    Th,
+    Thead,
+    Tr,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
 import NextLink from "next/link";
-import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
-import { Container } from "./../../components/Container";
-import Navbar from "./../../components/rootComponents/Navbar";
-import Footer from "./../../components/rootComponents/Footer";
+import React, { useEffect } from "react";
 import { FcWorkflow } from "react-icons/fc";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+import { Container } from "./../../components/Container";
+import Footer from "./../../components/rootComponents/Footer";
+import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
+import Navbar from "./../../components/rootComponents/Navbar";
+import { useGetProjectsQuery } from "./../../generated/graphql";
 
 interface projectsProps {}
 
@@ -46,19 +42,29 @@ const Project: React.FC<projectsProps> = ({}) => {
         <>
             <Container>
                 <Navbar />
-                <Flex p={2} margin="1em 2em 1em">
-                    <Breadcrumb
-                        separator={<ChevronRightIcon color="gray.500" />}
-                    >
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/project">
-                                Projects
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </Breadcrumb>
+                <Flex
+                    p={2}
+                    margin="1em 2em 1em"
+                    flexDir="row"
+                    alignItems="center"
+                >
+                    <NextLink href={"/"}>
+                        <Link>
+                            <Text>Home</Text>
+                        </Link>
+                    </NextLink>
+                    <Text color="gray.500" ml={2} mr={2}>
+                        {">"}
+                    </Text>
+
+                    <NextLink href={"/project"}>
+                        <Link>
+                            <Text>Project</Text>
+                        </Link>
+                    </NextLink>
+                    <Text color="gray.500" ml={2} mr={2}>
+                        {">"}
+                    </Text>
                 </Flex>
                 <Flex p={2} m={2}>
                     <Table size="lg" variant="striped">

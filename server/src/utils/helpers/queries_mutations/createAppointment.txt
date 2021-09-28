@@ -1,0 +1,26 @@
+mutation {
+    createAppointment(
+        options: {
+            start: "2021-09-25"
+            item_id: "d22da1a6-b665-40a2-b8e1-b93f0ddc615a"
+            user_id: "6b8eade3-15d5-4961-a86b-4302cb235118"
+        }
+    ) {
+        errors {
+            method
+            message
+            field
+        }
+        appointment {
+            id
+            start
+            end
+            user {
+                name
+            }
+            item {
+                summary
+            }
+        }
+    }
+}

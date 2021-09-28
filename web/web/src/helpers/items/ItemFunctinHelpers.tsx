@@ -115,7 +115,7 @@ export const returnPriorityIconHeaderModal = (
     type: ItemPriority | enumItemPriority
 ): JSX.Element => {
     let componentType: JSX.Element | null = null;
-
+    let size = "30px";
     switch (type) {
         case "HIGHEST":
             componentType = (
@@ -124,8 +124,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Highest Priority"
                     label="Highest Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowUpO color="#ad032c" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowUpO color="#ad032c" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -137,8 +137,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="High Priority"
                     label="High Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowTopRightO color="#d36a13" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowTopRightO color="#d36a13" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -150,8 +150,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Medium Priority"
                     label="Medium Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowRightO color="#f6de56" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowRightO color="#f6de56" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -163,8 +163,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Low Priority"
                     label="Low Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowBottomLeftO color="#63ace8" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowBottomLeftO color="#63ace8" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -176,8 +176,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Lowest Priority"
                     label="Lowest Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowDownO color="white" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowDownO color="white" size={size} />
                     </Box>
                 </Tooltip>
             );

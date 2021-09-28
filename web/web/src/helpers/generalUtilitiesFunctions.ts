@@ -13,3 +13,11 @@ export const getPastOrFutureDate = (
 
     return futureOrPastDate;
 };
+
+export const truncateString = (value: string, limit: number): string => {
+    if (value.length > limit) {
+        return value.substr(0, limit) + "...";
+    } else {
+        return value;
+    }
+};

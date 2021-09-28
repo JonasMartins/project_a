@@ -15,6 +15,7 @@ import {
 import { Item } from "./../../generated/graphql";
 import { MdDragHandle, MdBuild } from "react-icons/md";
 import ModalItemManagment from "./../../components/modal/ModalItemManagment";
+import { truncateString } from "./../../helpers/generalUtilitiesFunctions";
 
 import { useDrag } from "react-dnd";
 
@@ -62,7 +63,7 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                 justifyContent="space-between"
             >
                 <Flex flexDir="row" justifyContent="space-between">
-                    <Text size="md">{item.summary.substr(0, 20)}</Text>
+                    <Text size="md">{truncateString(item.summary, 15)}</Text>
                     <MdDragHandle />
                 </Flex>
                 <Flex flexDir="row" justifyContent="space-between">
@@ -86,7 +87,7 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                     </Tooltip>
                 </Flex>
             </Primary>
-            <ModalItemManagment isOpen={isOpen} onClose={onClose} />
+            <ModalItemManagment isOpen={isOpen} onClose={onClose} item={item} />
         </Box>
     );
 };

@@ -6,7 +6,7 @@ const GlobalProvider: React.FC<React.ReactNode> = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState("");
     const [userName, setUserName] = useState("");
-    const [colorMode, setColorMode] = useState<"dark" | "light">("dark");
+    const [colorMode, setColorMode] = useState<"dark" | "light">("light");
 
     const setIsLoading = (isLoading: boolean) => {
         setLoading(isLoading);

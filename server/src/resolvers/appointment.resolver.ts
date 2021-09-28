@@ -29,7 +29,7 @@ class AppointmentsResponse {
     @Field(() => [ErrorFieldHandler], { nullable: true })
     errors?: ErrorFieldHandler[];
     @Field(() => [Appointment], { nullable: true })
-    appointments?: [Appointment];
+    appointments?: [Appointment] | (Appointment & {})[];
 }
 
 @Resolver()
@@ -52,11 +52,33 @@ export class AppointmentResolver {
             };
         }
 
+        const item = await em.find(Item, { id: itemId });
+        if (!item) {
+            return {
+                errors: genericError(
+                    "itemId",
+                    "getAppointmentsByItem",
+                    __filename,
+                    `Could not found the item with id: ${itemId}`
+                ),
+            };
+        }
+
+        /*
         const qb = (em as EntityManager).createQueryBuilder(Appointment);
 
         qb.select("*").where({ item_id: itemId }).limit(max);
 
         const appointments: [Appointment] = await qb.execute();
+
+        return { appointments }; */
+        const appointments = await em.find(
+            Appointment,
+            { item: item },
+            {
+                populate: ["user"],
+            }
+        );
 
         return { appointments };
     }

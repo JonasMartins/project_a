@@ -28,11 +28,12 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
         useContext(GlobalContext);
 
     const { toggleColorMode } = useColorMode();
-    const [darkMode, setDarkMode] = useState(true);
+    const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => {}, [userName]);
 
     const handleDarkMode = () => {
+        console.log("here ? ");
         setDarkMode(!darkMode);
         setTheme(darkMode ? "dark" : "light");
         toggleColorMode();

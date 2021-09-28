@@ -1,0 +1,18 @@
+query getAppointmentsByItem($limit: Float, $itemId: String!) {
+    getAppointmentsByItem(itemId: $itemId, limit: $limit) {
+        errors {
+            method
+            message
+            field
+        }
+        appointments {
+            id
+            start
+            end
+            user {
+                id
+                name
+            }
+        }
+    }
+}

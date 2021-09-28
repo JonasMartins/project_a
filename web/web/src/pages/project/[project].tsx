@@ -1,31 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { Container } from "./../../components/Container";
+import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import {
     Box,
     Flex,
-    Text,
     IconButton,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
+    Link,
+    Text,
     useColorMode,
-    useDisclosure,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useDrop } from "react-dnd";
+import { Container } from "./../../components/Container";
+import ItemSprintBox from "./../../components/layout/ItemSprintBox";
+import SideBar from "./../../components/layout/SideBar";
+import Footer from "./../../components/rootComponents/Footer";
 import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import Navbar from "./../../components/rootComponents/Navbar";
-import Footer from "./../../components/rootComponents/Footer";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import { useDrop } from "react-dnd";
 import {
+    Item,
     ItemStatus,
     useGetProjectByIdQuery,
-    Item,
 } from "./../../generated/graphql";
-import SideBar from "./../../components/layout/SideBar";
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import ItemSprintBox from "./../../components/layout/ItemSprintBox";
-import ModalItemManagment from "./../../components/modal/ModalItemManagment";
 
 interface projectsProps {}
 
@@ -41,8 +37,8 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     let previousItemStatus: string = "";
 
+    const [dragedItem, setDragedItem] = useState<itemQuery | null>(null);
     const [expand, setExpand] = useState(true);
-    const [changeStatus, setChangeStatus] = useState(false);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
 
@@ -54,17 +50,6 @@ const Project: React.FC<projectsProps> = ({}) => {
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
-
-    const customOnOpenModal = (): void => {
-        onOpen();
-    };
-
-    const customOnCloseModal = (): void => {
-        onClose();
-        // setChangeStatus(false);
-    };
-
     const { project } = router.query;
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
@@ -72,10 +57,6 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
         pause: true,
     });
-
-    const handleChangedIitemStatus = (value: boolean): void => {
-        setChangeStatus(value);
-    };
 
     const [{ canDropPending }, dropRefPending] = useDrop({
         accept: "item",
@@ -86,8 +67,6 @@ const Project: React.FC<projectsProps> = ({}) => {
         drop: (item: itemQuery) => {
             previousItemStatus = item.status;
 
-            customOnOpenModal();
-
             if (item.status === ItemStatus.InProgress) {
                 item.status = ItemStatus.Open;
             } else {
@@ -97,6 +76,8 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPendingItens((prevItens) => [...prevItens, item]);
 
             removeItemFromStatusArray(item);
+
+            setDragedItem(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -114,12 +95,11 @@ const Project: React.FC<projectsProps> = ({}) => {
         drop: (item: itemQuery) => {
             previousItemStatus = item.status;
 
-            customOnOpenModal();
-
             item.status = ItemStatus.InProgress;
 
             setProgressItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
+            setDragedItem(item);
         },
 
         hover: (_, monitor) => {
@@ -146,12 +126,11 @@ const Project: React.FC<projectsProps> = ({}) => {
         drop: (item: itemQuery) => {
             previousItemStatus = item.status;
 
-            customOnOpenModal();
-
             item.status = ItemStatus.Resolved;
 
             setDoneItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
+            setDragedItem(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -204,11 +183,8 @@ const Project: React.FC<projectsProps> = ({}) => {
     useEffect(() => {
         if (fetching) return;
         loadItensByTypes();
-        reexecuteQuery({ requestPolicy: "cache-and-network" });
+        reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching, reexecuteQuery]);
-
-    // if (data && data.getProjectById.errors)
-    //     return  ( data.getProjectById.errors.map((erro) => <p>{erro.message}</p>) );
 
     useEffect(() => {
         return () => {
@@ -270,38 +246,47 @@ const Project: React.FC<projectsProps> = ({}) => {
             />
             <Flex
                 p={2}
-                mt="1em"
-                mb="1em"
+                margin="1em 2em 1em"
+                flexDir="row"
+                alignItems="center"
                 ml={pageWidth}
-                overflowX="hidden"
                 transition="0.3s"
             >
-                <Breadcrumb separator={<ChevronRightIcon color="gray.500" />}>
-                    <BreadcrumbItem>
-                        <IconButton
-                            isRound={true}
-                            aria-label="Switch Theme"
-                            icon={
-                                expand ? <ArrowLeftIcon /> : <ArrowRightIcon />
-                            }
-                            onClick={handleExpandSideBar}
-                        />
-                    </BreadcrumbItem>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/project">
-                            Projects
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href={`/project/${project}`}>
-                            {data && data.getProjectById.project.name}
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                </Breadcrumb>
+                <IconButton
+                    isRound={true}
+                    aria-label="Show Side Bar"
+                    mr={1}
+                    icon={expand ? <ArrowLeftIcon /> : <ArrowRightIcon />}
+                    onClick={handleExpandSideBar}
+                />
+                <NextLink href={"/"}>
+                    <Link>
+                        <Text>Home</Text>
+                    </Link>
+                </NextLink>
+                <Text color="gray.500" ml={2} mr={2}>
+                    {">"}
+                </Text>
+
+                <NextLink href={"/project"}>
+                    <Link>
+                        <Text>Project</Text>
+                    </Link>
+                </NextLink>
+                <Text color="gray.500" ml={2} mr={2}>
+                    {">"}
+                </Text>
+
+                <NextLink href={`/project/${project}`}>
+                    <Link>
+                        <Text>{data && data.getProjectById.project.name}</Text>
+                    </Link>
+                </NextLink>
+                <Text color="gray.500" ml={2} mr={2}>
+                    {">"}
+                </Text>
             </Flex>
+
             <Flex
                 mt="1em"
                 mb="1em"
@@ -390,11 +375,6 @@ const Project: React.FC<projectsProps> = ({}) => {
             <Box id="footer">
                 <Footer />
             </Box>
-            <ModalItemManagment
-                isOpen={isOpen}
-                onClose={customOnCloseModal}
-                hasChangedStatus={handleChangedIitemStatus}
-            />
         </Container>
     );
 
