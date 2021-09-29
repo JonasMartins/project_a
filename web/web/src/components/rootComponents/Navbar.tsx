@@ -33,7 +33,6 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
     useEffect(() => {}, [userName]);
 
     const handleDarkMode = () => {
-        console.log("here ? ");
         setDarkMode(!darkMode);
         setTheme(darkMode ? "dark" : "light");
         toggleColorMode();
@@ -56,7 +55,6 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
             m={0}
             p={[0, 2]}
             boxShadow="lg"
-            zIndex="2"
         >
             <Box>
                 <Icon mr={3} ml={2} as={DragHandleIcon} />

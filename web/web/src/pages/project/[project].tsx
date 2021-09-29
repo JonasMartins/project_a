@@ -11,6 +11,7 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
+import { CgLoupe } from "react-icons/cg";
 import { Container } from "./../../components/Container";
 import ItemSprintBox from "./../../components/layout/ItemSprintBox";
 import SideBar from "./../../components/layout/SideBar";
@@ -39,6 +40,8 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const [dragedItem, setDragedItem] = useState<itemQuery | null>(null);
     const [expand, setExpand] = useState(true);
+    const [dataLoaded, setDataLoaded] = useState(1);
+    const [fillItens, setFillItens] = useState(false);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
 
@@ -180,37 +183,11 @@ const Project: React.FC<projectsProps> = ({}) => {
         }
     };
 
-    useEffect(() => {
-        if (fetching) return;
-        loadItensByTypes();
-        reexecuteQuery({ requestPolicy: "cache-first" });
-    }, [fetching, reexecuteQuery]);
-
-    useEffect(() => {
-        return () => {
-            setDoneItens([]);
-            setPendingItens([]);
-            setProgressItens([]);
-        };
-    }, []);
-
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("215px");
-            setPageWidth("20em");
-        } else {
-            setSideBarWidth("0px");
-            setPageWidth("3em");
-        }
-    };
-
     const loadItensByTypes = (): void => {
         if (!(data && data.getProjectById?.project?.sprints[0]?.itens)) {
+            setDataLoaded(dataLoaded + 1);
             return;
         }
-
         data.getProjectById?.project?.sprints[0]?.itens?.map((item) => {
             switch (item.status) {
                 case ItemStatus.Open:
@@ -230,6 +207,36 @@ const Project: React.FC<projectsProps> = ({}) => {
                     break;
             }
         });
+        setFillItens(true);
+    };
+
+    useEffect(() => {
+        if (fetching) return;
+        if (!fillItens) {
+            loadItensByTypes();
+        }
+        reexecuteQuery({ requestPolicy: "cache-first" });
+    }, [fetching, reexecuteQuery, dataLoaded]);
+
+    useEffect(() => {
+        return () => {
+            setDoneItens([]);
+            setPendingItens([]);
+            setProgressItens([]);
+            setFillItens(false);
+        };
+    }, []);
+
+    const handleExpandSideBar = (): void => {
+        setExpand(!expand);
+
+        if (expand) {
+            setSideBarWidth("215px");
+            setPageWidth("20em");
+        } else {
+            setSideBarWidth("0px");
+            setPageWidth("3em");
+        }
     };
 
     if (error) return <p>Oh no... {error.message}</p>;
@@ -377,7 +384,6 @@ const Project: React.FC<projectsProps> = ({}) => {
             </Box>
         </Container>
     );
-
     return fetching ? loading : content;
 };
 
