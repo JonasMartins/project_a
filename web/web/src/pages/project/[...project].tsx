@@ -11,18 +11,17 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
-import { CgLoupe } from "react-icons/cg";
-import { Container } from "./../../components/Container";
-import ItemSprintBox from "./../../components/layout/ItemSprintBox";
-import SideBar from "./../../components/layout/SideBar";
-import Footer from "./../../components/rootComponents/Footer";
-import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
-import Navbar from "./../../components/rootComponents/Navbar";
+import { Container } from "../../components/Container";
+import ItemSprintBox from "../../components/layout/ItemSprintBox";
+import SideBar from "../../components/layout/SideBar";
+import Footer from "../../components/rootComponents/Footer";
+import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
+import Navbar from "../../components/rootComponents/Navbar";
 import {
     Item,
     ItemStatus,
     useGetProjectByIdQuery,
-} from "./../../generated/graphql";
+} from "../../generated/graphql";
 
 interface projectsProps {}
 
@@ -54,9 +53,11 @@ const Project: React.FC<projectsProps> = ({}) => {
     const color = { light: "black", dark: "white" };
 
     const { project } = router.query;
+    console.log("project ", project);
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
-            id: typeof project === "string" ? project : "",
+            // id: typeof project === "string" ? project : "",
+            id: project[0],
         },
         pause: true,
     });
@@ -184,10 +185,18 @@ const Project: React.FC<projectsProps> = ({}) => {
     };
 
     const loadItensByTypes = (): void => {
-        if (!(data && data.getProjectById?.project?.sprints[0]?.itens)) {
+        if (error) {
+            return;
+        }
+        if (!data) {
             setDataLoaded(dataLoaded + 1);
             return;
         }
+
+        if (!data.getProjectById?.project?.sprints.length) {
+            return;
+        }
+
         data.getProjectById?.project?.sprints[0]?.itens?.map((item) => {
             switch (item.status) {
                 case ItemStatus.Open:
@@ -231,7 +240,7 @@ const Project: React.FC<projectsProps> = ({}) => {
         setExpand(!expand);
 
         if (expand) {
-            setSideBarWidth("215px");
+            setSideBarWidth("225px");
             setPageWidth("20em");
         } else {
             setSideBarWidth("0px");
@@ -239,7 +248,9 @@ const Project: React.FC<projectsProps> = ({}) => {
         }
     };
 
-    if (error) return <p>Oh no... {error.message}</p>;
+    if (error) {
+        return <p>Oh no... {error.message}</p>;
+    }
 
     const loading = <FullPageSpinner />;
 
@@ -305,80 +316,86 @@ const Project: React.FC<projectsProps> = ({}) => {
                     {data && data.getProjectById.project.name}
                 </Text>
             </Flex>
-            <Flex
-                flexDir="row"
-                ml={pageWidth}
-                overflowX="hidden"
-                transition="0.3s"
-            >
+            {pendingItens.length || progressItens.length || doneItens.length ? (
                 <Flex
-                    border={canDropPending ? "1px dashed" : "none"}
-                    minH="150px"
-                    flexGrow={1}
-                    boxShadow="lg"
-                    flexDir="column"
-                    p={3}
-                    m="2em 2em 20em 0"
-                    bg={bgColor[colorMode]}
-                    color={color[colorMode]}
-                    ref={dropRefPending}
+                    flexDir="row"
+                    ml={pageWidth}
+                    overflowX="hidden"
+                    transition="0.3s"
                 >
-                    <Text size="lg">PEDNDING</Text>
-                    {pendingItens.length &&
-                        pendingItens.map((item) => (
+                    <Flex
+                        border={canDropPending ? "1px dashed" : "none"}
+                        minH="150px"
+                        flexGrow={1}
+                        boxShadow="lg"
+                        flexDir="column"
+                        p={3}
+                        m="2em 2em 20em 0"
+                        bg={bgColor[colorMode]}
+                        color={color[colorMode]}
+                        ref={dropRefPending}
+                    >
+                        <Text size="lg">PEDNDING</Text>
+                        {pendingItens.map((item) => (
                             <ItemSprintBox
                                 draggable
                                 key={item.id}
                                 item={item}
                             />
                         ))}
-                </Flex>
+                    </Flex>
 
-                <Flex
-                    border={candropProgress ? "1px dashed" : "none"}
-                    minH="150px"
-                    flexGrow={1}
-                    boxShadow="lg"
-                    flexDir="column"
-                    p={3}
-                    m="2em 2em 20em 0"
-                    bg={bgColor[colorMode]}
-                    color={color[colorMode]}
-                    ref={dropRefProgress}
-                >
-                    <Text size="lg">IN PROGRESS</Text>
-                    {progressItens.length &&
-                        progressItens.map((item) => (
+                    <Flex
+                        border={candropProgress ? "1px dashed" : "none"}
+                        minH="150px"
+                        flexGrow={1}
+                        boxShadow="lg"
+                        flexDir="column"
+                        p={3}
+                        m="2em 2em 20em 0"
+                        bg={bgColor[colorMode]}
+                        color={color[colorMode]}
+                        ref={dropRefProgress}
+                    >
+                        <Text size="lg">IN PROGRESS</Text>
+                        {progressItens.map((item) => (
                             <ItemSprintBox
                                 draggable
                                 key={item.id}
                                 item={item}
                             />
                         ))}
-                </Flex>
-                <Flex
-                    border={canDropDone ? "1px dashed" : "none"}
-                    minH="150px"
-                    flexGrow={1}
-                    boxShadow="lg"
-                    flexDir="column"
-                    p={3}
-                    m="2em 2em 20em 0"
-                    bg={bgColor[colorMode]}
-                    color={color[colorMode]}
-                    ref={dropRefDone}
-                >
-                    <Text size="lg">DONE</Text>
-                    {doneItens.length &&
-                        doneItens.map((item) => (
+                    </Flex>
+                    <Flex
+                        border={canDropDone ? "1px dashed" : "none"}
+                        minH="150px"
+                        flexGrow={1}
+                        boxShadow="lg"
+                        flexDir="column"
+                        p={3}
+                        m="2em 2em 20em 0"
+                        bg={bgColor[colorMode]}
+                        color={color[colorMode]}
+                        ref={dropRefDone}
+                    >
+                        <Text size="lg">DONE</Text>
+                        {doneItens.map((item) => (
                             <ItemSprintBox
                                 draggable
                                 key={item.id}
                                 item={item}
                             />
                         ))}
+                    </Flex>
                 </Flex>
-            </Flex>
+            ) : (
+                <Flex alignSelf="center" mb={"150px"}>
+                    <Text fontSize="2xl">
+                        {`The "${data?.getProjectById?.project?.name}" project doesn't have an active sprint, please manege
+                        one at Backlog`}
+                    </Text>
+                </Flex>
+            )}
             <Box id="footer">
                 <Footer />
             </Box>

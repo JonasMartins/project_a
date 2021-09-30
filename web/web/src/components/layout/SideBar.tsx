@@ -19,7 +19,8 @@ const SideBar: React.FC<SideBarProps> = ({
     return (
         <Box
             h="100%"
-            zIndex="1"
+            // zIndex="1"
+            overflowY="hidden"
             overflowX="hidden"
             transition="0.3s"
             pt="5"
