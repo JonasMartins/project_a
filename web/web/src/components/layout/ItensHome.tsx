@@ -73,6 +73,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
         // }, 1000);
 
         // return () => clearTimeout(timerId);
+
         reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching, reexecuteQuery]);
 

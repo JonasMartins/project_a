@@ -62,7 +62,6 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setErrors(
                                     toErrorMap(response.data.login.errors)
                                 );
-                                console.log("errr", response.data.login.errors);
                             } else if (
                                 response.data?.login.result.accessToken
                             ) {

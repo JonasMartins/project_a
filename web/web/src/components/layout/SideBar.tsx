@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, useColorMode, Text, Flex } from "@chakra-ui/react";
+import { SiCodesandbox } from "react-icons/si";
 
 interface SideBarProps {
     projectName: string;
@@ -34,10 +35,13 @@ const SideBar: React.FC<SideBarProps> = ({
             <Flex
                 visibility={visibility}
                 p={2}
-                mt={10}
+                mt={7}
                 flexDirection="column"
                 alignItems="center"
             >
+                <Box mb={3}>
+                    <SiCodesandbox size="35px" />
+                </Box>
                 <Text fontSize="2xl">{projectName}</Text>
                 <Text fontSize="lg">Software project</Text>
             </Flex>

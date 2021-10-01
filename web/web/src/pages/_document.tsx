@@ -7,6 +7,7 @@ class Document extends NextDocument {
         return (
             <Html>
                 <Head>
+                    <title>Project A</title>
                     <meta charSet="utf-8" />
                     <Favicon />
                 </Head>

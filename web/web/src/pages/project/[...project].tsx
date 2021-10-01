@@ -43,6 +43,7 @@ const Project: React.FC<projectsProps> = ({}) => {
     const [fillItens, setFillItens] = useState(false);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
+    const [navBarWidth, setNavBarWidth] = useState("0px");
 
     const [pendingItens, setPendingItens] = useState<Array<itemQuery>>([]);
     const [progressItens, setProgressItens] = useState<Array<itemQuery>>([]);
@@ -53,11 +54,10 @@ const Project: React.FC<projectsProps> = ({}) => {
     const color = { light: "black", dark: "white" };
 
     const { project } = router.query;
-    console.log("project ", project);
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
             // id: typeof project === "string" ? project : "",
-            id: project[0],
+            id: project[0] ? project[0] : "-1",
         },
         pause: true,
     });
@@ -242,9 +242,11 @@ const Project: React.FC<projectsProps> = ({}) => {
         if (expand) {
             setSideBarWidth("225px");
             setPageWidth("20em");
+            setNavBarWidth("16em");
         } else {
             setSideBarWidth("0px");
             setPageWidth("3em");
+            setNavBarWidth("0px");
         }
     };
 
@@ -256,7 +258,7 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const content = (
         <Container>
-            <Navbar />
+            <Navbar pageWidth={navBarWidth} />
             <SideBar
                 projectName={data && data.getProjectById.project.name}
                 width={sideBarWidth}

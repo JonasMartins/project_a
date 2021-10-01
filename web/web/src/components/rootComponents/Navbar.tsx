@@ -21,10 +21,13 @@ import { GlobalContext } from "./../../context/globalContext";
 import Avatar from "react-avatar";
 import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { SiCodesandbox } from "react-icons/si";
+import { AiOutlineLogout } from "react-icons/ai";
+import { BsGear, BsBook } from "react-icons/bs";
+interface NavbarProps {
+    pageWidth?: string;
+}
 
-interface NavbarProps {}
-
-const Navbar: React.FC<NavbarProps> = ({}) => {
+const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
     const router = useRouter();
 
     const { setIsLoading, setCurrentUserId, setTheme, userName } =
@@ -58,8 +61,10 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
             flexGrow={1}
             m={0}
             p={[0, 2]}
+            ml={pageWidth ? pageWidth : "0px"}
             boxShadow="lg"
             justifyContent="space-between"
+            transition="0.3s"
         >
             <Flex justifyContent="flex-start" alignItems="center">
                 <Icon mr={3} ml={2} as={DragHandleIcon} />
@@ -124,14 +129,19 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
                     ></MenuButton>
                     <MenuList>
                         <MenuGroup title="Profile">
-                            <MenuItem onClick={logout}>Logout</MenuItem>
-                            <MenuItem>Create a Copy</MenuItem>
-                            <MenuItem>Mark as Draft</MenuItem>
+                            <MenuItem
+                                icon={<AiOutlineLogout />}
+                                onClick={logout}
+                            >
+                                Logout
+                            </MenuItem>
+                            <MenuItem icon={<BsGear />}>Seetings</MenuItem>
                         </MenuGroup>
                         <MenuDivider />
                         <MenuGroup title="Help">
-                            <MenuItem>Delete</MenuItem>
-                            <MenuItem>Attend a Workshop</MenuItem>
+                            <MenuItem icon={<BsBook />}>
+                                About this project
+                            </MenuItem>
                         </MenuGroup>
                     </MenuList>
                 </Menu>

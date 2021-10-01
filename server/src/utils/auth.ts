@@ -2,7 +2,7 @@ import { User } from "../entities/user.entity";
 import { sign } from "jsonwebtoken";
 export const createAcessToken = (user: User) => {
     return sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, {
-        expiresIn: "30m",
+        expiresIn: "1d",
     });
 };
 
@@ -11,7 +11,7 @@ export const createRefreshToken = (user: User) => {
         { userId: user.id, tokenVersion: user.tokenVersion },
         process.env.REFRESH_TOKEN_SECRET!,
         {
-            expiresIn: "1d",
+            expiresIn: "3d",
         }
     );
 };
