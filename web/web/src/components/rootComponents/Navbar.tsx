@@ -13,6 +13,7 @@ import {
     Link,
     Text,
     Flex,
+    useDisclosure,
 } from "@chakra-ui/react";
 import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
@@ -23,6 +24,7 @@ import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { SiCodesandbox } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
 import { BsGear, BsBook } from "react-icons/bs";
+import ModalAboutProject from "./../modal/ModalAboutProject";
 interface NavbarProps {
     pageWidth?: string;
 }
@@ -35,6 +37,8 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
 
     const { toggleColorMode } = useColorMode();
     const [darkMode, setDarkMode] = useState(false);
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {}, [userName]);
 
@@ -89,7 +93,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                     <Box mr={2}>
                         <Avatar
                             name={userName ? userName : "Foo Bar"}
-                            size="32px"
+                            size="40px"
                             round={true}
                         />
                     </Box>
@@ -139,13 +143,14 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                         </MenuGroup>
                         <MenuDivider />
                         <MenuGroup title="Help">
-                            <MenuItem icon={<BsBook />}>
+                            <MenuItem onClick={onOpen} icon={<BsBook />}>
                                 About this project
                             </MenuItem>
                         </MenuGroup>
                     </MenuList>
                 </Menu>
             </Flex>
+            <ModalAboutProject isOpen={isOpen} onClose={onClose} />
         </Flex>
     );
 
