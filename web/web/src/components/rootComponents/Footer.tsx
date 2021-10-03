@@ -17,7 +17,7 @@ const Footer: React.FC<FooterProps> = ({}) => {
             flexGrow={1}
             bg={bgColor[colorMode]}
             color={color[colorMode]}
-            zIndex="2"
+            // zIndex="2"
         >
             <Box p="3">
                 <Text>@Copyright 2021</Text>

@@ -92,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                 <Menu>
                     <Box mr={2}>
                         <Avatar
-                            name={userName ? userName : "Foo Bar"}
+                            name={userName || "Foo Bar"}
                             size="40px"
                             round={true}
                         />
@@ -128,7 +128,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                         mr={2}
                         borderRadius={"full"}
                         as={IconButton}
-                        aria-label="Seetings"
+                        aria-label="Settings"
                         icon={<SettingsIcon />}
                     ></MenuButton>
                     <MenuList>
@@ -139,7 +139,14 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                             >
                                 Logout
                             </MenuItem>
-                            <MenuItem icon={<BsGear />}>Seetings</MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    router.push("/settings");
+                                }}
+                                icon={<BsGear />}
+                            >
+                                Settings
+                            </MenuItem>
                         </MenuGroup>
                         <MenuDivider />
                         <MenuGroup title="Help">

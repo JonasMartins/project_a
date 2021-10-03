@@ -1,0 +1,19 @@
+query GetUserSettings($id: String!) {
+    getUserSettings(id: $id) {
+        errors {
+            method
+            message
+            field
+        }
+        user {
+            id
+            name
+            email
+            picure
+            role {
+                name
+                code
+            }
+        }
+    }
+}

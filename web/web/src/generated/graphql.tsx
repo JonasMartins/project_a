@@ -213,6 +213,7 @@ export type Query = {
     hello: Scalars["String"];
     logedInTest: Scalars["String"];
     getUserById: UserResponse;
+    getUserSettings: UserResponse;
     getRoleById: RoleRespnse;
     getTeamById: TeamResponse;
     getAppointmentsByItem: AppointmentsResponse;
@@ -235,6 +236,10 @@ export type QueryGetItemByIdArgs = {
 };
 
 export type QueryGetUserByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetUserSettingsArgs = {
     id: Scalars["String"];
 };
 
@@ -376,6 +381,7 @@ export type User = {
     teams: Array<Team>;
     role: Role;
     appointments: Array<Appointment>;
+    picure?: Maybe<Scalars["String"]>;
 };
 
 export type UserBasicData = {
@@ -664,6 +670,29 @@ export type GetUserByIdQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetUserSettingsQueryVariables = Exact<{
+    id: Scalars["String"];
+}>;
+
+export type GetUserSettingsQuery = { __typename?: "Query" } & {
+    getUserSettings: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<
+                User,
+                "id" | "name" | "email" | "picure"
+            > & { role: { __typename?: "Role" } & Pick<Role, "name" | "code"> }
+        >;
+    };
+};
+
 export const CreateItemDocument = gql`
     mutation CreateItem(
         $approverId: String!
@@ -944,6 +973,39 @@ export function useGetUserByIdQuery(
 ) {
     return Urql.useQuery<GetUserByIdQuery>({
         query: GetUserByIdDocument,
+        ...options,
+    });
+}
+export const GetUserSettingsDocument = gql`
+    query GetUserSettings($id: String!) {
+        getUserSettings(id: $id) {
+            errors {
+                method
+                message
+                field
+            }
+            user {
+                id
+                name
+                email
+                picure
+                role {
+                    name
+                    code
+                }
+            }
+        }
+    }
+`;
+
+export function useGetUserSettingsQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetUserSettingsQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetUserSettingsQuery>({
+        query: GetUserSettingsDocument,
         ...options,
     });
 }

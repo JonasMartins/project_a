@@ -65,6 +65,10 @@ export class User extends Base<User> {
         this
     );
 
+    @Field(() => String, { nullable: true })
+    @Property({ nullable: true, length: 255 })
+    public picure: string;
+
     constructor(body: UserValidator) {
         super(body);
     }

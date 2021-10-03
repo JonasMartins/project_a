@@ -27,3 +27,17 @@ npm run dev // para startar o servidor
 No MacOs: psql pa_dev para entrar no banco pa_dev e rodar as consultas desejadas
 
 \dt para listar todas as tabelas
+
+Para limpar o terminal do postgres:
+
+Mac/ Linux:
+
+\! clear 
+
+Windows
+
+\! cls
+
+
+
+
