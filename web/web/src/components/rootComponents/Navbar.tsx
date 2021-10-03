@@ -134,18 +134,18 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                     <MenuList>
                         <MenuGroup title="Profile">
                             <MenuItem
-                                icon={<AiOutlineLogout />}
-                                onClick={logout}
-                            >
-                                Logout
-                            </MenuItem>
-                            <MenuItem
                                 onClick={() => {
                                     router.push("/settings");
                                 }}
                                 icon={<BsGear />}
                             >
                                 Settings
+                            </MenuItem>
+                            <MenuItem
+                                icon={<AiOutlineLogout />}
+                                onClick={logout}
+                            >
+                                Logout
                             </MenuItem>
                         </MenuGroup>
                         <MenuDivider />

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, ChangeEvent } from "react";
 import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import { Container } from "./../components/Container";
@@ -19,6 +19,7 @@ import { Form, Formik, Field } from "formik";
 import Avatar from "react-avatar";
 import Login from "./login";
 import { useGetUserSettingsQuery } from "./../generated/graphql";
+import { UserInfo } from "os";
 interface settingsProps {}
 
 interface userInfo {
@@ -31,13 +32,11 @@ interface userInfo {
 const Settings: React.FC<settingsProps> = ({}) => {
     const { userId } = useContext(GlobalContext);
 
-    const [userInfo, setUserInfo] = useState<{ user: userInfo }>({
-        user: {
-            name: "Name",
-            email: "Email",
-            picture: "",
-            role: "Role",
-        },
+    const [userInfo, setUserInfo] = useState<userInfo>({
+        name: "Name",
+        email: "Email",
+        picture: "",
+        role: "Role",
     });
 
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
@@ -52,17 +51,23 @@ const Settings: React.FC<settingsProps> = ({}) => {
     useEffect(() => {
         if (fetching) return;
 
-        const _userInfo = {
+        setUserInfo((prevUser) => ({
+            ...prevUser,
             name: data?.getUserSettings?.user?.name,
             email: data?.getUserSettings?.user?.email,
             picture: data?.getUserSettings?.user?.picure,
             role: data?.getUserSettings?.user?.role?.name,
-        };
-
-        setUserInfo({ ...userInfo, user: _userInfo });
+        }));
 
         reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching]);
+
+    const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
+        setUserInfo((prevUser) => ({
+            ...prevUser,
+            [e.target.name]: e.target.value,
+        }));
+    };
 
     // if (error) return <p>Oh no... {error.message}</p>;
     // /* topo | direita | inferior | esquerda */
@@ -70,12 +75,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         <Container>
             <Navbar />
 
-            <Flex
-                flexDir="row"
-                p={3}
-                m={[3, 3, 10, 3]}
-                justifyContent="flex-start"
-            >
+            <Flex flexDir="row" p={3} mb="150px" justifyContent="flex-start">
                 {data && data?.getUserSettings?.user?.picure ? (
                     <Flex
                         mt={5}
@@ -85,7 +85,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         flexGrow={1}
                     >
                         <Image
-                            boxSize="100px"
+                            boxSize="150px"
                             borderRadius="full"
                             src={data?.getUserSettings?.user?.picure}
                         />
@@ -100,7 +100,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         flexGrow={0.3}
                     >
                         <Avatar
-                            size="100px"
+                            size="150px"
                             round={true}
                             name={
                                 data?.getUserSettings?.user?.name || "Foo bar"
@@ -112,9 +112,9 @@ const Settings: React.FC<settingsProps> = ({}) => {
                 <Flex flexDir="column" alignItems="stretch" flexGrow={0.4}>
                     <Formik
                         initialValues={{
-                            name: userInfo.user.name,
-                            email: userInfo.user.email,
-                            role: userInfo.user.role,
+                            name: userInfo.name,
+                            email: userInfo.email,
+                            role: userInfo.role,
                         }}
                         onSubmit={() => {
                             console.log("submited");
@@ -136,7 +136,8 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     id="name"
                                                     borderRadius="2em"
                                                     size="lg"
-                                                    value={userInfo.user.name}
+                                                    onChange={handlerUpdateUser}
+                                                    value={userInfo.name}
                                                 />
                                                 <FormErrorMessage>
                                                     {form.errors.name}
@@ -157,7 +158,8 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     id="email"
                                                     borderRadius="2em"
                                                     size="lg"
-                                                    value={userInfo.user.email}
+                                                    onChange={handlerUpdateUser}
+                                                    value={userInfo.email}
                                                 />
                                                 <FormErrorMessage>
                                                     {form.errors.email}

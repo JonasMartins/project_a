@@ -6,6 +6,8 @@ const Footer: React.FC<FooterProps> = ({}) => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
+    /* topo | direita | inferior | esquerda */
+
     return (
         <Flex
             justifyContent="flex-end"

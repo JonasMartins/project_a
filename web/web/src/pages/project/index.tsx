@@ -66,7 +66,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                         {">"}
                     </Text>
                 </Flex>
-                <Flex p={2} m={2}>
+                <Flex p={2} m={2} mb="150px">
                     <Table size="lg" variant="striped">
                         <Thead>
                             <Tr>
@@ -123,7 +123,6 @@ const Project: React.FC<projectsProps> = ({}) => {
                         </Tfoot>
                     </Table>
                 </Flex>
-
                 <Box id="footer">
                     <Footer />
                 </Box>

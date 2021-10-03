@@ -25,7 +25,7 @@ const Index: React.FC<indexProps> = ({}) => {
         <>
             <Container>
                 <Navbar />
-                <Flex alignSelf="normal" flexGrow={1}>
+                <Flex alignSelf="normal" flexGrow={1} mb="150px">
                     <HomeNotifications />
                 </Flex>
                 <Box id="footer">
