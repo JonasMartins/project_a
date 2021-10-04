@@ -11,6 +11,7 @@ query GetUserSettings($id: String!) {
             email
             picure
             role {
+                id
                 name
                 code
             }

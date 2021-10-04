@@ -18,14 +18,19 @@ import {
 import { Form, Formik, Field } from "formik";
 import Avatar from "react-avatar";
 import Login from "./login";
-import { useGetUserSettingsQuery } from "./../generated/graphql";
+import {
+    useGetUserSettingsQuery,
+    useGetAllRolesQuery,
+    GetAllRolesQuery,
+} from "./../generated/graphql";
 import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
+
 interface settingsProps {}
 
 interface userInfo {
     name: string;
     email: string;
-    picture: string;
+    // picture: string;
     role: string;
 }
 
@@ -33,11 +38,12 @@ const Settings: React.FC<settingsProps> = ({}) => {
     const { userId, userRole } = useContext(GlobalContext);
 
     const [userIsAdmin, setUserIsAdmin] = useState(false);
+    const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
     const [userInfo, setUserInfo] = useState<userInfo>({
         name: "Name",
         email: "Email",
-        picture: "",
+        // picture: "",
         role: "Role",
     });
 
@@ -50,6 +56,8 @@ const Settings: React.FC<settingsProps> = ({}) => {
         }
     );
 
+    const [allRoles] = useGetAllRolesQuery();
+
     useEffect(() => {
         if (fetching) return;
 
@@ -57,11 +65,17 @@ const Settings: React.FC<settingsProps> = ({}) => {
             ...prevUser,
             name: data?.getUserSettings?.user?.name,
             email: data?.getUserSettings?.user?.email,
-            picture: data?.getUserSettings?.user?.picure,
+            // picture: data?.getUserSettings?.user?.picure,
             role: data?.getUserSettings?.user?.role?.name,
         }));
 
-        setUserIsAdmin(compareTwoStrings(userRole, "Admin"));
+        if (userRole) {
+            setUserIsAdmin(compareTwoStrings(userRole, "Admin"));
+        }
+
+        if (allRoles.data) {
+            setRoles(allRoles.data);
+        }
 
         reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching]);
@@ -192,39 +206,25 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     borderRadius="2em"
                                                     size="lg"
                                                 >
-                                                    <option value="option1">
-                                                        Option 1
-                                                    </option>
-                                                    <option value="option2">
-                                                        Option 2
-                                                    </option>
-                                                    <option value="option3">
-                                                        Option 3
-                                                    </option>
+                                                    {roles &&
+                                                        roles?.getAllRoles?.roles?.map(
+                                                            (role) => (
+                                                                <option
+                                                                    key={
+                                                                        role.id
+                                                                    }
+                                                                    value={
+                                                                        role.id
+                                                                    }
+                                                                >
+                                                                    {role.name}
+                                                                </option>
+                                                            )
+                                                        )}
                                                 </Select>
 
                                                 <FormErrorMessage>
                                                     {form.errors.role}
-                                                </FormErrorMessage>
-                                            </FormControl>
-                                        )}
-                                    </Field>
-                                    <Field name="picture">
-                                        {({ field, form }) => (
-                                            <FormControl
-                                                isInvalid={form.errors.picture}
-                                            >
-                                                <FormLabel htmlFor="picture">
-                                                    Picture
-                                                </FormLabel>
-                                                <input
-                                                    accept={"image/*"}
-                                                    type={"file"}
-                                                    multiple={false}
-                                                />
-
-                                                <FormErrorMessage>
-                                                    {form.errors.picture}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}

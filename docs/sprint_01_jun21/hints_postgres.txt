@@ -13,7 +13,7 @@ https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ub
 https://www.luiztools.com.br/post/como-usar-nodejs-postgresql/
 
 
-- Iniciando postgres
+- Iniciando postgres WINDOWS
 sudo service postgresql start
 
 - Logando usuario postgres:

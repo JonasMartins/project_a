@@ -21,6 +21,14 @@ class RoleRespnse {
     role?: Role;
 }
 
+@ObjectType()
+class RolesRespnse {
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => [Role], { nullable: true })
+    roles?: Role[];
+}
+
 @Resolver()
 export class RoleResolver {
     @Mutation(() => RoleRespnse)
@@ -74,5 +82,22 @@ export class RoleResolver {
         }
 
         return { role };
+    }
+
+    @Query(() => RolesRespnse)
+    async getAllRoles(@Ctx() { em }: Context): Promise<RolesRespnse> {
+        const roles = await em.find(Role, {});
+
+        if (!roles) {
+            return {
+                errors: genericError(
+                    "-",
+                    "getAllRoles",
+                    __filename,
+                    "Something went wrong"
+                ),
+            };
+        }
+        return { roles: roles };
     }
 }

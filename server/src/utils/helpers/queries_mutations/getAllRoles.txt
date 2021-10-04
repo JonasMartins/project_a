@@ -1,0 +1,14 @@
+{
+  getAllRoles {
+    errors {
+      method
+      message
+      field
+    }
+    roles {
+      name
+      code
+      wage
+    }
+  }
+}

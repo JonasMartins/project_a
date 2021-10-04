@@ -215,6 +215,7 @@ export type Query = {
     getUserById: UserResponse;
     getUserSettings: UserResponse;
     getRoleById: RoleRespnse;
+    getAllRoles: RolesRespnse;
     getTeamById: TeamResponse;
     getAppointmentsByItem: AppointmentsResponse;
     getAppointmentsByUser: AppointmentsResponse;
@@ -307,6 +308,12 @@ export type RoleValidator = {
     code: Scalars["String"];
     description: Scalars["String"];
     wage: Scalars["Float"];
+};
+
+export type RolesRespnse = {
+    __typename?: "RolesRespnse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    roles?: Maybe<Array<Role>>;
 };
 
 export type Sprint = {
@@ -470,6 +477,29 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
     Mutation,
     "logout"
 >;
+
+export type GetAllRolesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAllRolesQuery = { __typename?: "Query" } & {
+    getAllRoles: { __typename?: "RolesRespnse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        roles?: Maybe<
+            Array<
+                { __typename?: "Role" } & Pick<
+                    Role,
+                    "id" | "name" | "code" | "wage"
+                >
+            >
+        >;
+    };
+};
 
 export type GetAppointmentsByItemQueryVariables = Exact<{
     limit?: Maybe<Scalars["Float"]>;
@@ -689,7 +719,12 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
             { __typename?: "User" } & Pick<
                 User,
                 "id" | "name" | "email" | "picure"
-            > & { role: { __typename?: "Role" } & Pick<Role, "name" | "code"> }
+            > & {
+                    role: { __typename?: "Role" } & Pick<
+                        Role,
+                        "id" | "name" | "code"
+                    >;
+                }
         >;
     };
 };
@@ -769,6 +804,32 @@ export const Document = gql`
 
 export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
+}
+export const GetAllRolesDocument = gql`
+    query GetAllRoles {
+        getAllRoles {
+            errors {
+                method
+                message
+                field
+            }
+            roles {
+                id
+                name
+                code
+                wage
+            }
+        }
+    }
+`;
+
+export function useGetAllRolesQuery(
+    options: Omit<Urql.UseQueryArgs<GetAllRolesQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetAllRolesQuery>({
+        query: GetAllRolesDocument,
+        ...options,
+    });
 }
 export const GetAppointmentsByItemDocument = gql`
     query getAppointmentsByItem($limit: Float, $itemId: String!) {
@@ -992,6 +1053,7 @@ export const GetUserSettingsDocument = gql`
                 email
                 picure
                 role {
+                    id
                     name
                     code
                 }
