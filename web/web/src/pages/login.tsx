@@ -22,7 +22,8 @@ const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
 
-    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
+    const { setIsLoading, setCurrentUserId, setCurrentUserRole } =
+        useContext(GlobalContext);
     type errors = {
         email: string;
         password: string;
@@ -74,6 +75,9 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setIsLoading(false);
                                 setCurrentUserId(
                                     response.data?.login.result.userId
+                                );
+                                setCurrentUserRole(
+                                    response.data?.login.result.userRoleCode
                                 );
                             }
                         }}

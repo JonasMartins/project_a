@@ -19,7 +19,7 @@ import { Form, Formik, Field } from "formik";
 import Avatar from "react-avatar";
 import Login from "./login";
 import { useGetUserSettingsQuery } from "./../generated/graphql";
-import { UserInfo } from "os";
+import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
 interface settingsProps {}
 
 interface userInfo {
@@ -30,7 +30,9 @@ interface userInfo {
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
-    const { userId } = useContext(GlobalContext);
+    const { userId, userRole } = useContext(GlobalContext);
+
+    const [userIsAdmin, setUserIsAdmin] = useState(false);
 
     const [userInfo, setUserInfo] = useState<userInfo>({
         name: "Name",
@@ -59,6 +61,8 @@ const Settings: React.FC<settingsProps> = ({}) => {
             role: data?.getUserSettings?.user?.role?.name,
         }));
 
+        setUserIsAdmin(compareTwoStrings(userRole, "Admin"));
+
         reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching]);
 
@@ -69,8 +73,9 @@ const Settings: React.FC<settingsProps> = ({}) => {
         }));
     };
 
-    // if (error) return <p>Oh no... {error.message}</p>;
+    if (error) return <p>Oh no... {error.message}</p>;
     // /* topo | direita | inferior | esquerda */
+
     const content = (
         <Container>
             <Navbar />
@@ -132,6 +137,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     Name
                                                 </FormLabel>
                                                 <Input
+                                                    isDisabled={!userIsAdmin}
                                                     {...field}
                                                     id="name"
                                                     borderRadius="2em"
@@ -154,6 +160,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     Email
                                                 </FormLabel>
                                                 <Input
+                                                    isDisabled={!userIsAdmin}
                                                     {...field}
                                                     id="email"
                                                     borderRadius="2em"
@@ -178,6 +185,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                 </FormLabel>
 
                                                 <Select
+                                                    isDisabled={!userIsAdmin}
                                                     placeholder="Role"
                                                     {...field}
                                                     id="role"
@@ -197,6 +205,26 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
                                                 <FormErrorMessage>
                                                     {form.errors.role}
+                                                </FormErrorMessage>
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Field name="picture">
+                                        {({ field, form }) => (
+                                            <FormControl
+                                                isInvalid={form.errors.picture}
+                                            >
+                                                <FormLabel htmlFor="picture">
+                                                    Picture
+                                                </FormLabel>
+                                                <input
+                                                    accept={"image/*"}
+                                                    type={"file"}
+                                                    multiple={false}
+                                                />
+
+                                                <FormErrorMessage>
+                                                    {form.errors.picture}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}

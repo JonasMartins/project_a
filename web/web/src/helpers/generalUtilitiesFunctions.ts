@@ -21,3 +21,10 @@ export const truncateString = (value: string, limit: number): string => {
         return value;
     }
 };
+
+export const compareTwoStrings = (str1: string, str2: string): boolean => {
+    return (
+        str1.toLocaleLowerCase().replace(/ /g, "") ===
+        str2.toLocaleLowerCase().replace(/ /g, "")
+    );
+};

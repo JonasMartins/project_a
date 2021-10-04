@@ -401,6 +401,7 @@ export type TokenAndId = {
     __typename?: "tokenAndId";
     accessToken?: Maybe<Scalars["String"]>;
     userId?: Maybe<Scalars["String"]>;
+    userRoleCode?: Maybe<Scalars["String"]>;
 };
 
 export type CreateItemMutationVariables = Exact<{
@@ -457,7 +458,7 @@ export type LoginMutation = { __typename?: "Mutation" } & {
         result?: Maybe<
             { __typename?: "tokenAndId" } & Pick<
                 TokenAndId,
-                "accessToken" | "userId"
+                "accessToken" | "userId" | "userRoleCode"
             >
         >;
     };
@@ -749,6 +750,7 @@ export const LoginDocument = gql`
             result {
                 accessToken
                 userId
+                userRoleCode
             }
         }
     }

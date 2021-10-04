@@ -38,6 +38,9 @@ class tokenAndId {
 
     @Field(() => String, { nullable: true })
     userId?: string;
+
+    @Field(() => String, { nullable: true })
+    userRoleCode: string;
 }
 
 @ObjectType()
@@ -309,6 +312,7 @@ export class UserResolver {
         const result: tokenAndId = {
             accessToken: createAcessToken(user),
             userId: user.id,
+            userRoleCode: user.role.code,
         };
 
         return {

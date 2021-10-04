@@ -141,7 +141,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                             </Text>
                                         </Flex>
                                     ) : (
-                                        <></>
+                                        <React.Fragment></React.Fragment>
                                     )
                             )}
                     </TabPanel>
@@ -190,7 +190,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                             </Text>
                                         </Flex>
                                     ) : (
-                                        <></>
+                                        <React.Fragment></React.Fragment>
                                     )
                             )}
                     </TabPanel>
@@ -239,7 +239,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                             </Text>
                                         </Flex>
                                     ) : (
-                                        <></>
+                                        <React.Fragment></React.Fragment>
                                     )
                             )}
                     </TabPanel>
