@@ -66,7 +66,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
             name: data?.getUserSettings?.user?.name,
             email: data?.getUserSettings?.user?.email,
             // picture: data?.getUserSettings?.user?.picure,
-            role: data?.getUserSettings?.user?.role?.name,
+            role: data?.getUserSettings?.user?.role?.id,
         }));
 
         if (userRole) {
@@ -78,7 +78,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         }
 
         reexecuteQuery({ requestPolicy: "cache-first" });
-    }, [fetching]);
+    }, [fetching, allRoles.fetching]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -205,6 +205,11 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     id="role"
                                                     borderRadius="2em"
                                                     size="lg"
+                                                    value={
+                                                        data?.getUserSettings
+                                                            ?.user?.role?.id
+                                                    }
+                                                    onChange={handlerUpdateUser}
                                                 >
                                                     {roles &&
                                                         roles?.getAllRoles?.roles?.map(
