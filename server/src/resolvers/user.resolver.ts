@@ -31,6 +31,21 @@ class UserBasicData {
     role_id: string;
 }
 
+@InputType()
+class userSeetingsInput {
+    @Field()
+    id: string;
+
+    @Field(() => String, { nullable: true })
+    name: string;
+
+    @Field(() => String, { nullable: true })
+    email: string;
+
+    @Field(() => String, { nullable: true })
+    role_id: string;
+}
+
 @ObjectType()
 class tokenAndId {
     @Field(() => String, { nullable: true })
@@ -318,5 +333,79 @@ export class UserResolver {
         return {
             result,
         };
+    }
+
+    // userSeetingsInput
+    @Mutation(() => UserResponse)
+    async updateSeetingsUser(
+        @Arg("options") options: userSeetingsInput,
+        @Ctx() { em }: Context
+    ): Promise<UserResponse> {
+        const user = await em.findOne(User, { id: options.id });
+
+        if (!user) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: `Could not found user with id: ${options.id}`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        if (
+            options.email.toLocaleLowerCase().replace(/ /g, "") !==
+            user.email.toLocaleLowerCase().replace(/ /g, "")
+        ) {
+            const userEmail = await em.findOne(User, { email: options.email });
+
+            if (userEmail) {
+                return {
+                    errors: [
+                        {
+                            field: "email",
+                            message: `Email ${options.email} already takken.`,
+                            method: `Method: updateSeetingsUser, at ${__filename}`,
+                        },
+                    ],
+                };
+            }
+        }
+
+        const role = await em.findOne(Role, { id: options.role_id });
+
+        if (!role) {
+            return {
+                errors: [
+                    {
+                        field: "role_id",
+                        message: `Could not found role with id: ${options.role_id}`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        user.name = options.name;
+        user.email = options.email;
+        user.role = role;
+
+        try {
+            await em.persistAndFlush(user);
+        } catch (e) {
+            return {
+                errors: [
+                    {
+                        field: "-",
+                        message: `${e.message}`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        return { user };
     }
 }
