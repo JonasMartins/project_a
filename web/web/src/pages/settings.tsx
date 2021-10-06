@@ -18,6 +18,7 @@ import {
 import { Form, Formik, Field } from "formik";
 import Avatar from "react-avatar";
 import Login from "./login";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import {
     useGetUserSettingsQuery,
     useGetAllRolesQuery,
@@ -30,21 +31,22 @@ interface settingsProps {}
 interface userInfo {
     name: string;
     email: string;
-    // picture: string;
     role: string;
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
     const { userId, userRole } = useContext(GlobalContext);
 
+    const [loadingCount, setLoadingCount] = useState(0);
+    const [loading, setLoading] = useState(true);
+
     const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
     const [userInfo, setUserInfo] = useState<userInfo>({
-        name: "Name",
-        email: "Email",
-        // picture: "",
-        role: "Role",
+        name: "",
+        email: "",
+        role: "",
     });
 
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
@@ -58,16 +60,32 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
     const [allRoles] = useGetAllRolesQuery();
 
-    useEffect(() => {
-        if (fetching) return;
+    const forceDataAndStateReady = (): void => {
+        // console.log("times executed: ", loadingCount);
+        if (loadingCount < 20 && loading) {
+            setLoadingCount(loadingCount + 1);
+        }
 
-        setUserInfo((prevUser) => ({
-            ...prevUser,
-            name: data?.getUserSettings?.user?.name,
-            email: data?.getUserSettings?.user?.email,
-            // picture: data?.getUserSettings?.user?.picure,
-            role: data?.getUserSettings?.user?.role?.id,
-        }));
+        if (userInfo.name && userInfo.role && userInfo.email) {
+            // console.log(`vars: ${userInfo.name}, ${userInfo.role}`);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (fetching && allRoles.fetching) return;
+
+        if (
+            data?.getUserSettings?.user?.name &&
+            roles?.getAllRoles?.roles?.length
+        ) {
+            setUserInfo((prevUser) => ({
+                ...prevUser,
+                name: data?.getUserSettings?.user?.name,
+                email: data?.getUserSettings?.user?.email,
+                role: data?.getUserSettings?.user?.role?.id,
+            }));
+        }
 
         if (userRole) {
             setUserIsAdmin(compareTwoStrings(userRole, "Admin"));
@@ -77,10 +95,13 @@ const Settings: React.FC<settingsProps> = ({}) => {
             setRoles(allRoles.data);
         }
 
+        forceDataAndStateReady();
+
         reexecuteQuery({ requestPolicy: "cache-first" });
-    }, [fetching, allRoles.fetching]);
+    }, [fetching, allRoles.fetching, loadingCount]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
+        console.log("role : ", userInfo.role);
         setUserInfo((prevUser) => ({
             ...prevUser,
             [e.target.name]: e.target.value,
@@ -88,12 +109,12 @@ const Settings: React.FC<settingsProps> = ({}) => {
     };
 
     if (error) return <p>Oh no... {error.message}</p>;
-    // /* topo | direita | inferior | esquerda */
 
-    const content = (
+    const content = loading ? (
+        <FullPageSpinner />
+    ) : (
         <Container>
             <Navbar />
-
             <Flex flexDir="row" p={3} mb="150px" justifyContent="flex-start">
                 {data && data?.getUserSettings?.user?.picure ? (
                     <Flex
@@ -206,8 +227,12 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     borderRadius="2em"
                                                     size="lg"
                                                     value={
-                                                        data?.getUserSettings
-                                                            ?.user?.role?.id
+                                                        userInfo.role
+                                                            ? userInfo.role
+                                                            : data
+                                                                  ?.getUserSettings
+                                                                  ?.user?.role
+                                                                  ?.id
                                                     }
                                                     onChange={handlerUpdateUser}
                                                 >
