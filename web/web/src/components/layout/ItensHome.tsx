@@ -21,7 +21,7 @@ import {
     getItemTypeIcon,
 } from "./../../helpers/items/ItemFunctinHelpers";
 import ModalitemDetail from "./../modal/ModalitemDetail";
-import FlexSpinner from "./../rootComponents/FlexSpinner";
+import FullPageSpinner from "./../rootComponents/FullPageSpinner";
 
 interface ItensHomeProps {
     userId: string;
@@ -81,7 +81,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
 
     // console.log("data", data);
 
-    const loading = <FlexSpinner />;
+    const loading = <FullPageSpinner />;
     const content = (
         <>
             <Tabs>

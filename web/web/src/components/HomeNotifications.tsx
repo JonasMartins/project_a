@@ -37,7 +37,7 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
             setCurrentUserName(data.getUserById.user.name);
         }
 
-        reexecuteQuery({ requestPolicy: "cache-first" });
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
     }, [fetching, reexecuteQuery]);
 
     if (error) return <p>Oh no... {error.message}</p>;

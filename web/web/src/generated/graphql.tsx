@@ -138,6 +138,7 @@ export type Mutation = {
     createUser: UserResponse;
     logout?: Maybe<Scalars["Boolean"]>;
     login: LoginResponse;
+    updateSeetingsUser: UserResponse;
     createRole: RoleRespnse;
     createTeam: TeamResponse;
     createAppointment: AppointmentResponse;
@@ -163,6 +164,10 @@ export type MutationCreateUserArgs = {
 export type MutationLoginArgs = {
     password: Scalars["String"];
     email: Scalars["String"];
+};
+
+export type MutationUpdateSeetingsUserArgs = {
+    options: UserSeetingsInput;
 };
 
 export type MutationCreateRoleArgs = {
@@ -382,6 +387,7 @@ export type User = {
     updatedAt: Scalars["DateTime"];
     name: Scalars["String"];
     email: Scalars["String"];
+    password: Scalars["String"];
     itenReporter: Array<Item>;
     itenResponsible: Array<Item>;
     itenApprover: Array<Item>;
@@ -409,6 +415,14 @@ export type TokenAndId = {
     accessToken?: Maybe<Scalars["String"]>;
     userId?: Maybe<Scalars["String"]>;
     userRoleCode?: Maybe<Scalars["String"]>;
+};
+
+export type UserSeetingsInput = {
+    id: Scalars["String"];
+    name?: Maybe<Scalars["String"]>;
+    email?: Maybe<Scalars["String"]>;
+    password?: Maybe<Scalars["String"]>;
+    role_id?: Maybe<Scalars["String"]>;
 };
 
 export type CreateItemMutationVariables = Exact<{
@@ -477,6 +491,28 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
     Mutation,
     "logout"
 >;
+
+export type UpdateSeetingsUserMutationVariables = Exact<{
+    options: UserSeetingsInput;
+}>;
+
+export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
+    updateSeetingsUser: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "field" | "message" | "method"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<User, "id" | "name" | "email"> & {
+                    role: { __typename?: "Role" } & Pick<Role, "id" | "name">;
+                }
+        >;
+    };
+};
 
 export type GetAllRolesQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -718,7 +754,7 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
         user?: Maybe<
             { __typename?: "User" } & Pick<
                 User,
-                "id" | "name" | "email" | "picure"
+                "id" | "name" | "email" | "password" | "picure"
             > & {
                     role: { __typename?: "Role" } & Pick<
                         Role,
@@ -804,6 +840,33 @@ export const Document = gql`
 
 export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
+}
+export const UpdateSeetingsUserDocument = gql`
+    mutation UpdateSeetingsUser($options: userSeetingsInput!) {
+        updateSeetingsUser(options: $options) {
+            errors {
+                field
+                message
+                method
+            }
+            user {
+                id
+                name
+                email
+                role {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useUpdateSeetingsUserMutation() {
+    return Urql.useMutation<
+        UpdateSeetingsUserMutation,
+        UpdateSeetingsUserMutationVariables
+    >(UpdateSeetingsUserDocument);
 }
 export const GetAllRolesDocument = gql`
     query GetAllRoles {
@@ -1051,6 +1114,7 @@ export const GetUserSettingsDocument = gql`
                 id
                 name
                 email
+                password
                 picure
                 role {
                     id

@@ -43,6 +43,9 @@ class userSeetingsInput {
     email: string;
 
     @Field(() => String, { nullable: true })
+    password?: string;
+
+    @Field(() => String, { nullable: true })
     role_id: string;
 }
 
@@ -386,6 +389,25 @@ export class UserResolver {
                     },
                 ],
             };
+        }
+
+        if (options.password) {
+            if (options.password.length <= 3) {
+                return {
+                    errors: [
+                        {
+                            field: "password",
+                            message:
+                                "A user password must have length greater than 3 charachters.",
+                            method: `Method: updateSeetingsUser, at ${__filename}`,
+                        },
+                    ],
+                };
+            }
+
+            const hashedPassword = await argon2.hash(options.password);
+            options.password = hashedPassword;
+            user.password = options.password;
         }
 
         user.name = options.name;

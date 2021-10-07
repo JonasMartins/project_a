@@ -1,20 +1,17 @@
-query GetUserSettings($id: String!) {
-    getUserSettings(id: $id) {
+mutation UpdateSeetingsUser($options: userSeetingsInput!) {
+    updateSeetingsUser(options: $options) {
         errors {
-            method
-            message
             field
+            message
+            method
         }
         user {
             id
             name
             email
-            password
-            picure
             role {
                 id
                 name
-                code
             }
         }
     }

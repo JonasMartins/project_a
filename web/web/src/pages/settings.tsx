@@ -14,6 +14,8 @@ import {
     Stack,
     Select,
     FormErrorMessage,
+    useToast,
+    Switch,
 } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import Avatar from "react-avatar";
@@ -23,30 +25,41 @@ import {
     useGetUserSettingsQuery,
     useGetAllRolesQuery,
     GetAllRolesQuery,
+    useUpdateSeetingsUserMutation,
 } from "./../generated/graphql";
+import { useRouter } from "next/dist/client/router";
 import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface settingsProps {}
 
 interface userInfo {
+    id: string;
     name: string;
     email: string;
-    role: string;
+    passowrd: string;
+    role_id: string;
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
-    const { userId, userRole } = useContext(GlobalContext);
+    const { userId } = useContext(GlobalContext);
+
+    const toast = useToast();
+    const router = useRouter();
 
     const [loadingCount, setLoadingCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [changePassword, setChangePassword] = useState(false);
 
     const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
     const [userInfo, setUserInfo] = useState<userInfo>({
+        id: "",
         name: "",
         email: "",
-        role: "",
+        passowrd: "",
+        role_id: "",
     });
 
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
@@ -58,16 +71,20 @@ const Settings: React.FC<settingsProps> = ({}) => {
         }
     );
 
+    const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
+
     const [allRoles] = useGetAllRolesQuery();
 
     const forceDataAndStateReady = (): void => {
+        // console.log("userRole ", userRole);
+        // console.log("isAdmin ? ", userIsAdmin);
         // console.log("times executed: ", loadingCount);
         if (loadingCount < 20 && loading) {
             setLoadingCount(loadingCount + 1);
         }
 
-        if (userInfo.name && userInfo.role && userInfo.email) {
-            // console.log(`vars: ${userInfo.name}, ${userInfo.role}`);
+        if (userInfo.name && userInfo.role_id && userInfo.email) {
+            // console.log(`vars: ${userInfo.name}, ${userInfo.role_id}`);
             setLoading(false);
         }
     };
@@ -81,15 +98,19 @@ const Settings: React.FC<settingsProps> = ({}) => {
         ) {
             setUserInfo((prevUser) => ({
                 ...prevUser,
+                id: userId,
                 name: data?.getUserSettings?.user?.name,
                 email: data?.getUserSettings?.user?.email,
-                role: data?.getUserSettings?.user?.role?.id,
+                passowrd: "",
+                role_id: data?.getUserSettings?.user?.role?.id,
             }));
+
+            // setPrevPassword(data?.getUserSettings?.user?.password);
         }
 
-        if (userRole) {
-            setUserIsAdmin(compareTwoStrings(userRole, "Admin"));
-        }
+        setUserIsAdmin(
+            compareTwoStrings(data?.getUserSettings?.user?.role.name, "Admin")
+        );
 
         if (allRoles.data) {
             setRoles(allRoles.data);
@@ -97,11 +118,10 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
         forceDataAndStateReady();
 
-        reexecuteQuery({ requestPolicy: "cache-first" });
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
     }, [fetching, allRoles.fetching, loadingCount]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log("role : ", userInfo.role);
         setUserInfo((prevUser) => ({
             ...prevUser,
             [e.target.name]: e.target.value,
@@ -150,14 +170,48 @@ const Settings: React.FC<settingsProps> = ({}) => {
                     </Flex>
                 )}
                 <Flex flexDir="column" alignItems="stretch" flexGrow={0.4}>
+                    <Flex justifyContent="flex-end">
+                        <Switch
+                            size="sm"
+                            mr={3}
+                            onChange={() => {
+                                setChangePassword(!changePassword);
+                            }}
+                        />
+                        <Text>Change Password ?</Text>
+                    </Flex>
                     <Formik
                         initialValues={{
+                            id: userInfo.id,
                             name: userInfo.name,
                             email: userInfo.email,
-                            role: userInfo.role,
+                            password: userInfo.passowrd,
+                            role_id: userInfo.role_id,
                         }}
-                        onSubmit={() => {
-                            console.log("submited");
+                        enableReinitialize={true}
+                        onSubmit={async (values, { setErrors }) => {
+                            //console.log("values ", values);
+                            const response = await updateSeetingsUser({
+                                options: values,
+                            });
+
+                            if (response.data?.updateSeetingsUser?.errors) {
+                                setErrors(
+                                    toErrorMap(
+                                        response.data.updateSeetingsUser.errors
+                                    )
+                                );
+                            } else {
+                                toast({
+                                    title: "User Updated",
+                                    description: "User successfully updatde",
+                                    status: "success",
+                                    duration: 8000,
+                                    isClosable: true,
+                                    position: "bottom-right",
+                                });
+                                router.push("/");
+                            }
                         }}
                     >
                         {(props) => (
@@ -210,6 +264,50 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                         )}
                                     </Field>
 
+                                    {changePassword ? (
+                                        <Field name="password">
+                                            {({ field, form }) => (
+                                                <FormControl
+                                                    isInvalid={
+                                                        form.errors.password
+                                                    }
+                                                >
+                                                    <FormLabel htmlFor="password">
+                                                        Password
+                                                    </FormLabel>
+                                                    <Input
+                                                        placeholder="Insert new Password"
+                                                        type="password"
+                                                        {...field}
+                                                        id="password"
+                                                        borderRadius="2em"
+                                                        size="lg"
+                                                        onChange={(e) => {
+                                                            setUserInfo(
+                                                                (
+                                                                    prevUserInfo
+                                                                ) => ({
+                                                                    ...prevUserInfo,
+                                                                    passowrd:
+                                                                        e.target
+                                                                            .value,
+                                                                })
+                                                            );
+                                                        }}
+                                                        value={
+                                                            userInfo.passowrd
+                                                        }
+                                                    />
+                                                    <FormErrorMessage>
+                                                        {form.errors.password}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                            )}
+                                        </Field>
+                                    ) : (
+                                        <></>
+                                    )}
+
                                     <Field name="role">
                                         {({ field, form }) => (
                                             <FormControl
@@ -226,15 +324,17 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                                     id="role"
                                                     borderRadius="2em"
                                                     size="lg"
-                                                    value={
-                                                        userInfo.role
-                                                            ? userInfo.role
-                                                            : data
-                                                                  ?.getUserSettings
-                                                                  ?.user?.role
-                                                                  ?.id
-                                                    }
-                                                    onChange={handlerUpdateUser}
+                                                    value={userInfo.role_id}
+                                                    onChange={(e) => {
+                                                        setUserInfo(
+                                                            (prevUserInfo) => ({
+                                                                ...prevUserInfo,
+                                                                role_id:
+                                                                    e.target
+                                                                        .value,
+                                                            })
+                                                        );
+                                                    }}
                                                 >
                                                     {roles &&
                                                         roles?.getAllRoles?.roles?.map(

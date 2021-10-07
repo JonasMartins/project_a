@@ -25,6 +25,7 @@ export class User extends Base<User> {
     @Property({ type: "text", unique: true, nullable: true })
     email: string;
 
+    @Field()
     @Property({ type: "text" })
     password!: string;
 
