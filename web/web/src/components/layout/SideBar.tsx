@@ -3,7 +3,7 @@ import { Box, useColorMode, Text, Flex } from "@chakra-ui/react";
 import { SiCodesandbox } from "react-icons/si";
 
 interface SideBarProps {
-    projectName: string;
+    projectName?: string;
     width: string;
     visibility: "visible" | "hidden";
 }
@@ -41,8 +41,13 @@ const SideBar: React.FC<SideBarProps> = ({
                 <Box mb={3}>
                     <SiCodesandbox size="35px" />
                 </Box>
-                <Text fontSize="2xl">{projectName}</Text>
-                <Text fontSize="lg">Software project</Text>
+
+                {projectName && (
+                    <React.Fragment>
+                        <Text fontSize="2xl">{projectName}</Text>
+                        <Text fontSize="lg">Software project</Text>{" "}
+                    </React.Fragment>
+                )}
             </Flex>
         </Box>
     );

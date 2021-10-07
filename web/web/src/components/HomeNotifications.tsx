@@ -15,20 +15,8 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
         variables: {
             id: userId,
         },
-        // context: useMemo(() => data, []),
         pause: true,
     });
-
-    // useEffect(() => {
-    //     if (fetching) return;
-
-    //     // Set up to refetch in one second, if the query is idle
-    //     const timerId = setTimeout(() => {
-    //         reexecuteQuery({ requestPolicy: "cache-only" });
-    //     }, 1000);
-
-    //     return () => clearTimeout(timerId);
-    // }, [fetching, reexecuteQuery]);
 
     useEffect(() => {
         if (fetching) return;
@@ -44,7 +32,7 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
 
     const spinner = <FullPageSpinner />;
     const content = (
-        <Flex boxShadow="xl" p="6" m={3} grow={1} flexDir="column">
+        <Flex boxShadow="xl" p="6" m={1} grow={1} flexDir="column">
             <Box>
                 <Flex alignItems="baseline">
                     <Text fontSize="xl" m="1">

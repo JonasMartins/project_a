@@ -56,7 +56,6 @@ const Project: React.FC<projectsProps> = ({}) => {
     const { project } = router.query;
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
-            // id: typeof project === "string" ? project : "",
             id: project[0] ? project[0] : "-1",
         },
         pause: true,
@@ -224,7 +223,7 @@ const Project: React.FC<projectsProps> = ({}) => {
         if (!fillItens) {
             loadItensByTypes();
         }
-        reexecuteQuery({ requestPolicy: "cache-first" });
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
     }, [fetching, reexecuteQuery, dataLoaded]);
 
     useEffect(() => {
@@ -240,7 +239,7 @@ const Project: React.FC<projectsProps> = ({}) => {
         setExpand(!expand);
 
         if (expand) {
-            setSideBarWidth("225px");
+            setSideBarWidth("250px");
             setPageWidth("20em");
             setNavBarWidth("16em");
         } else {
