@@ -16,7 +16,7 @@ import { Project } from "./project.entity";
 @Entity()
 export class Sprint extends Base<Sprint> {
     @Field()
-    @Property({ length: 5, fieldName: "code" })
+    @Property({ length: 10, fieldName: "code" })
     code!: string;
 
     @Field()

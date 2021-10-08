@@ -16,6 +16,7 @@ import {
     FormErrorMessage,
     useToast,
     Switch,
+    IconButton,
 } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import Avatar from "react-avatar";
@@ -30,6 +31,8 @@ import {
 import { useRouter } from "next/dist/client/router";
 import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
 import { toErrorMap } from "../utils/toErrorMap";
+import SideBar from "../components/layout/SideBar";
+import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 
 interface settingsProps {}
 
@@ -54,6 +57,25 @@ const Settings: React.FC<settingsProps> = ({}) => {
     const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
+    const [expand, setExpand] = useState(true);
+    const [sideBarWidth, setSideBarWidth] = useState("0px");
+    const [pageWidth, setPageWidth] = useState("3em");
+    const [navBarWidth, setNavBarWidth] = useState("0px");
+
+    const handleExpandSideBar = (): void => {
+        setExpand(!expand);
+
+        if (expand) {
+            setSideBarWidth("250px");
+            setPageWidth("20em");
+            setNavBarWidth("16em");
+        } else {
+            setSideBarWidth("0px");
+            setPageWidth("3em");
+            setNavBarWidth("0px");
+        }
+    };
+
     const [userInfo, setUserInfo] = useState<userInfo>({
         id: "",
         name: "",
@@ -65,7 +87,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
         {
             variables: {
-                id: userId,
+                id: userId ? userId : "-1",
             },
             pause: true,
         }
@@ -119,7 +141,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         forceDataAndStateReady();
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, allRoles.fetching, loadingCount]);
+    }, [fetching, allRoles.fetching, loadingCount, userId]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -134,8 +156,28 @@ const Settings: React.FC<settingsProps> = ({}) => {
         <FullPageSpinner />
     ) : (
         <Container>
-            <Navbar />
-            <Flex flexDir="row" p={3} mb="150px" justifyContent="flex-start">
+            <Navbar pageWidth={navBarWidth} />
+            <SideBar
+                width={sideBarWidth}
+                visibility={expand ? "hidden" : "visible"}
+            />
+            <Flex
+                flexDir="row"
+                p={3}
+                mb="150px"
+                justifyContent="flex-start"
+                ml={pageWidth}
+                transition="0.3s"
+            >
+                <Flex mt={2}>
+                    <IconButton
+                        isRound={true}
+                        aria-label="Show Side Bar"
+                        mr={1}
+                        icon={expand ? <ArrowLeftIcon /> : <ArrowRightIcon />}
+                        onClick={handleExpandSideBar}
+                    />
+                </Flex>
                 {data && data?.getUserSettings?.user?.picure ? (
                     <Flex
                         mt={5}

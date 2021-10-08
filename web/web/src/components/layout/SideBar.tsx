@@ -1,6 +1,13 @@
 import React from "react";
-import { Box, useColorMode, Text, Flex } from "@chakra-ui/react";
+import { Box, useColorMode, Text, Flex, Link } from "@chakra-ui/react";
 import { SiCodesandbox } from "react-icons/si";
+import {
+    AiOutlineApartment,
+    AiOutlineOrderedList,
+    AiOutlineProject,
+    AiOutlineHome,
+} from "react-icons/ai";
+import NextLink from "next/link";
 
 interface SideBarProps {
     projectName?: string;
@@ -38,16 +45,46 @@ const SideBar: React.FC<SideBarProps> = ({
                 flexDirection="column"
                 alignItems="center"
             >
-                <Box mb={3}>
+                <Box mb={5}>
                     <SiCodesandbox size="35px" />
                 </Box>
-
                 {projectName && (
                     <React.Fragment>
                         <Text fontSize="2xl">{projectName}</Text>
                         <Text fontSize="lg">Software project</Text>{" "}
                     </React.Fragment>
                 )}
+
+                <Flex justifyContent="flex-start" flexDir="column" mt={3}>
+                    <Flex mb={5} alignItems="center">
+                        <AiOutlineHome size="35px" />
+                        <NextLink href="/">
+                            <Link textStyle="bold" ml={2}>
+                                Home
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                    <Flex mb={5} alignItems="center">
+                        <AiOutlineApartment size="35px" />
+                        <Text ml={2}>Active Sprints</Text>
+                    </Flex>
+                    <Flex mb={5} alignItems="center">
+                        <AiOutlineOrderedList size="35px" />
+                        <NextLink href="/backlog">
+                            <Link textStyle="bold" ml={2}>
+                                Backlog
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                    <Flex mb={5} alignItems="center">
+                        <AiOutlineProject size="35px" />
+                        <NextLink href="/project">
+                            <Link textStyle="bold" ml={2}>
+                                Projects
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Flex>
             </Flex>
         </Box>
     );
