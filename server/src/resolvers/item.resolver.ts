@@ -260,20 +260,23 @@ export class ItemResolver {
 
         if (cursor) {
             qb.select(["i.*", "u.name"], true)
-                .join("i.responsible", "u")
+                .leftJoin("i.responsible", "u")
                 .where({ updatedAt: { $lt: cursor } })
                 .limit(max)
                 .orderBy({ updatedAt: "DESC" });
         } else {
             qb.select(["i.*", "u.name"], true)
-                .join("i.responsible", "u")
+                .leftJoin("i.responsible", "u")
                 .where({ "1": "1" })
                 .limit(max)
                 .orderBy({ updatedAt: "DESC" });
         }
 
         try {
-            const itens: Item[] = await qb.execute();
+            const itens: Item[] = await qb.getResult();
+
+            await em.populate(itens, ["responsible"]);
+
             return { itens };
         } catch (e) {
             return {
