@@ -1,0 +1,24 @@
+{
+    getItensBacklog(limit: 3, cursor: "2021-10-10T17:26:35.000Z") {
+        errors {
+            method
+            message
+            field
+        }
+        itens {
+            summary
+            type
+            priority
+            status
+            updatedAt
+            responsible {
+                id
+                name
+            }
+            reporter {
+                id
+                name
+            }
+        }
+    }
+}

@@ -89,7 +89,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
             variables: {
                 id: userId ? userId : "-1",
             },
-            pause: true,
         }
     );
 
@@ -98,7 +97,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
     const [allRoles] = useGetAllRolesQuery();
 
     const forceDataAndStateReady = (): void => {
-        // console.log("userRole ", userRole);
+        console.log("user ", userInfo);
         // console.log("isAdmin ? ", userIsAdmin);
         // console.log("times executed: ", loadingCount);
         if (loadingCount < 20 && loading) {

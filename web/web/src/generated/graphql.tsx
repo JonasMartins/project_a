@@ -215,6 +215,7 @@ export type Query = {
     __typename?: "Query";
     getItensRelatedToUserByPeriod: ItensResponse;
     getItemById: ItemResponse;
+    getItensBacklog: ItensResponse;
     hello: Scalars["String"];
     logedInTest: Scalars["String"];
     getUserById: UserResponse;
@@ -239,6 +240,11 @@ export type QueryGetItensRelatedToUserByPeriodArgs = {
 
 export type QueryGetItemByIdArgs = {
     id: Scalars["String"];
+};
+
+export type QueryGetItensBacklogArgs = {
+    cursor?: Maybe<Scalars["DateTime"]>;
+    limit?: Maybe<Scalars["Float"]>;
 };
 
 export type QueryGetUserByIdArgs = {
@@ -600,6 +606,46 @@ export type GetItemByIdQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetItensBacklogQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    cursor?: Maybe<Scalars["DateTime"]>;
+}>;
+
+export type GetItensBacklogQuery = { __typename?: "Query" } & {
+    getItensBacklog: { __typename?: "ItensResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        itens?: Maybe<
+            Array<
+                { __typename?: "Item" } & Pick<
+                    Item,
+                    | "id"
+                    | "summary"
+                    | "type"
+                    | "priority"
+                    | "status"
+                    | "updatedAt"
+                > & {
+                        responsible: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "name"
+                        >;
+                        reporter: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "name"
+                        >;
+                    }
+            >
+        >;
+    };
+};
+
 export type GetItensRelatedToUserByPeriodQueryVariables = Exact<{
     limit?: Maybe<Scalars["Float"]>;
     userId: Scalars["String"];
@@ -957,6 +1003,45 @@ export function useGetItemByIdQuery(
 ) {
     return Urql.useQuery<GetItemByIdQuery>({
         query: GetItemByIdDocument,
+        ...options,
+    });
+}
+export const GetItensBacklogDocument = gql`
+    query GetItensBacklog($limit: Float, $cursor: DateTime) {
+        getItensBacklog(limit: $limit, cursor: $cursor) {
+            errors {
+                method
+                message
+                field
+            }
+            itens {
+                id
+                summary
+                type
+                priority
+                status
+                updatedAt
+                responsible {
+                    id
+                    name
+                }
+                reporter {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useGetItensBacklogQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetItensBacklogQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetItensBacklogQuery>({
+        query: GetItensBacklogDocument,
         ...options,
     });
 }

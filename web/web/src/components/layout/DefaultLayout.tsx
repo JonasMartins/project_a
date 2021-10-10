@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "@chakra-ui/icons";
-import SideBar from "../components/layout/SideBar";
-import { Container } from "./../components/Container";
-import Navbar from "./../components/rootComponents/Navbar";
-import Footer from "./../components/rootComponents/Footer";
-import Login from "./../pages/login";
-import { GlobalContext } from "./../context/globalContext";
+import SideBar from "./SideBar";
+import { Container } from "./../Container";
+import Navbar from "./../rootComponents/Navbar";
+import Footer from "./../rootComponents/Footer";
+import Login from "./../../pages/login";
+import { GlobalContext } from "./../../context/globalContext";
 import {
     Box,
     Flex,
@@ -18,44 +18,16 @@ import {
     Button,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useGetItensBacklogQuery, Maybe, Item } from "./../generated/graphql";
-import {
-    returnPriorityIconHeaderModal,
-    getItemTypeIcon,
-} from "./../helpers/items/ItemFunctinHelpers";
 
-interface backlogProps {}
+interface DefaultLayoutProps {}
 
-type itens = {
-    itens?: Maybe<
-        Array<
-            { __typename?: "Item" } & Pick<
-                Item,
-                "id" | "summary" | "type" | "priority" | "status" | "updatedAt"
-            > & {
-                    responsible: { __typename?: "User" } & Pick<
-                        User,
-                        "id" | "name"
-                    >;
-                    reporter: { __typename?: "User" } & Pick<
-                        User,
-                        "id" | "name"
-                    >;
-                }
-        >
-    >;
-};
-
-const Backlog: React.FC<backlogProps> = ({}) => {
+const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     const { userId } = useContext(GlobalContext);
 
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("0px");
-    const [page, setPage] = useState<number | null>(null);
-    const [cursor, setCursor] = useState<Date | null>(null);
-    const [itens, setItens] = useState<itens>(null);
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -70,22 +42,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
             setNavBarWidth("0px");
         }
     };
-
-    const [itensBacklog] = useGetItensBacklogQuery({
-        variables: {
-            limit: page ? page : 10,
-            cursor: cursor,
-        },
-    });
-
-    useEffect(() => {
-        if (itensBacklog.fetching) return;
-
-        if (itensBacklog.data?.getItensBacklog) {
-            setItens(itensBacklog.data?.getItensBacklog);
-        }
-        console.log("itens ", itens);
-    }, [itensBacklog.fetching, itens?.itens?.length]);
 
     const content = (
         <Container>
@@ -149,26 +105,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         My Itens
                     </Button>
                 </InputGroup>
-                <Flex flexDir="column" flexGrow={1} p={2}>
-                    {itens &&
-                        itens.itens.map((item) => (
-                            <Flex
-                                key={item.id}
-                                justifyContent="space-between"
-                                alignItems="center"
-                                p={1}
-                                // border="1px solid grey"
-                                boxShadow="md"
-                                m={1}
-                            >
-                                <Flex>
-                                    {getItemTypeIcon(item.type)}
-                                    <Text>{item.summary}</Text>
-                                </Flex>
-                                {returnPriorityIconHeaderModal(item.priority)}
-                            </Flex>
-                        ))}
-                </Flex>
             </Flex>
             <Box id="footer">
                 <Footer />
@@ -179,4 +115,4 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     return userId ? content : <Login />;
 };
 
-export default Backlog;
+export default DefaultLayout;

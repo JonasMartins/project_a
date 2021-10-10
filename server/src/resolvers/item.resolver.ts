@@ -243,7 +243,7 @@ export class ItemResolver {
      *  Recebendo o cursor com a data, ele retorna os itens com a data mais antiga que aquele item
      *
      * @param limit
-     * @param param1
+     * @param cursor
      * @returns
      */
     @Query(() => ItensResponse)
@@ -256,8 +256,9 @@ export class ItemResolver {
 
         const qb = (em as EntityManager).createQueryBuilder(Item, "i");
 
+        /*
         // $gte, $lte = >=| <=, $gt, $lt :  > | <
-
+        // With join
         if (cursor) {
             qb.select(["i.*", "u.name"], true)
                 .leftJoin("i.responsible", "u")
@@ -270,12 +271,25 @@ export class ItemResolver {
                 .where({ "1": "1" })
                 .limit(max)
                 .orderBy({ updatedAt: "DESC" });
+        } */
+
+        if (cursor) {
+            qb.select(["i.*"], true)
+                .where({ updatedAt: { $lt: cursor } })
+                .limit(max)
+                .orderBy({ updatedAt: "DESC" });
+        } else {
+            qb.select(["i.*"], true)
+                .where({ "1": "1" })
+                .limit(max)
+                .orderBy({ updatedAt: "DESC" });
         }
 
         try {
             const itens: Item[] = await qb.getResult();
 
             await em.populate(itens, ["responsible"]);
+            await em.populate(itens, ["reporter"]);
 
             return { itens };
         } catch (e) {

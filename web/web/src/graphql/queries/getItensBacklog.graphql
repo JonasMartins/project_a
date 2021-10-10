@@ -1,0 +1,25 @@
+query GetItensBacklog($limit: Float, $cursor: DateTime) {
+    getItensBacklog(limit: $limit, cursor: $cursor) {
+        errors {
+            method
+            message
+            field
+        }
+        itens {
+            id
+            summary
+            type
+            priority
+            status
+            updatedAt
+            responsible {
+                id
+                name
+            }
+            reporter {
+                id
+                name
+            }
+        }
+    }
+}
