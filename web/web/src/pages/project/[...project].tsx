@@ -317,7 +317,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                     {data && data.getProjectById.project.name}
                 </Text>
             </Flex>
-            {pendingItens.length || progressItens.length || doneItens.length ? (
+            {data?.getProjectById?.project?.sprints?.length ? (
                 <Flex
                     flexDir="row"
                     ml={pageWidth}
