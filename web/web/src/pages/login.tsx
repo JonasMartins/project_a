@@ -8,6 +8,9 @@ import {
     FormLabel,
     Input,
     FormErrorMessage,
+    Image,
+    Flex,
+    Text,
 } from "@chakra-ui/react";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -47,12 +50,23 @@ const Login: React.FC<loginProps> = ({}) => {
     return (
         <Container>
             <ButtonColorMode size="md" position="fixed" right="1em" top="1em" />
+
             <Box
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
                 minHeight="100vh"
+                flexDir="column"
             >
+                <Flex alignSelf="center" flexDir="column" mt="3">
+                    <Image
+                        boxSize="100px"
+                        src="/favicon/android-chrome-512x512.png"
+                    />
+                    <Text fontSize="3xl" fontWeight="semibold">
+                        Project A
+                    </Text>
+                </Flex>
                 <Box boxShadow="xl" p="6" rounded="md" padding={"2em"}>
                     <Formik
                         initialValues={{ email: "", password: "" }}
