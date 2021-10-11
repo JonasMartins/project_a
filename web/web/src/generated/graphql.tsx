@@ -640,6 +640,15 @@ export type GetItensBacklogQuery = { __typename?: "Query" } & {
                             User,
                             "id" | "name"
                         >;
+                        sprint: { __typename?: "Sprint" } & Pick<
+                            Sprint,
+                            "code" | "createdAt" | "length" | "final"
+                        > & {
+                                project: { __typename?: "Project" } & Pick<
+                                    Project,
+                                    "name"
+                                >;
+                            };
                     }
             >
         >;
@@ -1028,6 +1037,15 @@ export const GetItensBacklogDocument = gql`
                 reporter {
                     id
                     name
+                }
+                sprint {
+                    code
+                    createdAt
+                    length
+                    final
+                    project {
+                        name
+                    }
                 }
             }
         }

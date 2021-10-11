@@ -20,6 +20,15 @@ query GetItensBacklog($limit: Float, $cursor: DateTime) {
                 id
                 name
             }
+            sprint {
+                code
+                createdAt
+                length
+                final
+                project {
+                    name
+                }
+            }
         }
     }
 }

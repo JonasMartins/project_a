@@ -290,6 +290,7 @@ export class ItemResolver {
 
             await em.populate(itens, ["responsible"]);
             await em.populate(itens, ["reporter"]);
+            await em.populate(itens, ["sprint.project"]);
 
             return { itens };
         } catch (e) {

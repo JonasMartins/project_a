@@ -1,5 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
-import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    SearchIcon,
+    CloseIcon,
+} from "@chakra-ui/icons";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
@@ -22,9 +27,22 @@ import { useGetItensBacklogQuery, Maybe, Item } from "./../generated/graphql";
 import {
     returnPriorityIconHeaderModal,
     getItemTypeIcon,
+    returnItemStatusStyled,
 } from "./../helpers/items/ItemFunctinHelpers";
+import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 
 interface backlogProps {}
+
+const styleItemDetail = {
+    display: "flex",
+    justifyContent: "space-between",
+    flexShrink: 0,
+};
+
+type item = { __typename?: "Item" } & Pick<
+    Item,
+    "id" | "summary" | "type" | "priority" | "status" | "updatedAt"
+>;
 
 type itens = {
     itens?: Maybe<
@@ -56,6 +74,9 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [page, setPage] = useState<number | null>(null);
     const [cursor, setCursor] = useState<Date | null>(null);
     const [itens, setItens] = useState<itens>(null);
+    const [itemDetailWidth, setItemDetailWidth] = useState(0);
+    const [itemDetailOpen, setItemDetailOpen] = useState(false);
+    const [itemDetailed, setItemDetailed] = useState<item | null>(null);
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -84,8 +105,13 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         if (itensBacklog.data?.getItensBacklog) {
             setItens(itensBacklog.data?.getItensBacklog);
         }
-        console.log("itens ", itens);
-    }, [itensBacklog.fetching, itens?.itens?.length]);
+        // console.log("itens ", itens);
+    }, [
+        itensBacklog.fetching,
+        itens?.itens?.length,
+        itemDetailed,
+        itemDetailOpen,
+    ]);
 
     const content = (
         <Container>
@@ -149,25 +175,76 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         My Itens
                     </Button>
                 </InputGroup>
-                <Flex flexDir="column" flexGrow={1} p={2}>
-                    {itens &&
-                        itens.itens.map((item) => (
-                            <Flex
-                                key={item.id}
-                                justifyContent="space-between"
-                                alignItems="center"
-                                p={1}
-                                // border="1px solid grey"
-                                boxShadow="md"
-                                m={1}
-                            >
-                                <Flex>
-                                    {getItemTypeIcon(item.type)}
-                                    <Text>{item.summary}</Text>
+                <Flex flexDir="row">
+                    <Flex flexDir="column" p={2} cursor="pointer" flexGrow={1}>
+                        {itens &&
+                            itens.itens.map((item) => (
+                                <Flex
+                                    key={item.id}
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                    p={1}
+                                    boxShadow="md"
+                                    m={1}
+                                    onClick={() => {
+                                        setItemDetailOpen(true);
+                                        setItemDetailWidth(0.5);
+                                        setItemDetailed(item);
+                                    }}
+                                >
+                                    <Flex>
+                                        {getItemTypeIcon(item.type)}
+                                        <Text>
+                                            {truncateString(item.summary, 30)}
+                                        </Text>
+                                    </Flex>
+                                    {returnPriorityIconHeaderModal(
+                                        item.priority
+                                    )}
                                 </Flex>
-                                {returnPriorityIconHeaderModal(item.priority)}
+                            ))}
+                    </Flex>
+                    <Flex
+                        // display={itemDetailOpen ? "flex" : "none"}
+                        flexGrow={itemDetailWidth}
+                        overflowY="hidden"
+                        overflowX="hidden"
+                        transition="0.3s"
+                    >
+                        {itemDetailed && itemDetailOpen ? (
+                            <Flex flexDir="column" flexGrow={1} p={2}>
+                                <div style={styleItemDetail}>
+                                    <Flex>
+                                        {getItemTypeIcon(itemDetailed.type)}
+                                        <Text>
+                                            {truncateString(
+                                                itemDetailed.summary,
+                                                30
+                                            )}
+                                        </Text>
+                                    </Flex>
+
+                                    <IconButton
+                                        isRound={true}
+                                        aria-label="Close Item Detail"
+                                        icon={<CloseIcon />}
+                                        onClick={() => {
+                                            setItemDetailOpen(false);
+                                            setItemDetailWidth(0);
+                                        }}
+                                    />
+                                </div>
+                                <Flex>
+                                    <Text mr={2}>Current Status:</Text>
+                                    {returnItemStatusStyled(
+                                        itemDetailed.status
+                                    )}
+                                </Flex>
                             </Flex>
-                        ))}
+                        ) : (
+                            <></>
+                        )}
+                    </Flex>
                 </Flex>
             </Flex>
             <Box id="footer">
