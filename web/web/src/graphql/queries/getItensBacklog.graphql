@@ -11,6 +11,7 @@ query GetItensBacklog($limit: Float, $cursor: DateTime) {
             type
             priority
             status
+            description
             updatedAt
             responsible {
                 id

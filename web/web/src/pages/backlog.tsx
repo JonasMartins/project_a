@@ -21,9 +21,16 @@ import {
     InputGroup,
     InputLeftElement,
     Button,
+    Divider,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useGetItensBacklogQuery, Maybe, Item } from "./../generated/graphql";
+import {
+    useGetItensBacklogQuery,
+    Maybe,
+    Item,
+    Sprint,
+    Project,
+} from "./../generated/graphql";
 import {
     returnPriorityIconHeaderModal,
     getItemTypeIcon,
@@ -41,15 +48,36 @@ const styleItemDetail = {
 
 type item = { __typename?: "Item" } & Pick<
     Item,
-    "id" | "summary" | "type" | "priority" | "status" | "updatedAt"
->;
+    | "id"
+    | "summary"
+    | "type"
+    | "priority"
+    | "status"
+    | "updatedAt"
+    | "description"
+> & {
+        responsible: { __typename?: "User" } & Pick<User, "id" | "name">;
+        reporter: { __typename?: "User" } & Pick<User, "id" | "name">;
+        sprint: { __typename?: "Sprint" } & Pick<
+            Sprint,
+            "code" | "createdAt" | "length" | "final"
+        > & {
+                project: { __typename?: "Project" } & Pick<Project, "name">;
+            };
+    };
 
 type itens = {
     itens?: Maybe<
         Array<
             { __typename?: "Item" } & Pick<
                 Item,
-                "id" | "summary" | "type" | "priority" | "status" | "updatedAt"
+                | "id"
+                | "summary"
+                | "type"
+                | "priority"
+                | "status"
+                | "updatedAt"
+                | "description"
             > & {
                     responsible: { __typename?: "User" } & Pick<
                         User,
@@ -59,6 +87,15 @@ type itens = {
                         User,
                         "id" | "name"
                     >;
+                    sprint: { __typename?: "Sprint" } & Pick<
+                        Sprint,
+                        "code" | "createdAt" | "length" | "final"
+                    > & {
+                            project: { __typename?: "Project" } & Pick<
+                                Project,
+                                "name"
+                            >;
+                        };
                 }
         >
     >;
@@ -77,6 +114,11 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
     const [itemDetailed, setItemDetailed] = useState<item | null>(null);
+
+    const closeItemDetail = (): void => {
+        setItemDetailOpen(false);
+        setItemDetailWidth(0);
+    };
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -166,6 +208,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         children={<SearchIcon color="gray.300" />}
                     />
                     <Input
+                        onFocus={closeItemDetail}
                         type="text"
                         maxW="300px"
                         placeholder="Filter info"
@@ -197,6 +240,9 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                         <Text>
                                             {truncateString(item.summary, 30)}
                                         </Text>
+                                        <Text fontWeight="semibold" ml={3}>
+                                            {item.sprint.code}
+                                        </Text>
                                     </Flex>
                                     {returnPriorityIconHeaderModal(
                                         item.priority
@@ -210,6 +256,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         overflowY="hidden"
                         overflowX="hidden"
                         transition="0.3s"
+                        boxShadow="md"
                     >
                         {itemDetailed && itemDetailOpen ? (
                             <Flex flexDir="column" flexGrow={1} p={2}>
@@ -228,10 +275,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                         isRound={true}
                                         aria-label="Close Item Detail"
                                         icon={<CloseIcon />}
-                                        onClick={() => {
-                                            setItemDetailOpen(false);
-                                            setItemDetailWidth(0);
-                                        }}
+                                        onClick={closeItemDetail}
                                     />
                                 </div>
                                 <Flex>
@@ -239,6 +283,54 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                     {returnItemStatusStyled(
                                         itemDetailed.status
                                     )}
+                                </Flex>
+                                <Flex p={2} boxShadow="md">
+                                    <Flex flexDir="column" flexGrow={1}>
+                                        <Flex
+                                            flexGrow={1}
+                                            justifyContent="center"
+                                        >
+                                            <Text>Information</Text>
+                                        </Flex>
+                                        <Divider orientation="horizontal" />
+
+                                        <Flex mt={2}>
+                                            <Text mr={2}>Responsible:</Text>
+                                            {itemDetailed.responsible.name}
+                                        </Flex>
+                                        <Flex mt={2}>
+                                            <Text mr={2}>Reporter:</Text>
+                                            {itemDetailed.reporter.name}
+                                        </Flex>
+                                        <Flex
+                                            mt={2}
+                                            justifyContent="space-between"
+                                        >
+                                            <Flex>
+                                                <Text mr={2}>Sprint:</Text>
+                                                {itemDetailed.sprint.code}
+                                            </Flex>
+                                            <Flex>
+                                                <Text mr={2}>Sprint End:</Text>
+                                                {new Date(
+                                                    itemDetailed.sprint.final
+                                                ).toDateString()}
+                                            </Flex>
+                                        </Flex>
+                                        <Flex mt={2}>
+                                            <Text mr={2}>Project:</Text>
+                                            {itemDetailed.sprint.project.name}
+                                        </Flex>
+                                        <Flex mt={2}>
+                                            <Text mr={2}>Priority:</Text>
+                                            {returnPriorityIconHeaderModal(
+                                                itemDetailed.priority
+                                            )}
+                                        </Flex>
+                                    </Flex>
+                                </Flex>
+                                <Flex p={2} mt={2}>
+                                    <Text>{itemDetailed.description}</Text>
                                 </Flex>
                             </Flex>
                         ) : (
