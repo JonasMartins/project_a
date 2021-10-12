@@ -1,9 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, MouseEvent } from "react";
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
     SearchIcon,
     CloseIcon,
+    ArrowUpIcon,
+    ArrowDownIcon,
 } from "@chakra-ui/icons";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
@@ -114,6 +116,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
     const [itemDetailed, setItemDetailed] = useState<item | null>(null);
+    const [decrescentCreated, setDecrescentCreated] = useState(true);
+    const [decrescentUpdated, setDecrescentUpdated] = useState(true);
+    const [decrescentPriority, setDecrescentPriority] = useState(true);
+    const [decrescentStatus, setDecrescentStatus] = useState(true);
 
     const closeItemDetail = (): void => {
         setItemDetailOpen(false);
@@ -131,6 +137,33 @@ const Backlog: React.FC<backlogProps> = ({}) => {
             setSideBarWidth("0px");
             setPageWidth("3em");
             setNavBarWidth("0px");
+        }
+    };
+
+    const handleOrderItens = (event: MouseEvent<HTMLButtonElement>) => {
+        switch (event.target["name"]) {
+            case "created":
+                setItemDetailOpen(false);
+                setItemDetailWidth(0);
+                setDecrescentCreated(!decrescentCreated);
+                break;
+            case "updated":
+                setItemDetailOpen(false);
+                setItemDetailWidth(0);
+                setDecrescentUpdated(!decrescentUpdated);
+                break;
+            case "priority":
+                setItemDetailOpen(false);
+                setItemDetailWidth(0);
+                setDecrescentPriority(!decrescentPriority);
+                break;
+            case "status":
+                setItemDetailOpen(false);
+                setItemDetailWidth(0);
+                setDecrescentStatus(!decrescentStatus);
+                break;
+            default:
+                break;
         }
     };
 
@@ -199,10 +232,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         {">"}
                     </Text>
                 </Flex>
-                <Text p={2} fontSize="lg" fontWeight="semibold">
+                <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
                     Backlog
                 </Text>
-                <InputGroup>
+                <InputGroup ml={2}>
                     <InputLeftElement
                         pointerEvents="none"
                         children={<SearchIcon color="gray.300" />}
@@ -218,6 +251,76 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         My Itens
                     </Button>
                 </InputGroup>
+                <Flex
+                    flexGrow={1}
+                    p={2}
+                    mt={2}
+                    mb={1}
+                    ml={2}
+                    alignItems="center"
+                >
+                    <Text>Order by:</Text>
+                    <Button
+                        variant="ghost"
+                        name="created"
+                        ml={2}
+                        rightIcon={
+                            decrescentCreated ? (
+                                <ArrowUpIcon />
+                            ) : (
+                                <ArrowDownIcon />
+                            )
+                        }
+                        onClick={handleOrderItens}
+                    >
+                        Created At
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        name="updated"
+                        ml={2}
+                        rightIcon={
+                            decrescentUpdated ? (
+                                <ArrowUpIcon />
+                            ) : (
+                                <ArrowDownIcon />
+                            )
+                        }
+                        onClick={handleOrderItens}
+                    >
+                        Updated At
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        name="priority"
+                        ml={2}
+                        rightIcon={
+                            decrescentPriority ? (
+                                <ArrowUpIcon />
+                            ) : (
+                                <ArrowDownIcon />
+                            )
+                        }
+                        onClick={handleOrderItens}
+                    >
+                        Priority
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        name="status"
+                        ml={2}
+                        rightIcon={
+                            decrescentStatus ? (
+                                <ArrowUpIcon />
+                            ) : (
+                                <ArrowDownIcon />
+                            )
+                        }
+                        onClick={handleOrderItens}
+                    >
+                        Status
+                    </Button>
+                </Flex>
                 <Flex flexDir="row">
                     <Flex flexDir="column" p={2} cursor="pointer" flexGrow={1}>
                         {itens &&
