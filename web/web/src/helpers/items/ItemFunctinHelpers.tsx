@@ -10,7 +10,71 @@ import {
     CgArrowBottomLeftO,
     CgArrowDownO,
 } from "react-icons/cg";
-import { ItemPriority, ItemStatus } from "./../../generated/graphql";
+import {
+    ItemPriority,
+    ItemStatus,
+    Maybe,
+    Sprint,
+    Project,
+    Item,
+} from "./../../generated/graphql";
+
+export type itemBacklog = { __typename?: "Item" } & Pick<
+    Item,
+    | "id"
+    | "summary"
+    | "type"
+    | "priority"
+    | "status"
+    | "createdAt"
+    | "updatedAt"
+    | "description"
+> & {
+        responsible: { __typename?: "User" } & Pick<User, "id" | "name">;
+        reporter: { __typename?: "User" } & Pick<User, "id" | "name">;
+        sprint: { __typename?: "Sprint" } & Pick<
+            Sprint,
+            "code" | "createdAt" | "length" | "final"
+        > & {
+                project: { __typename?: "Project" } & Pick<Project, "name">;
+            };
+    };
+
+export type itensBacklog = {
+    itens?: Maybe<
+        Array<
+            { __typename?: "Item" } & Pick<
+                Item,
+                | "id"
+                | "summary"
+                | "type"
+                | "priority"
+                | "status"
+                | "createdAt"
+                | "updatedAt"
+                | "description"
+            > & {
+                    responsible: { __typename?: "User" } & Pick<
+                        User,
+                        "id" | "name"
+                    >;
+                    reporter: { __typename?: "User" } & Pick<
+                        User,
+                        "id" | "name"
+                    >;
+                    sprint: { __typename?: "Sprint" } & Pick<
+                        Sprint,
+                        "code" | "createdAt" | "length" | "final"
+                    > & {
+                            project: { __typename?: "Project" } & Pick<
+                                Project,
+                                "name"
+                            >;
+                        };
+                }
+        >
+    >;
+};
 
 export const getItemTypeIcon = (type: string): JSX.Element => {
     let componentType: JSX.Element | null = null;

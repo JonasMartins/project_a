@@ -13,6 +13,7 @@ query GetItensBacklog($limit: Float, $cursor: DateTime) {
             status
             description
             updatedAt
+            createdAt
             responsible {
                 id
                 name

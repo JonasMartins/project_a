@@ -26,17 +26,13 @@ import {
     Divider,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import {
-    useGetItensBacklogQuery,
-    Maybe,
-    Item,
-    Sprint,
-    Project,
-} from "./../generated/graphql";
+import { useGetItensBacklogQuery } from "./../generated/graphql";
 import {
     returnPriorityIconHeaderModal,
     getItemTypeIcon,
     returnItemStatusStyled,
+    itemBacklog,
+    itensBacklog,
 } from "./../helpers/items/ItemFunctinHelpers";
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 
@@ -48,59 +44,21 @@ const styleItemDetail = {
     flexShrink: 0,
 };
 
-type item = { __typename?: "Item" } & Pick<
-    Item,
-    | "id"
-    | "summary"
-    | "type"
-    | "priority"
-    | "status"
-    | "updatedAt"
-    | "description"
-> & {
-        responsible: { __typename?: "User" } & Pick<User, "id" | "name">;
-        reporter: { __typename?: "User" } & Pick<User, "id" | "name">;
-        sprint: { __typename?: "Sprint" } & Pick<
-            Sprint,
-            "code" | "createdAt" | "length" | "final"
-        > & {
-                project: { __typename?: "Project" } & Pick<Project, "name">;
-            };
-    };
+const priorityOrder = {
+    HIGHEST: 5,
+    HIGH: 4,
+    MEDIUM: 3,
+    LOW: 2,
+    LOWEST: 1,
+};
 
-type itens = {
-    itens?: Maybe<
-        Array<
-            { __typename?: "Item" } & Pick<
-                Item,
-                | "id"
-                | "summary"
-                | "type"
-                | "priority"
-                | "status"
-                | "updatedAt"
-                | "description"
-            > & {
-                    responsible: { __typename?: "User" } & Pick<
-                        User,
-                        "id" | "name"
-                    >;
-                    reporter: { __typename?: "User" } & Pick<
-                        User,
-                        "id" | "name"
-                    >;
-                    sprint: { __typename?: "Sprint" } & Pick<
-                        Sprint,
-                        "code" | "createdAt" | "length" | "final"
-                    > & {
-                            project: { __typename?: "Project" } & Pick<
-                                Project,
-                                "name"
-                            >;
-                        };
-                }
-        >
-    >;
+const statusOrder = {
+    OPEN: 1,
+    IN_PROGRESS: 2,
+    REOPENED: 3,
+    RESOLVED: 4,
+    COMPLETED: 5,
+    CLOSED: 6,
 };
 
 const Backlog: React.FC<backlogProps> = ({}) => {
@@ -112,10 +70,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [navBarWidth, setNavBarWidth] = useState("0px");
     const [page, setPage] = useState<number | null>(null);
     const [cursor, setCursor] = useState<Date | null>(null);
-    const [itens, setItens] = useState<itens>(null);
+    const [itens, setItens] = useState<itensBacklog>(null);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
-    const [itemDetailed, setItemDetailed] = useState<item | null>(null);
+    const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
     const [decrescentCreated, setDecrescentCreated] = useState(true);
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
     const [decrescentPriority, setDecrescentPriority] = useState(true);
@@ -137,33 +95,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
             setSideBarWidth("0px");
             setPageWidth("3em");
             setNavBarWidth("0px");
-        }
-    };
-
-    const handleOrderItens = (event: MouseEvent<HTMLButtonElement>) => {
-        switch (event.target["name"]) {
-            case "created":
-                setItemDetailOpen(false);
-                setItemDetailWidth(0);
-                setDecrescentCreated(!decrescentCreated);
-                break;
-            case "updated":
-                setItemDetailOpen(false);
-                setItemDetailWidth(0);
-                setDecrescentUpdated(!decrescentUpdated);
-                break;
-            case "priority":
-                setItemDetailOpen(false);
-                setItemDetailWidth(0);
-                setDecrescentPriority(!decrescentPriority);
-                break;
-            case "status":
-                setItemDetailOpen(false);
-                setItemDetailWidth(0);
-                setDecrescentStatus(!decrescentStatus);
-                break;
-            default:
-                break;
         }
     };
 
@@ -271,7 +202,23 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                 <ArrowDownIcon />
                             )
                         }
-                        onClick={handleOrderItens}
+                        onClick={() => {
+                            setItemDetailOpen(false);
+                            setItemDetailWidth(0);
+                            setDecrescentCreated(!decrescentCreated);
+
+                            if (decrescentCreated) {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        b.createdAt > a.createdAt ? 1 : -1
+                                );
+                            } else {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        b.createdAt < a.createdAt ? 1 : -1
+                                );
+                            }
+                        }}
                     >
                         Created At
                     </Button>
@@ -286,7 +233,22 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                 <ArrowDownIcon />
                             )
                         }
-                        onClick={handleOrderItens}
+                        onClick={() => {
+                            setItemDetailOpen(false);
+                            setItemDetailWidth(0);
+                            setDecrescentUpdated(!decrescentUpdated);
+                            if (decrescentUpdated) {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        b.updatedAt > a.updatedAt ? 1 : -1
+                                );
+                            } else {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        b.updatedAt < a.updatedAt ? 1 : -1
+                                );
+                            }
+                        }}
                     >
                         Updated At
                     </Button>
@@ -301,7 +263,36 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                 <ArrowDownIcon />
                             )
                         }
-                        onClick={handleOrderItens}
+                        onClick={() => {
+                            setItemDetailOpen(false);
+                            setItemDetailWidth(0);
+                            setDecrescentPriority(!decrescentPriority);
+                            if (decrescentPriority) {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        priorityOrder[
+                                            b.priority.toLocaleUpperCase()
+                                        ] >
+                                        priorityOrder[
+                                            a.updatedAt.toLocaleUpperCase()
+                                        ]
+                                            ? 1
+                                            : -1
+                                );
+                            } else {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        priorityOrder[
+                                            b.priority.toLocaleUpperCase()
+                                        ] <
+                                        priorityOrder[
+                                            a.updatedAt.toLocaleUpperCase()
+                                        ]
+                                            ? 1
+                                            : -1
+                                );
+                            }
+                        }}
                     >
                         Priority
                     </Button>
@@ -316,7 +307,36 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                 <ArrowDownIcon />
                             )
                         }
-                        onClick={handleOrderItens}
+                        onClick={() => {
+                            setItemDetailOpen(false);
+                            setItemDetailWidth(0);
+                            setDecrescentStatus(!decrescentStatus);
+                            if (decrescentStatus) {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        statusOrder[
+                                            b.status.toLocaleUpperCase()
+                                        ] >
+                                        statusOrder[
+                                            a.status.toLocaleUpperCase()
+                                        ]
+                                            ? 1
+                                            : -1
+                                );
+                            } else {
+                                itens.itens.sort(
+                                    (a: itemBacklog, b: itemBacklog) =>
+                                        statusOrder[
+                                            b.status.toLocaleUpperCase()
+                                        ] <
+                                        statusOrder[
+                                            a.status.toLocaleUpperCase()
+                                        ]
+                                            ? 1
+                                            : -1
+                                );
+                            }
+                        }}
                     >
                         Status
                     </Button>
