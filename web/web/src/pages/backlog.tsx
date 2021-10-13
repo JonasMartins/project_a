@@ -267,27 +267,20 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                             setItemDetailOpen(false);
                             setItemDetailWidth(0);
                             setDecrescentPriority(!decrescentPriority);
+
                             if (decrescentPriority) {
                                 itens.itens.sort(
                                     (a: itemBacklog, b: itemBacklog) =>
-                                        priorityOrder[
-                                            b.priority.toLocaleUpperCase()
-                                        ] >
-                                        priorityOrder[
-                                            a.updatedAt.toLocaleUpperCase()
-                                        ]
+                                        priorityOrder[b.priority] >
+                                        priorityOrder[a.priority]
                                             ? 1
                                             : -1
                                 );
                             } else {
                                 itens.itens.sort(
                                     (a: itemBacklog, b: itemBacklog) =>
-                                        priorityOrder[
-                                            b.priority.toLocaleUpperCase()
-                                        ] <
-                                        priorityOrder[
-                                            a.updatedAt.toLocaleUpperCase()
-                                        ]
+                                        priorityOrder[b.priority] <
+                                        priorityOrder[a.priority]
                                             ? 1
                                             : -1
                                 );
@@ -314,24 +307,16 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                             if (decrescentStatus) {
                                 itens.itens.sort(
                                     (a: itemBacklog, b: itemBacklog) =>
-                                        statusOrder[
-                                            b.status.toLocaleUpperCase()
-                                        ] >
-                                        statusOrder[
-                                            a.status.toLocaleUpperCase()
-                                        ]
+                                        statusOrder[b.status] >
+                                        statusOrder[a.status]
                                             ? 1
                                             : -1
                                 );
                             } else {
                                 itens.itens.sort(
                                     (a: itemBacklog, b: itemBacklog) =>
-                                        statusOrder[
-                                            b.status.toLocaleUpperCase()
-                                        ] <
-                                        statusOrder[
-                                            a.status.toLocaleUpperCase()
-                                        ]
+                                        statusOrder[b.status] <
+                                        statusOrder[a.status]
                                             ? 1
                                             : -1
                                 );
