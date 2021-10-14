@@ -1,4 +1,9 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, {
+    useContext,
+    useState,
+    useEffect,
+    CMouseEventHandler,
+} from "react";
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
@@ -13,6 +18,7 @@ import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import Login from "./../pages/login";
 import { GlobalContext } from "./../context/globalContext";
+import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import {
     Box,
     Flex,
@@ -70,8 +76,9 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("0px");
-    const [page, setPage] = useState<number>(1);
-    // const [cursor, setCursor] = useState<Date | null>(null);
+    const [page, setPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [cursor, setCursor] = useState<Date | null>(null);
     const [itens, setItens] = useState<itensBacklog>(null);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
@@ -100,14 +107,14 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         }
     };
 
-    const [itensBacklog] = useGetItensBacklogQuery({
+    const [itensBacklog, reexecuteQuery] = useGetItensBacklogQuery({
         variables: {
             limit: itensPerPage,
-            cursor: null,
+            cursor: cursor,
         },
     });
 
-    const handlePagination = () => {
+    const handlePagination = (e: CMouseEventHandler<HTMLButtonElement>) => {
         let lastIten = 0;
         let _cursor: Date | null = null;
 
@@ -122,8 +129,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     lastIten - 1
                 ].createdAt
             );
-            // setCursor(_cursor);
+            setCursor(_cursor);
         }
+
+        console.log(e.target.name, _cursor);
     };
 
     const returnPagination = (): JSX.Element[] => {
@@ -139,7 +148,14 @@ const Backlog: React.FC<backlogProps> = ({}) => {
 
             for (let i = 0; i < page; i++) {
                 _pages.push(
-                    <Button variant="ghost" name={`page_${i + 1}`}>
+                    <Button
+                        variant={currentPage === i ? "cyan-gradient" : "ghost"}
+                        name={`${i + 1}`}
+                        onClick={(e) => {
+                            setCurrentPage(i);
+                            handlePagination(e);
+                        }}
+                    >
                         {i + 1}
                     </Button>
                 );
@@ -166,11 +182,16 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                 )
             );
         }
+        if (cursor) {
+            reexecuteQuery({ requestPolicy: "cache-and-network" });
+        }
     }, [
         itensBacklog.fetching,
         itens?.itens?.length,
         itemDetailed,
         itemDetailOpen,
+        cursor,
+        currentPage,
     ]);
 
     const content = (
@@ -380,126 +401,143 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         Status
                     </Button>
                 </Flex>
-                <Flex flexDir="row">
-                    <Flex flexDir="column" p={2} cursor="pointer" flexGrow={1}>
-                        {itens &&
-                            itens.itens.map((item) => (
-                                <Flex
-                                    key={item.id}
-                                    justifyContent="space-between"
-                                    alignItems="center"
-                                    p={1}
-                                    boxShadow="md"
-                                    m={1}
-                                    onClick={() => {
-                                        setItemDetailOpen(true);
-                                        setItemDetailWidth(0.5);
-                                        setItemDetailed(item);
-                                    }}
-                                >
-                                    <Flex>
-                                        {getItemTypeIcon(item.type)}
-                                        <Text>
-                                            {truncateString(item.summary, 30)}
-                                        </Text>
-                                        <Text fontWeight="semibold" ml={3}>
-                                            {item.sprint.code}
-                                        </Text>
+                {itensBacklog.fetching && !itens?.itens ? (
+                    <FlexSpinner />
+                ) : (
+                    <Flex flexDir="row">
+                        <Flex
+                            flexDir="column"
+                            p={2}
+                            cursor="pointer"
+                            flexGrow={1}
+                        >
+                            {itens &&
+                                itens.itens.map((item) => (
+                                    <Flex
+                                        key={item.id}
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        p={1}
+                                        boxShadow="md"
+                                        m={1}
+                                        onClick={() => {
+                                            setItemDetailOpen(true);
+                                            setItemDetailWidth(0.5);
+                                            setItemDetailed(item);
+                                        }}
+                                    >
+                                        <Flex>
+                                            {getItemTypeIcon(item.type)}
+                                            <Text>
+                                                {truncateString(
+                                                    item.summary,
+                                                    30
+                                                )}
+                                            </Text>
+                                            <Text fontWeight="semibold" ml={3}>
+                                                {item.sprint.code}
+                                            </Text>
+                                        </Flex>
+                                        {returnPriorityIconHeaderModal(
+                                            item.priority
+                                        )}
                                     </Flex>
-                                    {returnPriorityIconHeaderModal(
-                                        item.priority
-                                    )}
-                                </Flex>
-                            ))}
-                    </Flex>
-                    <Flex
-                        // display={itemDetailOpen ? "flex" : "none"}
-                        flexGrow={itemDetailWidth}
-                        overflowY="hidden"
-                        overflowX="hidden"
-                        transition="0.3s"
-                        boxShadow="md"
-                    >
-                        {itemDetailed && itemDetailOpen ? (
-                            <Flex flexDir="column" flexGrow={1} p={2}>
-                                <div style={styleItemDetail}>
-                                    <Flex>
-                                        {getItemTypeIcon(itemDetailed.type)}
-                                        <Text>
-                                            {truncateString(
-                                                itemDetailed.summary,
-                                                30
-                                            )}
-                                        </Text>
-                                    </Flex>
+                                ))}
+                        </Flex>
+                        <Flex
+                            // display={itemDetailOpen ? "flex" : "none"}
+                            flexGrow={itemDetailWidth}
+                            overflowY="hidden"
+                            overflowX="hidden"
+                            transition="0.3s"
+                            boxShadow="md"
+                        >
+                            {itemDetailed && itemDetailOpen ? (
+                                <Flex flexDir="column" flexGrow={1} p={2}>
+                                    <div style={styleItemDetail}>
+                                        <Flex>
+                                            {getItemTypeIcon(itemDetailed.type)}
+                                            <Text>
+                                                {truncateString(
+                                                    itemDetailed.summary,
+                                                    30
+                                                )}
+                                            </Text>
+                                        </Flex>
 
-                                    <IconButton
-                                        isRound={true}
-                                        aria-label="Close Item Detail"
-                                        icon={<CloseIcon />}
-                                        onClick={closeItemDetail}
-                                    />
-                                </div>
-                                <Flex>
-                                    <Text mr={2}>Current Status:</Text>
-                                    {returnItemStatusStyled(
-                                        itemDetailed.status
-                                    )}
-                                </Flex>
-                                <Flex p={2} boxShadow="md">
-                                    <Flex flexDir="column" flexGrow={1}>
-                                        <Flex
-                                            flexGrow={1}
-                                            justifyContent="center"
-                                        >
-                                            <Text>Information</Text>
-                                        </Flex>
-                                        <Divider orientation="horizontal" />
+                                        <IconButton
+                                            isRound={true}
+                                            aria-label="Close Item Detail"
+                                            icon={<CloseIcon />}
+                                            onClick={closeItemDetail}
+                                        />
+                                    </div>
+                                    <Flex>
+                                        <Text mr={2}>Current Status:</Text>
+                                        {returnItemStatusStyled(
+                                            itemDetailed.status
+                                        )}
+                                    </Flex>
+                                    <Flex p={2} boxShadow="md">
+                                        <Flex flexDir="column" flexGrow={1}>
+                                            <Flex
+                                                flexGrow={1}
+                                                justifyContent="center"
+                                            >
+                                                <Text>Information</Text>
+                                            </Flex>
+                                            <Divider orientation="horizontal" />
 
-                                        <Flex mt={2}>
-                                            <Text mr={2}>Responsible:</Text>
-                                            {itemDetailed.responsible.name}
-                                        </Flex>
-                                        <Flex mt={2}>
-                                            <Text mr={2}>Reporter:</Text>
-                                            {itemDetailed.reporter.name}
-                                        </Flex>
-                                        <Flex
-                                            mt={2}
-                                            justifyContent="space-between"
-                                        >
-                                            <Flex>
-                                                <Text mr={2}>Sprint:</Text>
-                                                {itemDetailed.sprint.code}
+                                            <Flex mt={2}>
+                                                <Text mr={2}>Responsible:</Text>
+                                                {itemDetailed.responsible.name}
                                             </Flex>
-                                            <Flex>
-                                                <Text mr={2}>Sprint End:</Text>
-                                                {new Date(
-                                                    itemDetailed.sprint.final
-                                                ).toDateString()}
+                                            <Flex mt={2}>
+                                                <Text mr={2}>Reporter:</Text>
+                                                {itemDetailed.reporter.name}
                                             </Flex>
-                                        </Flex>
-                                        <Flex mt={2}>
-                                            <Text mr={2}>Project:</Text>
-                                            {itemDetailed.sprint.project.name}
-                                        </Flex>
-                                        <Flex mt={2}>
-                                            <Text mr={2}>Priority:</Text>
-                                            {returnPriorityIconHeaderModal(
-                                                itemDetailed.priority
-                                            )}
+                                            <Flex
+                                                mt={2}
+                                                justifyContent="space-between"
+                                            >
+                                                <Flex>
+                                                    <Text mr={2}>Sprint:</Text>
+                                                    {itemDetailed.sprint.code}
+                                                </Flex>
+                                                <Flex>
+                                                    <Text mr={2}>
+                                                        Sprint End:
+                                                    </Text>
+                                                    {new Date(
+                                                        itemDetailed.sprint.final
+                                                    ).toDateString()}
+                                                </Flex>
+                                            </Flex>
+                                            <Flex mt={2}>
+                                                <Text mr={2}>Project:</Text>
+                                                {
+                                                    itemDetailed.sprint.project
+                                                        .name
+                                                }
+                                            </Flex>
+                                            <Flex mt={2}>
+                                                <Text mr={2}>Priority:</Text>
+                                                {returnPriorityIconHeaderModal(
+                                                    itemDetailed.priority
+                                                )}
+                                            </Flex>
                                         </Flex>
                                     </Flex>
+                                    <Flex p={2} mt={2}>
+                                        <Text>{itemDetailed.description}</Text>
+                                    </Flex>
                                 </Flex>
-                                <Flex p={2} mt={2}>
-                                    <Text>{itemDetailed.description}</Text>
-                                </Flex>
-                            </Flex>
-                        ) : (
-                            <></>
-                        )}
+                            ) : (
+                                <></>
+                            )}
+                        </Flex>
                     </Flex>
-                </Flex>
+                )}
 
                 <Flex justifyContent="center">
                     {returnPagination().map((page) => (
