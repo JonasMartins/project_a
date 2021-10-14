@@ -5,6 +5,7 @@ query GetItensBacklog($limit: Float, $cursor: DateTime) {
             message
             field
         }
+        total
         itens {
             id
             summary

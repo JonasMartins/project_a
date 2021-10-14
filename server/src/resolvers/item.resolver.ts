@@ -30,6 +30,8 @@ class ItensResponse {
     errors?: ErrorFieldHandler[];
     @Field(() => [Item], { nullable: true })
     itens?: Item[];
+    @Field()
+    total?: Number;
 }
 
 @Resolver()
@@ -274,25 +276,28 @@ export class ItemResolver {
         } */
 
         if (cursor) {
-            qb.select(["i.*"], true)
+            qb.select(["i.*"])
                 .where({ updatedAt: { $lt: cursor } })
                 .limit(max)
-                .orderBy({ updatedAt: "DESC" });
+                .orderBy({ updatedAt: "DESC" })
+                .groupBy("i.id");
         } else {
-            qb.select(["i.*"], true)
+            qb.select(["i.*"])
                 .where({ "1": "1" })
                 .limit(max)
                 .orderBy({ updatedAt: "DESC" });
         }
 
         try {
-            const itens: Item[] = await qb.getResult();
+            const itens = await qb.getResult();
 
             await em.populate(itens, ["responsible"]);
             await em.populate(itens, ["reporter"]);
             await em.populate(itens, ["sprint.project"]);
 
-            return { itens };
+            const total = await em.count(Item);
+
+            return { itens, total };
         } catch (e) {
             return {
                 errors: genericError(

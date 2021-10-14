@@ -123,6 +123,7 @@ export type ItensResponse = {
     __typename?: "ItensResponse";
     errors?: Maybe<Array<ErrorFieldHandler>>;
     itens?: Maybe<Array<Item>>;
+    total: Scalars["Float"];
 };
 
 export type LoginResponse = {
@@ -612,49 +613,52 @@ export type GetItensBacklogQueryVariables = Exact<{
 }>;
 
 export type GetItensBacklogQuery = { __typename?: "Query" } & {
-    getItensBacklog: { __typename?: "ItensResponse" } & {
-        errors?: Maybe<
-            Array<
-                { __typename?: "ErrorFieldHandler" } & Pick<
-                    ErrorFieldHandler,
-                    "method" | "message" | "field"
+    getItensBacklog: { __typename?: "ItensResponse" } & Pick<
+        ItensResponse,
+        "total"
+    > & {
+            errors?: Maybe<
+                Array<
+                    { __typename?: "ErrorFieldHandler" } & Pick<
+                        ErrorFieldHandler,
+                        "method" | "message" | "field"
+                    >
                 >
-            >
-        >;
-        itens?: Maybe<
-            Array<
-                { __typename?: "Item" } & Pick<
-                    Item,
-                    | "id"
-                    | "summary"
-                    | "type"
-                    | "priority"
-                    | "status"
-                    | "description"
-                    | "updatedAt"
-                    | "createdAt"
-                > & {
-                        responsible: { __typename?: "User" } & Pick<
-                            User,
-                            "id" | "name"
-                        >;
-                        reporter: { __typename?: "User" } & Pick<
-                            User,
-                            "id" | "name"
-                        >;
-                        sprint: { __typename?: "Sprint" } & Pick<
-                            Sprint,
-                            "code" | "createdAt" | "length" | "final"
-                        > & {
-                                project: { __typename?: "Project" } & Pick<
-                                    Project,
-                                    "name"
-                                >;
-                            };
-                    }
-            >
-        >;
-    };
+            >;
+            itens?: Maybe<
+                Array<
+                    { __typename?: "Item" } & Pick<
+                        Item,
+                        | "id"
+                        | "summary"
+                        | "type"
+                        | "priority"
+                        | "status"
+                        | "description"
+                        | "updatedAt"
+                        | "createdAt"
+                    > & {
+                            responsible: { __typename?: "User" } & Pick<
+                                User,
+                                "id" | "name"
+                            >;
+                            reporter: { __typename?: "User" } & Pick<
+                                User,
+                                "id" | "name"
+                            >;
+                            sprint: { __typename?: "Sprint" } & Pick<
+                                Sprint,
+                                "code" | "createdAt" | "length" | "final"
+                            > & {
+                                    project: { __typename?: "Project" } & Pick<
+                                        Project,
+                                        "name"
+                                    >;
+                                };
+                        }
+                >
+            >;
+        };
 };
 
 export type GetItensRelatedToUserByPeriodQueryVariables = Exact<{
@@ -1025,6 +1029,7 @@ export const GetItensBacklogDocument = gql`
                 message
                 field
             }
+            total
             itens {
                 id
                 summary

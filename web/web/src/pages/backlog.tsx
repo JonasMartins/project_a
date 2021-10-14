@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, MouseEvent } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
@@ -54,12 +54,14 @@ const priorityOrder = {
 
 const statusOrder = {
     OPEN: 1,
-    IN_PROGRESS: 2,
+    IN_PRORESS: 2,
     REOPENED: 3,
     RESOLVED: 4,
     COMPLETED: 5,
     CLOSED: 6,
 };
+
+const itensPerPage = 10;
 
 const Backlog: React.FC<backlogProps> = ({}) => {
     const { userId } = useContext(GlobalContext);
@@ -68,8 +70,8 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("0px");
-    const [page, setPage] = useState<number | null>(null);
-    const [cursor, setCursor] = useState<Date | null>(null);
+    const [page, setPage] = useState<number>(1);
+    // const [cursor, setCursor] = useState<Date | null>(null);
     const [itens, setItens] = useState<itensBacklog>(null);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
@@ -100,18 +102,70 @@ const Backlog: React.FC<backlogProps> = ({}) => {
 
     const [itensBacklog] = useGetItensBacklogQuery({
         variables: {
-            limit: page ? page : 10,
-            cursor: cursor,
+            limit: itensPerPage,
+            cursor: null,
         },
     });
+
+    const handlePagination = () => {
+        let lastIten = 0;
+        let _cursor: Date | null = null;
+
+        lastIten =
+            itensPerPage <= itensBacklog.data?.getItensBacklog?.itens?.length
+                ? itensPerPage
+                : itensBacklog.data?.getItensBacklog?.itens?.length;
+
+        if (lastIten) {
+            _cursor = new Date(
+                itensBacklog.data?.getItensBacklog?.itens[
+                    lastIten - 1
+                ].createdAt
+            );
+            // setCursor(_cursor);
+        }
+    };
+
+    const returnPagination = (): JSX.Element[] => {
+        let _pages: JSX.Element[] = [];
+
+        if (page) {
+            _pages.push(
+                <IconButton
+                    aria-label="Previous Itens page"
+                    icon={<ArrowLeftIcon />}
+                />
+            );
+
+            for (let i = 0; i < page; i++) {
+                _pages.push(
+                    <Button variant="ghost" name={`page_${i + 1}`}>
+                        {i + 1}
+                    </Button>
+                );
+            }
+
+            _pages.push(
+                <IconButton
+                    aria-label="Next Itens page"
+                    icon={<ArrowRightIcon />}
+                />
+            );
+        }
+        return _pages;
+    };
 
     useEffect(() => {
         if (itensBacklog.fetching) return;
 
         if (itensBacklog.data?.getItensBacklog) {
             setItens(itensBacklog.data?.getItensBacklog);
+            setPage(
+                Math.ceil(
+                    itensBacklog.data?.getItensBacklog?.total / itensPerPage
+                )
+            );
         }
-        // console.log("itens ", itens);
     }, [
         itensBacklog.fetching,
         itens?.itens?.length,
@@ -445,6 +499,12 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                             <></>
                         )}
                     </Flex>
+                </Flex>
+
+                <Flex justifyContent="center">
+                    {returnPagination().map((page) => (
+                        <Box m={1}>{page}</Box>
+                    ))}
                 </Flex>
             </Flex>
             <Box id="footer">
