@@ -19,6 +19,9 @@ import { Context } from "../types";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { COOKIE_NAME } from "../constants";
 import { Role } from "./../entities/role.entity";
+import { EntityManager } from "@mikro-orm/postgresql";
+import { genericError } from "./../utils/generalAuxiliaryMethods";
+
 @InputType()
 class UserBasicData {
     @Field()
@@ -78,6 +81,16 @@ class UserResponse {
 }
 
 @ObjectType()
+class UsersResponse {
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => [User], { nullable: true })
+    users?: User[];
+    @Field()
+    total?: Number;
+}
+
+@ObjectType()
 class RevokeResponse {
     @Field(() => Boolean)
     incrementado: true | false;
@@ -126,6 +139,40 @@ export class UserResolver {
     @UseMiddleware(isAuth)
     logedInTest(@Ctx() { payload }: Context) {
         return `Hi, yout id is : ${payload!.userId}`;
+    }
+
+    @Query(() => UsersResponse)
+    async getAllUsers(
+        @Arg("active") active: boolean,
+        @Arg("limit", () => Number, { nullable: true }) limit: number,
+        @Ctx() { em }: Context
+    ): Promise<UsersResponse> {
+        const max = Math.min(10, limit);
+
+        const qb = (em as EntityManager).createQueryBuilder(User, "u");
+        qb.select(["u.*"])
+            .where({ active: active })
+            .limit(max)
+            .orderBy({ name: "ASC" });
+
+        try {
+            const users: User[] = await qb.getResult();
+
+            await em.populate(users, ["role"]);
+
+            const result = { users: users, total: users.length };
+
+            return result;
+        } catch (e) {
+            return {
+                errors: genericError(
+                    "-",
+                    "getAllUsers",
+                    __filename,
+                    `message: ${e.message}`
+                ),
+            };
+        }
     }
 
     @Query(() => UserResponse)

@@ -70,6 +70,10 @@ export class User extends Base<User> {
     @Property({ nullable: true, length: 255 })
     public picure: string;
 
+    @Field(() => Boolean)
+    @Property({ default: true })
+    public active: boolean;
+
     constructor(body: UserValidator) {
         super(body);
     }
