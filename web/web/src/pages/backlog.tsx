@@ -137,7 +137,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
             }
         }
 
-        console.log(e.target.name, _cursor);
+        // console.log(e.target.name, _cursor);
     };
 
     const returnPagination = (): JSX.Element[] => {

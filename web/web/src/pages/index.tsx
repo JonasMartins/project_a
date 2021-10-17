@@ -13,7 +13,7 @@ import SideBar from "../components/layout/SideBar";
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    const { loading, userId, setCurrentUserId } = useContext(GlobalContext);
+    const { loading, userId } = useContext(GlobalContext);
 
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
@@ -35,13 +35,7 @@ const Index: React.FC<indexProps> = ({}) => {
     };
 
     useEffect(() => {
-        try {
-            localStorage.userId
-                ? setCurrentUserId(localStorage.userId)
-                : setCurrentUserId("");
-        } catch (e) {
-            console.error("err", e);
-        }
+        console.log("id ", userId);
     }, []);
     const content = userId ? (
         <>

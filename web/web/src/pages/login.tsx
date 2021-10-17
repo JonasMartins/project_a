@@ -21,6 +21,13 @@ import { GlobalContext } from "./../context/globalContext";
 
 interface loginProps {}
 
+const roleCode = {
+    "001": "Developer Jr 1",
+    "002": "Developer Jr 2",
+    "003": "Tech Leader",
+    "999": "Admin",
+};
+
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
@@ -81,7 +88,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                 response.data?.login.result.accessToken
                             ) {
                                 localStorage.setItem(
-                                    "userId",
+                                    "user_id",
                                     response.data?.login.result.userId
                                 );
 
@@ -92,6 +99,13 @@ const Login: React.FC<loginProps> = ({}) => {
                                 );
                                 setCurrentUserRole(
                                     response.data?.login.result.userRoleCode
+                                );
+
+                                localStorage.setItem(
+                                    "user_role",
+                                    roleCode[
+                                        response.data?.login.result.userRoleCode
+                                    ]
                                 );
                             }
                         }}

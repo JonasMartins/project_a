@@ -6,11 +6,27 @@ import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import Login from "./../pages/login";
 import { GlobalContext } from "./../context/globalContext";
-import { Box, Flex, Text, IconButton, Link, Tooltip } from "@chakra-ui/react";
+import {
+    Box,
+    Flex,
+    Text,
+    IconButton,
+    Link,
+    Tooltip,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import Index from "./index";
 import { IoPersonAddOutline } from "react-icons/io5";
-// import {FaUserEdit} from 'react-icons/fa'
+import { AiFillEdit } from "react-icons/ai";
+import { useGetAllUsersQuery } from "./../generated/graphql";
+import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 
 interface manageProps {}
 
@@ -21,6 +37,13 @@ const Manage: React.FC<manageProps> = ({}) => {
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("0px");
+
+    const [users] = useGetAllUsersQuery({
+        variables: {
+            limit: 10,
+            active: true,
+        },
+    });
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -37,9 +60,12 @@ const Manage: React.FC<manageProps> = ({}) => {
     };
 
     useEffect(() => {
+        if (users.fetching) return;
+
         console.log("id ", userId);
         console.log("role ", userRole);
-    }, [userId, userRole]);
+        // console.log("localStorage", localStorage);
+    }, [users.fetching]);
 
     const content = (
         <Container>
@@ -88,7 +114,7 @@ const Manage: React.FC<manageProps> = ({}) => {
                 <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
                     Management
                 </Text>
-                <Flex p={2} m={2}>
+                <Flex p={2} m={2} justifyContent="end">
                     <Tooltip
                         hasArrow
                         aria-label="Add new user"
@@ -104,6 +130,50 @@ const Manage: React.FC<manageProps> = ({}) => {
                         />
                     </Tooltip>
                 </Flex>
+
+                {users.data?.getAllUsers?.users ? (
+                    <Flex p={2} m={2}>
+                        <Table variant="striped">
+                            <Thead>
+                                <Tr>
+                                    <Th>Name</Th>
+                                    <Th>Email</Th>
+                                    <Th>Role</Th>
+                                    <Th>Active?</Th>
+                                    <Th>Edit</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {users.data?.getAllUsers?.users?.map((user) => (
+                                    <Tr key={user.id}>
+                                        <Th>{user.name}</Th>
+                                        <Th>{user.email}</Th>
+                                        <Th>{user.role.name}</Th>
+                                        <Th>{user.active ? "Yes" : "No"}</Th>
+                                        <Th>
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label="Edit user"
+                                                label="Edit user"
+                                                colorScheme="withe"
+                                            >
+                                                <IconButton
+                                                    isRound={true}
+                                                    aria-label="Edit user"
+                                                    variant="ghost"
+                                                    mr={1}
+                                                    icon={<AiFillEdit />}
+                                                />
+                                            </Tooltip>
+                                        </Th>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                        </Table>
+                    </Flex>
+                ) : (
+                    <FlexSpinner />
+                )}
             </Flex>
             <Box id="footer">
                 <Footer />
@@ -111,13 +181,17 @@ const Manage: React.FC<manageProps> = ({}) => {
         </Container>
     );
 
+    /*
+
     if (userId) {
         userRole === "Admin" ? content : <Index />;
     } else {
         return <Login />;
     }
 
-    return userId ? content : <Login />;
+    return userId ? content : <Login />; */
+
+    return content;
 };
 
 export default Manage;

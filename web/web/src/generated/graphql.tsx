@@ -219,6 +219,7 @@ export type Query = {
     getItensBacklog: ItensResponse;
     hello: Scalars["String"];
     logedInTest: Scalars["String"];
+    getAllUsers: UsersResponse;
     getUserById: UserResponse;
     getUserSettings: UserResponse;
     getRoleById: RoleRespnse;
@@ -246,6 +247,11 @@ export type QueryGetItemByIdArgs = {
 export type QueryGetItensBacklogArgs = {
     cursor?: Maybe<Scalars["DateTime"]>;
     limit?: Maybe<Scalars["Float"]>;
+};
+
+export type QueryGetAllUsersArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
 };
 
 export type QueryGetUserByIdArgs = {
@@ -402,6 +408,7 @@ export type User = {
     role: Role;
     appointments: Array<Appointment>;
     picure?: Maybe<Scalars["String"]>;
+    active: Scalars["Boolean"];
 };
 
 export type UserBasicData = {
@@ -415,6 +422,13 @@ export type UserResponse = {
     __typename?: "UserResponse";
     errors?: Maybe<Array<ErrorFieldHandler>>;
     user?: Maybe<User>;
+};
+
+export type UsersResponse = {
+    __typename?: "UsersResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    users?: Maybe<Array<User>>;
+    total: Scalars["Float"];
 };
 
 export type TokenAndId = {
@@ -539,6 +553,32 @@ export type GetAllRolesQuery = { __typename?: "Query" } & {
                     Role,
                     "id" | "name" | "code" | "wage"
                 >
+            >
+        >;
+    };
+};
+
+export type GetAllUsersQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
+}>;
+
+export type GetAllUsersQuery = { __typename?: "Query" } & {
+    getAllUsers: { __typename?: "UsersResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        users?: Maybe<
+            Array<
+                { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "name" | "email" | "active"
+                > & { role: { __typename?: "Role" } & Pick<Role, "name"> }
             >
         >;
     };
@@ -952,6 +992,35 @@ export function useGetAllRolesQuery(
 ) {
     return Urql.useQuery<GetAllRolesQuery>({
         query: GetAllRolesDocument,
+        ...options,
+    });
+}
+export const GetAllUsersDocument = gql`
+    query getAllUsers($limit: Float, $active: Boolean!) {
+        getAllUsers(active: $active, limit: $limit) {
+            errors {
+                method
+                message
+                field
+            }
+            users {
+                id
+                name
+                email
+                active
+                role {
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useGetAllUsersQuery(
+    options: Omit<Urql.UseQueryArgs<GetAllUsersQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetAllUsersQuery>({
+        query: GetAllUsersDocument,
         ...options,
     });
 }
