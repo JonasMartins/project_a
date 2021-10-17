@@ -118,18 +118,23 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         let lastIten = 0;
         let _cursor: Date | null = null;
 
-        lastIten =
-            itensPerPage <= itensBacklog.data?.getItensBacklog?.itens?.length
-                ? itensPerPage
-                : itensBacklog.data?.getItensBacklog?.itens?.length;
+        if (e.target.name == "1") {
+            setCursor(null);
+        } else {
+            lastIten =
+                itensPerPage <=
+                itensBacklog.data?.getItensBacklog?.itens?.length
+                    ? itensPerPage
+                    : itensBacklog.data?.getItensBacklog?.itens?.length;
 
-        if (lastIten) {
-            _cursor = new Date(
-                itensBacklog.data?.getItensBacklog?.itens[
-                    lastIten - 1
-                ].createdAt
-            );
-            setCursor(_cursor);
+            if (lastIten) {
+                _cursor = new Date(
+                    itensBacklog.data?.getItensBacklog?.itens[
+                        lastIten - 1
+                    ].createdAt
+                );
+                setCursor(_cursor);
+            }
         }
 
         console.log(e.target.name, _cursor);
@@ -192,6 +197,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         itemDetailOpen,
         cursor,
         currentPage,
+        userId,
     ]);
 
     const content = (

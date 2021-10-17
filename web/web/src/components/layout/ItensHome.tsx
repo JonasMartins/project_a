@@ -103,7 +103,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                             data.getItensRelatedToUserByPeriod.itens.map(
                                 (item) =>
                                     item.status !== "COMPLETED" &&
-                                    item.status !== "CLOSED" ? (
+                                    item.status !== "CLOSED" && (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
                                             <Box ml="1em" mr="1em">
@@ -140,8 +140,6 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                 {item.summary}
                                             </Text>
                                         </Flex>
-                                    ) : (
-                                        <React.Fragment></React.Fragment>
                                     )
                             )}
                     </TabPanel>
@@ -151,7 +149,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                 (item) =>
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" &&
-                                    item.responsible_id === userId ? (
+                                    item.responsible_id === userId && (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
 
@@ -189,8 +187,6 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                 {item.summary}
                                             </Text>
                                         </Flex>
-                                    ) : (
-                                        <React.Fragment></React.Fragment>
                                     )
                             )}
                     </TabPanel>
@@ -200,7 +196,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                 (item) =>
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" &&
-                                    item.reporter_id === userId ? (
+                                    item.reporter_id === userId && (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
 
@@ -238,8 +234,6 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                 {item.summary}
                                             </Text>
                                         </Flex>
-                                    ) : (
-                                        <React.Fragment></React.Fragment>
                                     )
                             )}
                     </TabPanel>
