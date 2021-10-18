@@ -27,11 +27,14 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import { AiFillEdit } from "react-icons/ai";
 import { useGetAllUsersQuery } from "./../generated/graphql";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
+import { useUser } from "./../helpers/hooks/useUser";
 
 interface manageProps {}
 
 const Manage: React.FC<manageProps> = ({}) => {
     const { userId, userRole } = useContext(GlobalContext);
+
+    const user = useUser();
 
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
@@ -61,10 +64,6 @@ const Manage: React.FC<manageProps> = ({}) => {
 
     useEffect(() => {
         if (users.fetching) return;
-
-        console.log("id ", userId);
-        console.log("role ", userRole);
-        // console.log("localStorage", localStorage);
     }, [users.fetching]);
 
     const content = (
@@ -181,15 +180,13 @@ const Manage: React.FC<manageProps> = ({}) => {
         </Container>
     );
 
-    /*
+    // if (user.userId) {
+    //     user.role === "Admin" ? content : <Index />;
+    // } else {
+    //     return <Login />;
+    // }
 
-    if (userId) {
-        userRole === "Admin" ? content : <Index />;
-    } else {
-        return <Login />;
-    }
-
-    return userId ? content : <Login />; */
+    // return user && user.userId ? content : <Login />;
 
     return content;
 };

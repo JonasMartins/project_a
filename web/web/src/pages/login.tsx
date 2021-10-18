@@ -18,6 +18,7 @@ import { useRouter } from "next/dist/client/router";
 import { Container } from "./../components/Container";
 import ButtonColorMode from "../components/ButtonColorMode";
 import { GlobalContext } from "./../context/globalContext";
+import { useToken } from "./../helpers/hooks/useToken";
 
 interface loginProps {}
 
@@ -31,6 +32,8 @@ const roleCode = {
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
+
+    const [_, setToken] = useToken();
 
     const { setIsLoading, setCurrentUserId, setCurrentUserRole } =
         useContext(GlobalContext);
@@ -91,6 +94,23 @@ const Login: React.FC<loginProps> = ({}) => {
                                     "user_id",
                                     response.data?.login.result.userId
                                 );
+                                localStorage.setItem(
+                                    "user_role",
+                                    roleCode[
+                                        response.data?.login.result.userRoleCode
+                                    ]
+                                );
+
+                                localStorage.setItem(
+                                    "token",
+                                    roleCode[
+                                        response.data?.login.result.accessToken
+                                    ]
+                                );
+
+                                setToken(
+                                    response.data?.login?.result?.accessToken
+                                );
 
                                 router.push("/");
                                 setIsLoading(false);
@@ -99,13 +119,6 @@ const Login: React.FC<loginProps> = ({}) => {
                                 );
                                 setCurrentUserRole(
                                     response.data?.login.result.userRoleCode
-                                );
-
-                                localStorage.setItem(
-                                    "user_role",
-                                    roleCode[
-                                        response.data?.login.result.userRoleCode
-                                    ]
                                 );
                             }
                         }}

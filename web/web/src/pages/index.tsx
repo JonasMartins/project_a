@@ -9,6 +9,7 @@ import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Login from "./../pages/login";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import SideBar from "../components/layout/SideBar";
+import { useUser } from "./../helpers/hooks/useUser";
 
 interface indexProps {}
 
@@ -19,6 +20,8 @@ const Index: React.FC<indexProps> = ({}) => {
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("0px");
+
+    const user = useUser();
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -34,49 +37,54 @@ const Index: React.FC<indexProps> = ({}) => {
         }
     };
 
-    useEffect(() => {
-        console.log("id ", userId);
-    }, []);
-    const content = userId ? (
-        <>
-            <Container>
-                <Navbar pageWidth={navBarWidth} />
-                <SideBar
-                    width={sideBarWidth}
-                    visibility={expand ? "hidden" : "visible"}
-                />
-                <Flex
-                    alignSelf="normal"
-                    flexDir="column"
-                    flexGrow={1}
-                    mb="150px"
-                    ml={pageWidth}
-                    transition="0.3s"
-                >
-                    <Flex mt={2}>
-                        <IconButton
-                            isRound={true}
-                            aria-label="Show Side Bar"
-                            mr={1}
-                            icon={
-                                expand ? <ArrowLeftIcon /> : <ArrowRightIcon />
-                            }
-                            onClick={handleExpandSideBar}
-                        />
-                    </Flex>
+    // useEffect(() => {
 
-                    <HomeNotifications />
-                </Flex>
-                <Box id="footer">
-                    <Footer />
-                </Box>
-            </Container>
-        </>
-    ) : (
-        <>
-            <Login />
-        </>
-    );
+    // }, []);
+    const content =
+        user && user.userId ? (
+            <>
+                <Container>
+                    <Navbar pageWidth={navBarWidth} />
+                    <SideBar
+                        width={sideBarWidth}
+                        visibility={expand ? "hidden" : "visible"}
+                    />
+                    <Flex
+                        alignSelf="normal"
+                        flexDir="column"
+                        flexGrow={1}
+                        mb="150px"
+                        ml={pageWidth}
+                        transition="0.3s"
+                    >
+                        <Flex mt={2}>
+                            <IconButton
+                                isRound={true}
+                                aria-label="Show Side Bar"
+                                mr={1}
+                                icon={
+                                    expand ? (
+                                        <ArrowLeftIcon />
+                                    ) : (
+                                        <ArrowRightIcon />
+                                    )
+                                }
+                                onClick={handleExpandSideBar}
+                            />
+                        </Flex>
+
+                        <HomeNotifications />
+                    </Flex>
+                    <Box id="footer">
+                        <Footer />
+                    </Box>
+                </Container>
+            </>
+        ) : (
+            <>
+                <Login />
+            </>
+        );
 
     const spinner = <FullPageSpinner />;
 

@@ -50,11 +50,10 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
 
     const logout = () => {
         setIsLoading(true);
-        setTimeout(() => {
-            localStorage.clear();
-        }, 600);
+        localStorage.clear();
         setCurrentUserId("");
         router.push("/login");
+        console.log("ls ", localStorage);
     };
 
     const content = (

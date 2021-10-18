@@ -1,25 +1,24 @@
+import { EntityManager } from "@mikro-orm/postgresql";
+import argon2 from "argon2";
 import {
     Arg,
     Ctx,
     Field,
     InputType,
+    Int,
     Mutation,
     ObjectType,
     Query,
     Resolver,
     UseMiddleware,
-    Int,
 } from "type-graphql";
-import { User } from "../entities/user.entity";
-import argon2 from "argon2";
-import { createAcessToken, createRefreshToken } from "../utils/auth";
-import { isAuth } from "../utils/isAuth";
-import { sendRefreshToken } from "../utils/sendRefreshToken";
-import { Context } from "../types";
-import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { COOKIE_NAME } from "../constants";
+import { User } from "../entities/user.entity";
+import { Context } from "../types";
+import { createAcessToken } from "../utils/auth";
+import { ErrorFieldHandler } from "../utils/errorFieldHandler";
+import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
-import { EntityManager } from "@mikro-orm/postgresql";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 
 @InputType()
@@ -296,7 +295,7 @@ export class UserResolver {
     async login(
         @Arg("email", () => String!) email: string,
         @Arg("password", () => String!) password: string,
-        @Ctx() { em, res }: Context
+        @Ctx() { em }: Context
     ): Promise<LoginResponse> {
         if (!email || !password) {
             let errors: ErrorFieldHandler[] | undefined = [];
@@ -351,28 +350,6 @@ export class UserResolver {
                 ],
             };
         }
-        /*
-        if (typeof window === "undefined") {
-            /**
-             *
-             *  When you're rendering on the server, you do not have a
-             *  browser and thus you do not have access to all the APIs
-             *  that the browser provides, including localStorage.
-             *
-             /
-
-            localStorage.setItem("currentUserId", `${user.id}`);
-            //localStorage.clear();
-            //localStorage.removeItem("mykey");
-            //localStorage.getItem("mykey");
-            sendRefreshToken(res, createRefreshToken(user));
-        } 
-        */
-
-        if (typeof window !== "undefined") {
-            localStorage.setItem("currentUserId", `${user.id}`);
-        }
-        sendRefreshToken(res, createRefreshToken(user));
 
         const result: tokenAndId = {
             accessToken: createAcessToken(user),
