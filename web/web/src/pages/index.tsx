@@ -37,7 +37,9 @@ const Index: React.FC<indexProps> = ({}) => {
         }
     };
 
-    useEffect(() => {}, [loading]);
+    useEffect(() => {
+        // console.log("here", user);
+    }, [loading]);
 
     const content =
         user && user.userId ? (

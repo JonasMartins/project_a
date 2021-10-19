@@ -89,8 +89,6 @@ const Login: React.FC<loginProps> = ({}) => {
                             } else if (
                                 response.data?.login.result.accessToken
                             ) {
-                                router.push("/");
-
                                 setIsLoading(false);
 
                                 localStorage.setItem(
@@ -101,6 +99,8 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setToken(
                                     response.data?.login?.result?.accessToken
                                 );*/
+                                // console.log("login");
+                                router.push("/");
                             }
                         }}
                     >

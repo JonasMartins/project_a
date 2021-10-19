@@ -24,9 +24,10 @@ import { userManageInfo } from "./../../helpers/users/userFunctonHelpers";
 import {
     useUpdateSeetingsUserMutation,
     GetAllRolesQuery,
+    User,
 } from "./../../generated/graphql";
 import router from "next/router";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { toErrorMap } from "../../utils/toErrorMap";
 
 interface ModalManagerUpdateUserProps {
@@ -69,6 +70,17 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
         }));
     };
 
+    useEffect(() => {
+        if (!user) return;
+        setUserInfo((prevUser) => ({
+            ...prevUser,
+            id: user?.user?.id,
+            name: user?.user?.name,
+            email: user?.user?.email,
+            role_id: user?.user?.role?.id,
+        }));
+    }, [user]);
+
     return (
         <Modal
             isOpen={isOpen}
@@ -95,10 +107,10 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                     <Flex p={2} m={2} justifyContent="center">
                         <Formik
                             initialValues={{
-                                id: user?.user?.id,
-                                name: user?.user?.name,
-                                email: user?.user?.email,
-                                role_id: user?.user?.role.id,
+                                id: userInfo.id,
+                                name: userInfo.name,
+                                email: userInfo.email,
+                                role_id: userInfo.role_id,
                             }}
                             enableReinitialize={true}
                             onSubmit={async (values, { setErrors }) => {
@@ -149,6 +161,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                         id="name"
                                                         borderRadius="2em"
                                                         size="lg"
+                                                        color={color[colorMode]}
                                                         onChange={
                                                             handlerUpdateUser
                                                         }
@@ -181,6 +194,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                         id="email"
                                                         borderRadius="2em"
                                                         size="lg"
+                                                        color={color[colorMode]}
                                                         onChange={
                                                             handlerUpdateUser
                                                         }
@@ -214,6 +228,9 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                         id="role"
                                                         borderRadius="2em"
                                                         size="lg"
+                                                        textColor={
+                                                            color[colorMode]
+                                                        }
                                                         value={userInfo.role_id}
                                                         onChange={(e) => {
                                                             setUserInfo(
