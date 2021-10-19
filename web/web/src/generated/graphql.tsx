@@ -435,6 +435,7 @@ export type TokenAndId = {
     __typename?: "tokenAndId";
     accessToken?: Maybe<Scalars["String"]>;
     userId?: Maybe<Scalars["String"]>;
+    name?: Maybe<Scalars["String"]>;
     userRoleCode?: Maybe<Scalars["String"]>;
 };
 
@@ -578,7 +579,12 @@ export type GetAllUsersQuery = { __typename?: "Query" } & {
                 { __typename?: "User" } & Pick<
                     User,
                     "id" | "name" | "email" | "active"
-                > & { role: { __typename?: "Role" } & Pick<Role, "name"> }
+                > & {
+                        role: { __typename?: "Role" } & Pick<
+                            Role,
+                            "id" | "name"
+                        >;
+                    }
             >
         >;
     };
@@ -1009,6 +1015,7 @@ export const GetAllUsersDocument = gql`
                 email
                 active
                 role {
+                    id
                     name
                 }
             }

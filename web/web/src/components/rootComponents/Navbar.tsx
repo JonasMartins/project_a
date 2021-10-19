@@ -25,6 +25,7 @@ import { SiCodesandbox } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
 import { BsGear, BsBook } from "react-icons/bs";
 import ModalAboutProject from "./../modal/ModalAboutProject";
+import { useUser } from "./../../helpers/hooks/useUser";
 interface NavbarProps {
     pageWidth?: string;
 }
@@ -32,15 +33,15 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
     const router = useRouter();
 
-    const { setIsLoading, setCurrentUserId, setTheme, userName } =
+    const { setIsLoading, setCurrentUserId, setTheme } =
         useContext(GlobalContext);
+
+    const user = useUser();
 
     const { toggleColorMode } = useColorMode();
     const [darkMode, setDarkMode] = useState(false);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-
-    useEffect(() => {}, [userName]);
 
     const handleDarkMode = () => {
         setDarkMode(!darkMode);
@@ -90,7 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                 <Menu>
                     <Box mr={2}>
                         <Avatar
-                            name={userName || "Foo Bar"}
+                            name={user.name || "Foo Bar"}
                             size="40px"
                             round={true}
                         />

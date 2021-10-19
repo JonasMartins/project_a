@@ -17,7 +17,6 @@ import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import Login from "./../pages/login";
-import { GlobalContext } from "./../context/globalContext";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import {
     Box,
@@ -41,6 +40,7 @@ import {
     itensBacklog,
 } from "./../helpers/items/ItemFunctinHelpers";
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
+import { useUser } from "./../helpers/hooks/useUser";
 
 interface backlogProps {}
 
@@ -70,8 +70,7 @@ const statusOrder = {
 const itensPerPage = 10;
 
 const Backlog: React.FC<backlogProps> = ({}) => {
-    const { userId } = useContext(GlobalContext);
-
+    const user = useUser();
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
@@ -136,8 +135,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                 setCursor(_cursor);
             }
         }
-
-        // console.log(e.target.name, _cursor);
     };
 
     const returnPagination = (): JSX.Element[] => {
@@ -197,7 +194,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         itemDetailOpen,
         cursor,
         currentPage,
-        userId,
     ]);
 
     const content = (
@@ -557,7 +553,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         </Container>
     );
 
-    return userId ? content : <Login />;
+    return user.userId ? content : <Login />;
 };
 
 export default Backlog;

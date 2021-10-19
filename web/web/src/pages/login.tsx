@@ -91,6 +91,8 @@ const Login: React.FC<loginProps> = ({}) => {
                             ) {
                                 router.push("/");
 
+                                setIsLoading(false);
+
                                 localStorage.setItem(
                                     "token",
                                     response.data?.login.result.accessToken
@@ -99,8 +101,6 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setToken(
                                     response.data?.login?.result?.accessToken
                                 );*/
-
-                                setIsLoading(false);
                             }
                         }}
                     >

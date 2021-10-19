@@ -4,6 +4,7 @@ import { useToken } from "./useToken";
 type user = {
     userId: string;
     role: string;
+    name: string;
     iat: number;
     exp: number;
 };

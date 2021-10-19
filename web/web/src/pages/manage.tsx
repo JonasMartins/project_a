@@ -15,30 +15,36 @@ import {
     useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillEdit } from "react-icons/ai";
 import { IoPersonAddOutline } from "react-icons/io5";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Footer from "./../components/rootComponents/Footer";
 import Navbar from "./../components/rootComponents/Navbar";
-import { GlobalContext } from "./../context/globalContext";
-import { useGetAllUsersQuery } from "./../generated/graphql";
+import {
+    useGetAllUsersQuery,
+    GetAllRolesQuery,
+    useGetAllRolesQuery,
+} from "./../generated/graphql";
 import { useUser } from "./../helpers/hooks/useUser";
 import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
+import { userManageInfo } from "./../helpers/users/userFunctonHelpers";
 
 interface manageProps {}
 
 const Manage: React.FC<manageProps> = ({}) => {
-    const { userId, userRole } = useContext(GlobalContext);
-
     const user = useUser();
-
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("0px");
+    const [seletedUser, setSelectedUser] = useState<userManageInfo | null>(
+        null
+    );
+    const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
     const [users] = useGetAllUsersQuery({
         variables: {
@@ -46,6 +52,8 @@ const Manage: React.FC<manageProps> = ({}) => {
             active: true,
         },
     });
+
+    const [allRoles] = useGetAllRolesQuery();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -68,8 +76,12 @@ const Manage: React.FC<manageProps> = ({}) => {
     };
 
     useEffect(() => {
-        if (users.fetching) return;
-    }, [users.fetching]);
+        if (users.fetching && allRoles.fetching) return;
+
+        if (allRoles.data) {
+            setRoles(allRoles.data);
+        }
+    }, [users.fetching, allRoles.fetching]);
 
     const content = (
         <Container>
@@ -167,7 +179,12 @@ const Manage: React.FC<manageProps> = ({}) => {
                                                     variant="ghost"
                                                     mr={1}
                                                     icon={<AiFillEdit />}
-                                                    onClick={customOnOpen}
+                                                    onClick={() => {
+                                                        customOnOpen();
+                                                        setSelectedUser({
+                                                            user,
+                                                        });
+                                                    }}
                                                 />
                                             </Tooltip>
                                         </Td>
@@ -183,7 +200,12 @@ const Manage: React.FC<manageProps> = ({}) => {
             <Box id="footer">
                 <Footer />
             </Box>
-            <ModalManagerUpdateUser isOpen={isOpen} onClose={onClose} />
+            <ModalManagerUpdateUser
+                user={seletedUser}
+                isOpen={isOpen}
+                roles={roles}
+                onClose={onClose}
+            />
         </Container>
     );
 
@@ -195,7 +217,7 @@ const Manage: React.FC<manageProps> = ({}) => {
 
     // return user && user.userId ? content : <Login />;
 
-    return users.fetching ? <FlexSpinner /> : content;
+    return users.fetching ? <FullPageSpinner /> : content;
 };
 
 export default Manage;

@@ -60,6 +60,9 @@ class tokenAndId {
     userId?: string;
 
     @Field(() => String, { nullable: true })
+    name?: string;
+
+    @Field(() => String, { nullable: true })
     userRoleCode: string;
 }
 
