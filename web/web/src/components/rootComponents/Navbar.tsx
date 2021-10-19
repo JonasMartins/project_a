@@ -53,7 +53,6 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         localStorage.clear();
         setCurrentUserId("");
         router.push("/login");
-        console.log("ls ", localStorage);
     };
 
     const content = (

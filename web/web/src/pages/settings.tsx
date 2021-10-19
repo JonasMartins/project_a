@@ -33,6 +33,7 @@ import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
 import { toErrorMap } from "../utils/toErrorMap";
 import SideBar from "../components/layout/SideBar";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import { useUser } from "./../helpers/hooks/useUser";
 
 interface settingsProps {}
 
@@ -46,6 +47,8 @@ interface userInfo {
 
 const Settings: React.FC<settingsProps> = ({}) => {
     const { userId } = useContext(GlobalContext);
+
+    const user = useUser();
 
     const toast = useToast();
     const router = useRouter();
@@ -87,7 +90,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
         {
             variables: {
-                id: userId ? userId : "-1",
+                id: user.userId ? user.userId : "-1",
             },
         }
     );
@@ -97,15 +100,11 @@ const Settings: React.FC<settingsProps> = ({}) => {
     const [allRoles] = useGetAllRolesQuery();
 
     const forceDataAndStateReady = (): void => {
-        console.log("user ", userInfo);
-        // console.log("isAdmin ? ", userIsAdmin);
-        // console.log("times executed: ", loadingCount);
         if (loadingCount < 20 && loading) {
             setLoadingCount(loadingCount + 1);
         }
 
         if (userInfo.name && userInfo.role_id && userInfo.email) {
-            // console.log(`vars: ${userInfo.name}, ${userInfo.role_id}`);
             setLoading(false);
         }
     };
@@ -119,14 +118,12 @@ const Settings: React.FC<settingsProps> = ({}) => {
         ) {
             setUserInfo((prevUser) => ({
                 ...prevUser,
-                id: userId,
+                id: user.userId,
                 name: data?.getUserSettings?.user?.name,
                 email: data?.getUserSettings?.user?.email,
                 passowrd: "",
                 role_id: data?.getUserSettings?.user?.role?.id,
             }));
-
-            // setPrevPassword(data?.getUserSettings?.user?.password);
         }
 
         setUserIsAdmin(
@@ -140,7 +137,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         forceDataAndStateReady();
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, allRoles.fetching, loadingCount, userId]);
+    }, [fetching, allRoles.fetching, loadingCount]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -231,7 +228,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values, { setErrors }) => {
-                            //console.log("values ", values);
                             const response = await updateSeetingsUser({
                                 options: values,
                             });
@@ -421,7 +417,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         </Container>
     );
 
-    return userId ? content : <Login />;
+    return user.userId ? content : <Login />;
 };
 
 export default Settings;

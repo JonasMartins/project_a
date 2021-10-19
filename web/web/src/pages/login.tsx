@@ -35,8 +35,7 @@ const Login: React.FC<loginProps> = ({}) => {
 
     const [_, setToken] = useToken();
 
-    const { setIsLoading, setCurrentUserId, setCurrentUserRole } =
-        useContext(GlobalContext);
+    const { setIsLoading } = useContext(GlobalContext);
     type errors = {
         email: string;
         password: string;
@@ -90,36 +89,18 @@ const Login: React.FC<loginProps> = ({}) => {
                             } else if (
                                 response.data?.login.result.accessToken
                             ) {
-                                localStorage.setItem(
-                                    "user_id",
-                                    response.data?.login.result.userId
-                                );
-                                localStorage.setItem(
-                                    "user_role",
-                                    roleCode[
-                                        response.data?.login.result.userRoleCode
-                                    ]
-                                );
+                                router.push("/");
 
                                 localStorage.setItem(
                                     "token",
-                                    roleCode[
-                                        response.data?.login.result.accessToken
-                                    ]
+                                    response.data?.login.result.accessToken
                                 );
-
+                                /*
                                 setToken(
                                     response.data?.login?.result?.accessToken
-                                );
+                                );*/
 
-                                router.push("/");
                                 setIsLoading(false);
-                                setCurrentUserId(
-                                    response.data?.login.result.userId
-                                );
-                                setCurrentUserRole(
-                                    response.data?.login.result.userRoleCode
-                                );
                             }
                         }}
                     >

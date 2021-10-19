@@ -1,19 +1,22 @@
-import { Box, Text, Link, Flex /*Circle*/ } from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import { GlobalContext } from "./../context/globalContext";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { useGetUserByIdQuery } from "./../generated/graphql";
 import Notifications from "./../components/layout/Notifications";
 import ItensHome from "./../components/layout/ItensHome";
+import { useUser } from "./../helpers/hooks/useUser";
 
 interface HomeNotificationsProps {}
 
 const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
     const { userId, setCurrentUserName } = useContext(GlobalContext);
 
+    const user = useUser();
+
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserByIdQuery({
         variables: {
-            id: userId,
+            id: user.userId,
         },
         pause: true,
     });
@@ -53,9 +56,6 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     flexGrow={1}
                 >
                     <Flex flexDir="row" alignItems="center">
-                        {/* <Circle m="1" size="1.5em" bg="red.500">
-                            <Text color="white">99</Text>
-                        </Circle> */}
                         <Text fontSize="l" ml="1">
                             Notifications
                         </Text>
@@ -64,7 +64,7 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                 </Flex>
             </Flex>
             <Box mt="3">
-                <ItensHome userId={userId} />
+                <ItensHome userId={user.userId} />
             </Box>
         </Flex>
     );

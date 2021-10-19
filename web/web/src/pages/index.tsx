@@ -37,9 +37,10 @@ const Index: React.FC<indexProps> = ({}) => {
         }
     };
 
-    // useEffect(() => {
+    useEffect(() => {
+        if (loading) return;
+    }, [loading]);
 
-    // }, []);
     const content =
         user && user.userId ? (
             <>
@@ -89,6 +90,8 @@ const Index: React.FC<indexProps> = ({}) => {
     const spinner = <FullPageSpinner />;
 
     return loading ? spinner : content;
+
+    //return content;
 };
 
 export default Index;

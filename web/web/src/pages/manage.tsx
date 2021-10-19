@@ -1,33 +1,32 @@
-import React, { useContext, useState, useEffect } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import SideBar from "../components/layout/SideBar";
-import { Container } from "./../components/Container";
-import Navbar from "./../components/rootComponents/Navbar";
-import Footer from "./../components/rootComponents/Footer";
-import Login from "./../pages/login";
-import { GlobalContext } from "./../context/globalContext";
 import {
     Box,
     Flex,
-    Text,
     IconButton,
     Link,
-    Tooltip,
     Table,
-    Thead,
     Tbody,
-    Tfoot,
-    Tr,
+    Text,
     Th,
     Td,
+    Thead,
+    Tooltip,
+    Tr,
+    useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import Index from "./index";
-import { IoPersonAddOutline } from "react-icons/io5";
+import React, { useContext, useEffect, useState } from "react";
 import { AiFillEdit } from "react-icons/ai";
-import { useGetAllUsersQuery } from "./../generated/graphql";
+import { IoPersonAddOutline } from "react-icons/io5";
+import SideBar from "../components/layout/SideBar";
+import { Container } from "./../components/Container";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
+import Footer from "./../components/rootComponents/Footer";
+import Navbar from "./../components/rootComponents/Navbar";
+import { GlobalContext } from "./../context/globalContext";
+import { useGetAllUsersQuery } from "./../generated/graphql";
 import { useUser } from "./../helpers/hooks/useUser";
+import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
 
 interface manageProps {}
 
@@ -47,6 +46,12 @@ const Manage: React.FC<manageProps> = ({}) => {
             active: true,
         },
     });
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const customOnOpen = (): void => {
+        onOpen();
+    };
 
     const handleExpandSideBar = (): void => {
         setExpand(!expand);
@@ -132,7 +137,7 @@ const Manage: React.FC<manageProps> = ({}) => {
 
                 {users.data?.getAllUsers?.users ? (
                     <Flex p={2} m={2}>
-                        <Table variant="striped">
+                        <Table variant="striped" size="sm">
                             <Thead>
                                 <Tr>
                                     <Th>Name</Th>
@@ -145,11 +150,11 @@ const Manage: React.FC<manageProps> = ({}) => {
                             <Tbody>
                                 {users.data?.getAllUsers?.users?.map((user) => (
                                     <Tr key={user.id}>
-                                        <Th>{user.name}</Th>
-                                        <Th>{user.email}</Th>
-                                        <Th>{user.role.name}</Th>
-                                        <Th>{user.active ? "Yes" : "No"}</Th>
-                                        <Th>
+                                        <Td>{user.name}</Td>
+                                        <Td>{user.email}</Td>
+                                        <Td>{user.role.name}</Td>
+                                        <Td>{user.active ? "Yes" : "No"}</Td>
+                                        <Td>
                                             <Tooltip
                                                 hasArrow
                                                 aria-label="Edit user"
@@ -162,9 +167,10 @@ const Manage: React.FC<manageProps> = ({}) => {
                                                     variant="ghost"
                                                     mr={1}
                                                     icon={<AiFillEdit />}
+                                                    onClick={customOnOpen}
                                                 />
                                             </Tooltip>
-                                        </Th>
+                                        </Td>
                                     </Tr>
                                 ))}
                             </Tbody>
@@ -177,6 +183,7 @@ const Manage: React.FC<manageProps> = ({}) => {
             <Box id="footer">
                 <Footer />
             </Box>
+            <ModalManagerUpdateUser isOpen={isOpen} onClose={onClose} />
         </Container>
     );
 
@@ -188,7 +195,7 @@ const Manage: React.FC<manageProps> = ({}) => {
 
     // return user && user.userId ? content : <Login />;
 
-    return content;
+    return users.fetching ? <FlexSpinner /> : content;
 };
 
 export default Manage;

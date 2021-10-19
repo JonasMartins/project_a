@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import { Box, useColorMode, Text, Flex, Link } from "@chakra-ui/react";
 import { SiCodesandbox } from "react-icons/si";
 import {
@@ -8,8 +8,8 @@ import {
     AiOutlineHome,
 } from "react-icons/ai";
 import NextLink from "next/link";
-import { GlobalContext } from "./../../context/globalContext";
 import { RiAdminLine } from "react-icons/ri";
+import { useUser } from "./../../helpers/hooks/useUser";
 
 interface SideBarProps {
     projectName?: string;
@@ -26,9 +26,7 @@ const SideBar: React.FC<SideBarProps> = ({
     const bgColor = { light: "gray.50", dark: "gray.700" };
     const color = { light: "black", dark: "white" };
 
-    const { userRole } = useContext(GlobalContext);
-
-    useEffect(() => {}, [userRole]);
+    const user = useUser();
 
     return (
         <Box
@@ -91,7 +89,7 @@ const SideBar: React.FC<SideBarProps> = ({
                         </NextLink>
                     </Flex>
 
-                    {userRole === "Admin" ? (
+                    {user && user.role === "Admin" ? (
                         <Flex mb={5} alignItems="center">
                             <RiAdminLine size="35px" />
                             <NextLink href="/manage">
