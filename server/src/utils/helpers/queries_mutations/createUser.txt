@@ -4,7 +4,7 @@ mutation {
             name: "Karen"
             password: "password"
             email: "karen@email.com"
-            role_id: "8e8885b5-6f09-44e4-8d88-43ef75ebecdb"
+            role_id: "ab760a43-7ecb-43cb-9527-8e5df7f48642"
         }
     ) {
         errors {

@@ -17,6 +17,7 @@ import {
     Input,
     Select,
     Stack,
+    Checkbox,
 } from "@chakra-ui/react";
 import Avatar from "react-avatar";
 import { Form, Formik, Field } from "formik";
@@ -24,7 +25,6 @@ import { userManageInfo } from "./../../helpers/users/userFunctonHelpers";
 import {
     useUpdateSeetingsUserMutation,
     GetAllRolesQuery,
-    User,
 } from "./../../generated/graphql";
 import router from "next/router";
 import React, { useState, ChangeEvent, useEffect } from "react";
@@ -42,6 +42,7 @@ interface userInfo {
     name: string;
     email: string;
     role_id: string;
+    active: string;
 }
 
 const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
@@ -59,6 +60,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
         name: user?.user?.name,
         email: user?.user?.email,
         role_id: user?.user?.role?.id,
+        active: user?.user?.active ? "active" : "",
     });
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
@@ -78,6 +80,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
             name: user?.user?.name,
             email: user?.user?.email,
             role_id: user?.user?.role?.id,
+            active: user?.user?.active ? "active" : "",
         }));
     }, [user]);
 
@@ -111,6 +114,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                 name: userInfo.name,
                                 email: userInfo.email,
                                 role_id: userInfo.role_id,
+                                active: userInfo.active ? true : false,
                             }}
                             enableReinitialize={true}
                             onSubmit={async (values, { setErrors }) => {
@@ -129,13 +133,12 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                     toast({
                                         title: "User Updated",
                                         description:
-                                            "User successfully updatde",
+                                            "User successfully updated",
                                         status: "success",
                                         duration: 8000,
                                         isClosable: true,
                                         position: "bottom-right",
                                     });
-                                    router.push("/");
                                 }
                             }}
                         >
@@ -160,7 +163,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                         {...field}
                                                         id="name"
                                                         borderRadius="2em"
-                                                        size="lg"
+                                                        size="sm"
                                                         color={color[colorMode]}
                                                         onChange={
                                                             handlerUpdateUser
@@ -193,7 +196,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                         {...field}
                                                         id="email"
                                                         borderRadius="2em"
-                                                        size="lg"
+                                                        size="sm"
                                                         color={color[colorMode]}
                                                         onChange={
                                                             handlerUpdateUser
@@ -206,7 +209,45 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                 </FormControl>
                                             )}
                                         </Field>
-
+                                        <Field name="active">
+                                            {({ field, form }) => (
+                                                <FormControl
+                                                    isInvalid={
+                                                        form.errors.active
+                                                    }
+                                                >
+                                                    <FormLabel htmlFor="active">
+                                                        <Text
+                                                            color={
+                                                                color[colorMode]
+                                                            }
+                                                        >
+                                                            Active ?
+                                                        </Text>
+                                                    </FormLabel>
+                                                    <Checkbox
+                                                        {...field}
+                                                        isChecked={userInfo.active}
+                                                        id="active"
+                                                        size="sm"
+                                                        value={userInfo.active}
+                                                        onChange={(e) => {
+                                                            setUserInfo(
+                                                                (
+                                                                    prevUserInfo
+                                                                ) => ({
+                                                                    ...prevUserInfo,
+                                                                    active: 
+                                                                        e.target
+                                                                            .value
+                                                                    ,
+                                                                })
+                                                            );
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                            )}
+                                        </Field>
                                         <Field name="role">
                                             {({ field, form }) => (
                                                 <FormControl
@@ -227,7 +268,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                         {...field}
                                                         id="role"
                                                         borderRadius="2em"
-                                                        size="lg"
+                                                        size="sm"
                                                         textColor={
                                                             color[colorMode]
                                                         }

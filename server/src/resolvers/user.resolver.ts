@@ -49,6 +49,9 @@ class userSeetingsInput {
 
     @Field(() => String, { nullable: true })
     role_id: string;
+
+    @Field(() => Boolean, { nullable: true })
+    active?: boolean;
 }
 
 @ObjectType()

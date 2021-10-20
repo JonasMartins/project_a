@@ -1,10 +1,10 @@
 mutation {
     createSprint(
         options: {
-            code: "AGO21"
-            description: "sprint agosto de 2021"
+            code: "CEN_OUT21"
+            description: "sprint out 21 - Chess Engine"
             length: FOUR
-            project_id: "f2894f5b-6e00-4e06-8361-10aa1bfff777"
+            project_id: "1bc1a5ca-2ab7-4750-b504-5828a932e788"
         }
     ) {
         errors {
