@@ -14,7 +14,7 @@ import { useUser } from "./../helpers/hooks/useUser";
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    const { loading, userId } = useContext(GlobalContext);
+    const { loading } = useContext(GlobalContext);
 
     const [expand, setExpand] = useState(true);
     const [sideBarWidth, setSideBarWidth] = useState("0px");

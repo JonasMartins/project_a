@@ -18,7 +18,6 @@ import { useRouter } from "next/dist/client/router";
 import { Container } from "./../components/Container";
 import ButtonColorMode from "../components/ButtonColorMode";
 import { GlobalContext } from "./../context/globalContext";
-import { useToken } from "./../helpers/hooks/useToken";
 
 interface loginProps {}
 
@@ -32,8 +31,6 @@ const roleCode = {
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
-
-    const [_, setToken] = useToken();
 
     const { setIsLoading } = useContext(GlobalContext);
     type errors = {
@@ -100,7 +97,11 @@ const Login: React.FC<loginProps> = ({}) => {
                                     response.data?.login?.result?.accessToken
                                 );*/
                                 // console.log("login");
-                                router.push("/");
+
+                                setTimeout(() => {
+                                    router.push("/");
+                                }, 300)
+
                             }
                         }}
                     >

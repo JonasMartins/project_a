@@ -26,7 +26,6 @@ import {
     useUpdateSeetingsUserMutation,
     GetAllRolesQuery,
 } from "./../../generated/graphql";
-import router from "next/router";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { toErrorMap } from "../../utils/toErrorMap";
 
@@ -74,6 +73,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
 
     useEffect(() => {
         if (!user) return;
+
         setUserInfo((prevUser) => ({
             ...prevUser,
             id: user?.user?.id,
@@ -139,6 +139,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                         isClosable: true,
                                         position: "bottom-right",
                                     });
+                                    onClose();
                                 }
                             }}
                         >

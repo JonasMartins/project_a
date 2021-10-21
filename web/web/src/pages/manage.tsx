@@ -1,4 +1,3 @@
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import {
     Box,
     Flex,
@@ -6,41 +5,42 @@ import {
     Link,
     Table,
     Tbody,
+    Td,
     Text,
     Th,
-    Td,
     Thead,
     Tooltip,
     Tr,
     useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AiFillEdit } from "react-icons/ai";
 import { IoPersonAddOutline } from "react-icons/io5";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
+import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
-import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Footer from "./../components/rootComponents/Footer";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Navbar from "./../components/rootComponents/Navbar";
+import { GlobalContext } from "./../context/globalContext";
 import {
-    useGetAllUsersQuery,
     GetAllRolesQuery,
     useGetAllRolesQuery,
+    useGetAllUsersQuery,
 } from "./../generated/graphql";
 import { useUser } from "./../helpers/hooks/useUser";
-import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
 import { userManageInfo } from "./../helpers/users/userFunctonHelpers";
 
 interface manageProps {}
 
 const Manage: React.FC<manageProps> = ({}) => {
     const user = useUser();
-    const [expand, setExpand] = useState(true);
-    const [sideBarWidth, setSideBarWidth] = useState("0px");
+
+    const { expanded } = useContext(GlobalContext);
     const [pageWidth, setPageWidth] = useState("3em");
-    const [navBarWidth, setNavBarWidth] = useState("0px");
+    const [navBarWidth, setNavBarWidth] = useState("50px");
     const [seletedUser, setSelectedUser] = useState<userManageInfo | null>(
         null
     );
@@ -61,55 +61,35 @@ const Manage: React.FC<manageProps> = ({}) => {
         onOpen();
     };
 
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("250px");
-            setPageWidth("20em");
-            setNavBarWidth("16em");
-        } else {
-            setSideBarWidth("0px");
-            setPageWidth("3em");
-            setNavBarWidth("0px");
-        }
-    };
-
     useEffect(() => {
         if (users.fetching && allRoles.fetching) return;
 
         if (allRoles.data) {
             setRoles(allRoles.data);
         }
-    }, [users.fetching, allRoles.fetching]);
+
+        if (expanded) {
+            setPageWidth("20em");
+            setNavBarWidth("16em");
+        } else {
+            setPageWidth("3em");
+            setNavBarWidth("50px");
+        }
+    }, [users.fetching, allRoles.fetching, expanded]);
 
     const content = (
         <Container>
             <Navbar pageWidth={navBarWidth} />
-            <SideBar
-                width={sideBarWidth}
-                visibility={expand ? "hidden" : "visible"}
-            />
+            <SideBar />
             <Flex
                 alignSelf="normal"
                 flexDir="column"
                 flexGrow={1}
                 mb="150px"
                 ml={pageWidth}
-                transition="0.3s"
+                transition="0.5s"
             >
-                <Flex flexDir="row" alignItems="center" p={2}>
-                    <Flex mt={2}>
-                        <IconButton
-                            isRound={true}
-                            aria-label="Show Side Bar"
-                            mr={1}
-                            icon={
-                                expand ? <ArrowLeftIcon /> : <ArrowRightIcon />
-                            }
-                            onClick={handleExpandSideBar}
-                        />
-                    </Flex>
+                <Flex flexDir="row" alignItems="center" p={2} ml={2}>
                     <NextLink href={"/"}>
                         <Link>
                             <Text>Home</Text>

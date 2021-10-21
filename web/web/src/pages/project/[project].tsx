@@ -24,7 +24,7 @@ import {
 } from "../../generated/graphql";
 
 interface projectsProps {
-    id: string
+    id: string;
 }
 
 type itemQuery = {
@@ -56,10 +56,10 @@ const Project: React.FC<projectsProps> = ({}) => {
     const color = { light: "black", dark: "white" };
 
     const { project } = router.query;
-    
+
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
-            id: project && typeof project === 'string' ? project : "-1",
+            id: project && typeof project === "string" ? project : "-1",
         },
         pause: true,
     });
@@ -261,11 +261,7 @@ const Project: React.FC<projectsProps> = ({}) => {
     const content = (
         <Container>
             <Navbar pageWidth={navBarWidth} />
-            <SideBar
-                projectName={data && data.getProjectById.project.name}
-                width={sideBarWidth}
-                visibility={expand ? "hidden" : "visible"}
-            />
+            <SideBar />
             <Flex
                 p={2}
                 margin="1em 2em 1em"
