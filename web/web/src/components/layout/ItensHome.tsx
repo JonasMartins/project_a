@@ -21,7 +21,7 @@ import {
     getItemTypeIcon,
 } from "./../../helpers/items/ItemFunctinHelpers";
 import ModalitemDetail from "./../modal/ModalitemDetail";
-import FlexSpinner from "./../rootComponents/FlexSpinner";
+import FullPageSpinner from "./../rootComponents/FullPageSpinner";
 
 interface ItensHomeProps {
     userId: string;
@@ -73,6 +73,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
         // }, 1000);
 
         // return () => clearTimeout(timerId);
+
         reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching, reexecuteQuery]);
 
@@ -80,7 +81,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
 
     // console.log("data", data);
 
-    const loading = <FlexSpinner />;
+    const loading = <FullPageSpinner />;
     const content = (
         <>
             <Tabs>
@@ -102,7 +103,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                             data.getItensRelatedToUserByPeriod.itens.map(
                                 (item) =>
                                     item.status !== "COMPLETED" &&
-                                    item.status !== "CLOSED" ? (
+                                    item.status !== "CLOSED" && (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
                                             <Box ml="1em" mr="1em">
@@ -139,8 +140,6 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                 {item.summary}
                                             </Text>
                                         </Flex>
-                                    ) : (
-                                        <></>
                                     )
                             )}
                     </TabPanel>
@@ -150,7 +149,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                 (item) =>
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" &&
-                                    item.responsible_id === userId ? (
+                                    item.responsible_id === userId && (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
 
@@ -188,8 +187,6 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                 {item.summary}
                                             </Text>
                                         </Flex>
-                                    ) : (
-                                        <></>
                                     )
                             )}
                     </TabPanel>
@@ -199,7 +196,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                 (item) =>
                                     item.status !== "COMPLETED" &&
                                     item.status !== "CLOSED" &&
-                                    item.reporter_id === userId ? (
+                                    item.reporter_id === userId && (
                                         <Flex alignItems="center" key={item.id}>
                                             {getItemTypeIcon(item.type)}
 
@@ -237,8 +234,6 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                 {item.summary}
                                             </Text>
                                         </Flex>
-                                    ) : (
-                                        <></>
                                     )
                             )}
                     </TabPanel>

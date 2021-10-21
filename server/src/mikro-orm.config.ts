@@ -7,6 +7,7 @@ import { Role } from "./entities/role.entity";
 import { Team } from "./entities/team.entity";
 import { Sprint } from "./entities/sprint.entity";
 import { Project } from "./entities/project.entity";
+import { Appointment } from "./entities/appointment.entity";
 
 const microConfig = {
     migrations: {
@@ -14,7 +15,16 @@ const microConfig = {
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
 
-    entities: [User, Item, Role, Team, Collection, Sprint, Project],
+    entities: [
+        User,
+        Item,
+        Role,
+        Team,
+        Collection,
+        Sprint,
+        Project,
+        Appointment,
+    ],
     dbName: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

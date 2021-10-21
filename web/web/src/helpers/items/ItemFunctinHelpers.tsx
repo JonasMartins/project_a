@@ -1,4 +1,4 @@
-import { Box, Square, Tooltip } from "@chakra-ui/react";
+import { Box, Square, Tooltip, Text } from "@chakra-ui/react";
 import React from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { BsFillBookmarkFill } from "react-icons/bs";
@@ -10,7 +10,71 @@ import {
     CgArrowBottomLeftO,
     CgArrowDownO,
 } from "react-icons/cg";
-import { ItemPriority } from "./../../generated/graphql";
+import {
+    ItemPriority,
+    ItemStatus,
+    Maybe,
+    Sprint,
+    Project,
+    Item,
+} from "./../../generated/graphql";
+
+export type itemBacklog = { __typename?: "Item" } & Pick<
+    Item,
+    | "id"
+    | "summary"
+    | "type"
+    | "priority"
+    | "status"
+    | "createdAt"
+    | "updatedAt"
+    | "description"
+> & {
+        responsible: { __typename?: "User" } & Pick<User, "id" | "name">;
+        reporter: { __typename?: "User" } & Pick<User, "id" | "name">;
+        sprint: { __typename?: "Sprint" } & Pick<
+            Sprint,
+            "code" | "createdAt" | "length" | "final"
+        > & {
+                project: { __typename?: "Project" } & Pick<Project, "name">;
+            };
+    };
+
+export type itensBacklog = {
+    itens?: Maybe<
+        Array<
+            { __typename?: "Item" } & Pick<
+                Item,
+                | "id"
+                | "summary"
+                | "type"
+                | "priority"
+                | "status"
+                | "createdAt"
+                | "updatedAt"
+                | "description"
+            > & {
+                    responsible: { __typename?: "User" } & Pick<
+                        User,
+                        "id" | "name"
+                    >;
+                    reporter: { __typename?: "User" } & Pick<
+                        User,
+                        "id" | "name"
+                    >;
+                    sprint: { __typename?: "Sprint" } & Pick<
+                        Sprint,
+                        "code" | "createdAt" | "length" | "final"
+                    > & {
+                            project: { __typename?: "Project" } & Pick<
+                                Project,
+                                "name"
+                            >;
+                        };
+                }
+        >
+    >;
+};
 
 export const getItemTypeIcon = (type: string): JSX.Element => {
     let componentType: JSX.Element | null = null;
@@ -115,7 +179,7 @@ export const returnPriorityIconHeaderModal = (
     type: ItemPriority | enumItemPriority
 ): JSX.Element => {
     let componentType: JSX.Element | null = null;
-
+    let size = "30px";
     switch (type) {
         case "HIGHEST":
             componentType = (
@@ -124,8 +188,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Highest Priority"
                     label="Highest Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowUpO color="#ad032c" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowUpO color="#ad032c" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -137,8 +201,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="High Priority"
                     label="High Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowTopRightO color="#d36a13" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowTopRightO color="#d36a13" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -150,8 +214,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Medium Priority"
                     label="Medium Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowRightO color="#f6de56" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowRightO color="#f6de56" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -163,8 +227,8 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Low Priority"
                     label="Low Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowBottomLeftO color="#63ace8" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowBottomLeftO color="#63ace8" size={size} />
                     </Box>
                 </Tooltip>
             );
@@ -176,13 +240,58 @@ export const returnPriorityIconHeaderModal = (
                     aria-label="Lowest Priority"
                     label="Lowest Priority"
                 >
-                    <Box ml={2} bg="black" rounded="full">
-                        <CgArrowDownO color="white" size="35px" />
+                    <Box ml={2} bg="black" rounded="full" h={size}>
+                        <CgArrowDownO color="white" size={size} />
                     </Box>
                 </Tooltip>
             );
             break;
     }
+    return componentType;
+};
+
+export const returnItemStatusStyled = (status: ItemStatus): JSX.Element => {
+    let componentType: JSX.Element | null = null;
+    switch (status) {
+        case "OPEN":
+            componentType = (
+                <Text fontWeight="semibold" textShadow="#f6de56 1px 0 10px">
+                    OPEN
+                </Text>
+            );
+            break;
+        case "REOPENED":
+            componentType = (
+                <Text fontWeight="semibold" textShadow="#f6ad55 1px 0 10px">
+                    REOPENED
+                </Text>
+            );
+            break;
+        case "IN_PROGRESS":
+            componentType = (
+                <Text fontWeight="semibold" textShadow="#7fe7fb 1px 0 10px">
+                    IN PROGRESS
+                </Text>
+            );
+            break;
+        case "CLOSED":
+            componentType = (
+                <Text fontWeight="semibold" textShadow="#58c184 1px 0 10px">
+                    CLOSED
+                </Text>
+            );
+            break;
+        case "RESOLVED":
+            componentType = (
+                <Text fontWeight="semibold" textShadow="#3994e0 1px 0 10px">
+                    RESOLVED
+                </Text>
+            );
+            break;
+        default:
+            break;
+    }
+
     return componentType;
 };
 

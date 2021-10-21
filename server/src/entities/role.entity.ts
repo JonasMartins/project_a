@@ -20,7 +20,7 @@ export class Role extends Base<Role> {
     description: string;
 
     @Field()
-    @Property({ fieldName: "wage", columnType: "money" }) // money postgrs only
+    @Property({ fieldName: "wage", columnType: "numeric" })
     wage!: number;
 
     @Field(() => [User])

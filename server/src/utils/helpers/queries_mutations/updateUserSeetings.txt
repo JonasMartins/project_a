@@ -1,0 +1,23 @@
+mutation {
+  updateSeetingsUser(
+    options: {
+      id: "6b8eade3-15d5-4961-a86b-4302cb235118"
+      name: "Admin"
+      email: "admin@email.com"
+      role_id: "854330ed-c007-4cb6-a95c-f14dcb04493a"
+    }
+  ) {
+    errors {
+      message
+    }
+    user {
+      id
+      name
+      email
+      role {
+        id
+        name
+      }
+    }
+  }
+}

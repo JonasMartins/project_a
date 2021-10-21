@@ -17,6 +17,7 @@ import { Project } from "../entities/project.entity";
 import SprintValidator from "./../validators/sprint.validator";
 import { Context } from "../types";
 import { SprintLength } from "../enums/sprintLength.enum";
+import { EntityManager } from "@mikro-orm/postgresql";
 
 @ObjectType()
 class SprintResponse {
@@ -44,7 +45,26 @@ export class SprintResolver {
             };
         }
 
-        const sprint = await em.create(Sprint, options);
+        const qb = (em as EntityManager).createQueryBuilder(Sprint);
+
+        qb.select("*")
+            .where({ active: true })
+            .andWhere({ project_id: options.project_id })
+            .limit(1);
+
+        const activeSprints: Sprint = await qb.execute();
+
+        if (activeSprints.length) {
+            return {
+                errors: genericError(
+                    "project_id",
+                    "createSprint",
+                    __filename,
+                    `Already exists a active sprint for the project with id: ${options.project_id}`
+                ),
+            };
+        }
+
         const project = await em.findOne(Project, { id: options.project_id });
 
         if (!project) {
@@ -57,6 +77,8 @@ export class SprintResolver {
                 ),
             };
         }
+
+        const sprint = await em.create(Sprint, options);
 
         sprint.project = project;
 

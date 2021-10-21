@@ -1,0 +1,25 @@
+mutation {
+    createSprint(
+        options: {
+            code: "CEN_OUT21"
+            description: "sprint out 21 - Chess Engine"
+            length: FOUR
+            project_id: "1bc1a5ca-2ab7-4750-b504-5828a932e788"
+        }
+    ) {
+        errors {
+            message
+        }
+        sprint {
+            id
+            code
+            description
+            length
+            project {
+                id
+                name
+            }
+        }
+    }
+}
+

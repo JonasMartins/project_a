@@ -13,3 +13,26 @@ export const getPastOrFutureDate = (
 
     return futureOrPastDate;
 };
+
+export const truncateString = (value: string, limit: number): string => {
+    if (value.length > limit) {
+        return value.substr(0, limit) + "...";
+    } else {
+        return value;
+    }
+};
+
+export const compareTwoStrings = (str1: string, str2: string): boolean => {
+    if (!str1 && !str2) {
+        return true;
+    }
+
+    if (!str1 || !str2) {
+        return false;
+    }
+
+    return (
+        str1.toLocaleLowerCase().replace(/ /g, "") ===
+        str2.toLocaleLowerCase().replace(/ /g, "")
+    );
+};

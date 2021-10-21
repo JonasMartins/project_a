@@ -1,0 +1,24 @@
+mutation {
+    createUser(
+        options: {
+            name: "Karen"
+            password: "password"
+            email: "karen@email.com"
+            role_id: "ab760a43-7ecb-43cb-9527-8e5df7f48642"
+        }
+    ) {
+        errors {
+            message
+        }
+        user {
+            id
+            name
+            role {
+                name
+                code
+            }
+        }
+    }
+}
+# Katen, Richard, Admin, John, Sarah, Peter
+#

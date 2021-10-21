@@ -30,6 +30,8 @@ class ItensResponse {
     errors?: ErrorFieldHandler[];
     @Field(() => [Item], { nullable: true })
     itens?: Item[];
+    @Field()
+    total?: Number;
 }
 
 @Resolver()
@@ -228,5 +230,83 @@ export class ItemResolver {
         });
 
         return { item };
+    }
+
+    /**
+     *
+     *      Essa mutation deve receber um numero de pagina, e
+     *  uma quantidade de itens por pagina, os itens serão ordenados por
+     *  data de update inicialmente.
+     *
+     *  Deve receber outro argumento chamado cursor, que deve ser a data de atualização
+     *  do ultimo item da página anterior, se não for passado, siguinifica que o usuário navega
+     *  pela primeira página.
+     *
+     *  Recebendo o cursor com a data, ele retorna os itens com a data mais antiga que aquele item
+     *
+     * @param limit
+     * @param cursor
+     * @returns
+     */
+    @Query(() => ItensResponse)
+    async getItensBacklog(
+        @Arg("limit", () => Number, { nullable: true }) limit: number,
+        @Arg("cursor", () => Date, { nullable: true }) cursor: Date,
+        @Ctx() { em }: Context
+    ): Promise<ItensResponse> {
+        const max = Math.min(10, limit);
+
+        const qb = (em as EntityManager).createQueryBuilder(Item, "i");
+
+        /*
+        // $gte, $lte = >=| <=, $gt, $lt :  > | <
+        // With join
+        if (cursor) {
+            qb.select(["i.*", "u.name"], true)
+                .leftJoin("i.responsible", "u")
+                .where({ updatedAt: { $lt: cursor } })
+                .limit(max)
+                .orderBy({ updatedAt: "DESC" });
+        } else {
+            qb.select(["i.*", "u.name"], true)
+                .leftJoin("i.responsible", "u")
+                .where({ "1": "1" })
+                .limit(max)
+                .orderBy({ updatedAt: "DESC" });
+        } */
+
+        if (cursor) {
+            qb.select(["i.*"])
+                .where({ updatedAt: { $lt: cursor } })
+                .limit(max)
+                .orderBy({ updatedAt: "DESC" })
+                .groupBy("i.id");
+        } else {
+            qb.select(["i.*"])
+                .where({ "1": "1" })
+                .limit(max)
+                .orderBy({ updatedAt: "DESC" });
+        }
+
+        try {
+            const itens = await qb.getResult();
+
+            await em.populate(itens, ["responsible"]);
+            await em.populate(itens, ["reporter"]);
+            await em.populate(itens, ["sprint.project"]);
+
+            const total = await em.count(Item);
+
+            return { itens, total };
+        } catch (e) {
+            return {
+                errors: genericError(
+                    "-",
+                    "getItensBacklog",
+                    __filename,
+                    `message: ${e.message}`
+                ),
+            };
+        }
     }
 }

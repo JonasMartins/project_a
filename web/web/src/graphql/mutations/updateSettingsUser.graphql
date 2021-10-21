@@ -1,0 +1,18 @@
+mutation UpdateSeetingsUser($options: userSeetingsInput!) {
+    updateSeetingsUser(options: $options) {
+        errors {
+            field
+            message
+            method
+        }
+        user {
+            id
+            name
+            email
+            role {
+                id
+                name
+            }
+        }
+    }
+}

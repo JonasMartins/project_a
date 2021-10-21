@@ -12,6 +12,7 @@ import { Item } from "./item.entity";
 import { Base } from "./../utils/entities/base.entity";
 import { Team } from "./team.entity";
 import { Role } from "./role.entity";
+import { Appointment } from "./appointment.entity";
 
 @ObjectType()
 @Entity()
@@ -24,6 +25,7 @@ export class User extends Base<User> {
     @Property({ type: "text", unique: true, nullable: true })
     email: string;
 
+    @Field()
     @Property({ type: "text" })
     password!: string;
 
@@ -53,6 +55,24 @@ export class User extends Base<User> {
     @Field(() => Role)
     @ManyToOne(() => Role, { eager: true })
     public role: Role;
+
+    @Field(() => [Appointment])
+    @OneToMany(
+        () => Appointment,
+        (appointment: Appointment) => appointment.user,
+        { lazy: true }
+    )
+    public appointments: Collection<Appointment> = new Collection<Appointment>(
+        this
+    );
+
+    @Field(() => String, { nullable: true })
+    @Property({ nullable: true, length: 255 })
+    public picure: string;
+
+    @Field(() => Boolean)
+    @Property({ default: true })
+    public active: boolean;
 
     constructor(body: UserValidator) {
         super(body);

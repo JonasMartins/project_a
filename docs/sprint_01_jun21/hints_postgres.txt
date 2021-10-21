@@ -13,7 +13,7 @@ https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ub
 https://www.luiztools.com.br/post/como-usar-nodejs-postgresql/
 
 
-- Iniciando postgres
+- Iniciando postgres WINDOWS
 sudo service postgresql start
 
 - Logando usuario postgres:
@@ -27,3 +27,17 @@ npm run dev // para startar o servidor
 No MacOs: psql pa_dev para entrar no banco pa_dev e rodar as consultas desejadas
 
 \dt para listar todas as tabelas
+
+Para limpar o terminal do postgres:
+
+Mac/ Linux:
+
+\! clear 
+
+Windows
+
+\! cls
+
+
+
+

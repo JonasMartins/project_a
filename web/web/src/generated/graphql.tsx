@@ -4,10 +4,12 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
     [K in keyof T]: T[K];
 };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-    { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-    { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+    [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+    [SubKey in K]: Maybe<T[SubKey]>;
+};
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -18,6 +20,35 @@ export type Scalars = {
     Float: number;
     /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
     DateTime: any;
+};
+
+export type Appointment = {
+    __typename?: "Appointment";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    start: Scalars["DateTime"];
+    end?: Maybe<Scalars["DateTime"]>;
+    user: User;
+    item: Item;
+};
+
+export type AppointmentResponse = {
+    __typename?: "AppointmentResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    appointment?: Maybe<Appointment>;
+};
+
+export type AppointmentValidator = {
+    start: Scalars["DateTime"];
+    item_id: Scalars["String"];
+    user_id: Scalars["String"];
+};
+
+export type AppointmentsResponse = {
+    __typename?: "AppointmentsResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    appointments?: Maybe<Array<Appointment>>;
 };
 
 export type ErrorFieldHandler = {
@@ -44,6 +75,7 @@ export type Item = {
     reporter_id: Scalars["String"];
     approver_id: Scalars["String"];
     sprint: Sprint;
+    appointments: Array<Appointment>;
 };
 
 /** The basic directions */
@@ -91,6 +123,7 @@ export type ItensResponse = {
     __typename?: "ItensResponse";
     errors?: Maybe<Array<ErrorFieldHandler>>;
     itens?: Maybe<Array<Item>>;
+    total: Scalars["Float"];
 };
 
 export type LoginResponse = {
@@ -106,8 +139,10 @@ export type Mutation = {
     createUser: UserResponse;
     logout?: Maybe<Scalars["Boolean"]>;
     login: LoginResponse;
+    updateSeetingsUser: UserResponse;
     createRole: RoleRespnse;
     createTeam: TeamResponse;
+    createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
     createProject: ProjectResponse;
 };
@@ -132,12 +167,20 @@ export type MutationLoginArgs = {
     email: Scalars["String"];
 };
 
+export type MutationUpdateSeetingsUserArgs = {
+    options: UserSeetingsInput;
+};
+
 export type MutationCreateRoleArgs = {
     options: RoleValidator;
 };
 
 export type MutationCreateTeamArgs = {
     options: TeamValidator;
+};
+
+export type MutationCreateAppointmentArgs = {
+    options: AppointmentValidator;
 };
 
 export type MutationCreateSprintArgs = {
@@ -173,11 +216,17 @@ export type Query = {
     __typename?: "Query";
     getItensRelatedToUserByPeriod: ItensResponse;
     getItemById: ItemResponse;
+    getItensBacklog: ItensResponse;
     hello: Scalars["String"];
     logedInTest: Scalars["String"];
+    getAllUsers: UsersResponse;
     getUserById: UserResponse;
+    getUserSettings: UserResponse;
     getRoleById: RoleRespnse;
+    getAllRoles: RolesRespnse;
     getTeamById: TeamResponse;
+    getAppointmentsByItem: AppointmentsResponse;
+    getAppointmentsByUser: AppointmentsResponse;
     getSprints?: Maybe<Array<Sprint>>;
     getSprintById: SprintResponse;
     getProjects?: Maybe<Array<Project>>;
@@ -195,7 +244,21 @@ export type QueryGetItemByIdArgs = {
     id: Scalars["String"];
 };
 
+export type QueryGetItensBacklogArgs = {
+    cursor?: Maybe<Scalars["DateTime"]>;
+    limit?: Maybe<Scalars["Float"]>;
+};
+
+export type QueryGetAllUsersArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
+};
+
 export type QueryGetUserByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetUserSettingsArgs = {
     id: Scalars["String"];
 };
 
@@ -205,6 +268,16 @@ export type QueryGetRoleByIdArgs = {
 
 export type QueryGetTeamByIdArgs = {
     id: Scalars["String"];
+};
+
+export type QueryGetAppointmentsByItemArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    itemId: Scalars["String"];
+};
+
+export type QueryGetAppointmentsByUserArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    userId: Scalars["String"];
 };
 
 export type QueryGetSprintsArgs = {
@@ -253,6 +326,12 @@ export type RoleValidator = {
     code: Scalars["String"];
     description: Scalars["String"];
     wage: Scalars["Float"];
+};
+
+export type RolesRespnse = {
+    __typename?: "RolesRespnse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    roles?: Maybe<Array<Role>>;
 };
 
 export type Sprint = {
@@ -321,11 +400,15 @@ export type User = {
     updatedAt: Scalars["DateTime"];
     name: Scalars["String"];
     email: Scalars["String"];
+    password: Scalars["String"];
     itenReporter: Array<Item>;
     itenResponsible: Array<Item>;
     itenApprover: Array<Item>;
     teams: Array<Team>;
     role: Role;
+    appointments: Array<Appointment>;
+    picure?: Maybe<Scalars["String"]>;
+    active: Scalars["Boolean"];
 };
 
 export type UserBasicData = {
@@ -341,10 +424,27 @@ export type UserResponse = {
     user?: Maybe<User>;
 };
 
+export type UsersResponse = {
+    __typename?: "UsersResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    users?: Maybe<Array<User>>;
+    total: Scalars["Float"];
+};
+
 export type TokenAndId = {
     __typename?: "tokenAndId";
     accessToken?: Maybe<Scalars["String"]>;
     userId?: Maybe<Scalars["String"]>;
+    name?: Maybe<Scalars["String"]>;
+    userRoleCode?: Maybe<Scalars["String"]>;
+};
+
+export type UserSeetingsInput = {
+    id: Scalars["String"];
+    name?: Maybe<Scalars["String"]>;
+    email?: Maybe<Scalars["String"]>;
+    password?: Maybe<Scalars["String"]>;
+    role_id?: Maybe<Scalars["String"]>;
 };
 
 export type CreateItemMutationVariables = Exact<{
@@ -401,7 +501,7 @@ export type LoginMutation = { __typename?: "Mutation" } & {
         result?: Maybe<
             { __typename?: "tokenAndId" } & Pick<
                 TokenAndId,
-                "accessToken" | "userId"
+                "accessToken" | "userId" | "userRoleCode"
             >
         >;
     };
@@ -413,6 +513,113 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
     Mutation,
     "logout"
 >;
+
+export type UpdateSeetingsUserMutationVariables = Exact<{
+    options: UserSeetingsInput;
+}>;
+
+export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
+    updateSeetingsUser: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "field" | "message" | "method"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<User, "id" | "name" | "email"> & {
+                    role: { __typename?: "Role" } & Pick<Role, "id" | "name">;
+                }
+        >;
+    };
+};
+
+export type GetAllRolesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAllRolesQuery = { __typename?: "Query" } & {
+    getAllRoles: { __typename?: "RolesRespnse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        roles?: Maybe<
+            Array<
+                { __typename?: "Role" } & Pick<
+                    Role,
+                    "id" | "name" | "code" | "wage"
+                >
+            >
+        >;
+    };
+};
+
+export type GetAllUsersQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
+}>;
+
+export type GetAllUsersQuery = { __typename?: "Query" } & {
+    getAllUsers: { __typename?: "UsersResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        users?: Maybe<
+            Array<
+                { __typename?: "User" } & Pick<
+                    User,
+                    "id" | "name" | "email" | "active"
+                > & {
+                        role: { __typename?: "Role" } & Pick<
+                            Role,
+                            "id" | "name"
+                        >;
+                    }
+            >
+        >;
+    };
+};
+
+export type GetAppointmentsByItemQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    itemId: Scalars["String"];
+}>;
+
+export type GetAppointmentsByItemQuery = { __typename?: "Query" } & {
+    getAppointmentsByItem: { __typename?: "AppointmentsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        appointments?: Maybe<
+            Array<
+                { __typename?: "Appointment" } & Pick<
+                    Appointment,
+                    "id" | "start" | "end"
+                > & {
+                        user: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "name"
+                        >;
+                    }
+            >
+        >;
+    };
+};
 
 export type GetItemByIdQueryVariables = Exact<{
     id: Scalars["String"];
@@ -444,6 +651,60 @@ export type GetItemByIdQuery = { __typename?: "Query" } & {
                 }
         >;
     };
+};
+
+export type GetItensBacklogQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    cursor?: Maybe<Scalars["DateTime"]>;
+}>;
+
+export type GetItensBacklogQuery = { __typename?: "Query" } & {
+    getItensBacklog: { __typename?: "ItensResponse" } & Pick<
+        ItensResponse,
+        "total"
+    > & {
+            errors?: Maybe<
+                Array<
+                    { __typename?: "ErrorFieldHandler" } & Pick<
+                        ErrorFieldHandler,
+                        "method" | "message" | "field"
+                    >
+                >
+            >;
+            itens?: Maybe<
+                Array<
+                    { __typename?: "Item" } & Pick<
+                        Item,
+                        | "id"
+                        | "summary"
+                        | "type"
+                        | "priority"
+                        | "status"
+                        | "description"
+                        | "updatedAt"
+                        | "createdAt"
+                    > & {
+                            responsible: { __typename?: "User" } & Pick<
+                                User,
+                                "id" | "name"
+                            >;
+                            reporter: { __typename?: "User" } & Pick<
+                                User,
+                                "id" | "name"
+                            >;
+                            sprint: { __typename?: "Sprint" } & Pick<
+                                Sprint,
+                                "code" | "createdAt" | "length" | "final"
+                            > & {
+                                    project: { __typename?: "Project" } & Pick<
+                                        Project,
+                                        "name"
+                                    >;
+                                };
+                        }
+                >
+            >;
+        };
 };
 
 export type GetItensRelatedToUserByPeriodQueryVariables = Exact<{
@@ -583,6 +844,34 @@ export type GetUserByIdQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetUserSettingsQueryVariables = Exact<{
+    id: Scalars["String"];
+}>;
+
+export type GetUserSettingsQuery = { __typename?: "Query" } & {
+    getUserSettings: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<
+                User,
+                "id" | "name" | "email" | "password" | "picure"
+            > & {
+                    role: { __typename?: "Role" } & Pick<
+                        Role,
+                        "id" | "name" | "code"
+                    >;
+                }
+        >;
+    };
+};
+
 export const CreateItemDocument = gql`
     mutation CreateItem(
         $approverId: String!
@@ -639,6 +928,7 @@ export const LoginDocument = gql`
             result {
                 accessToken
                 userId
+                userRoleCode
             }
         }
     }
@@ -657,6 +947,121 @@ export const Document = gql`
 
 export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
+}
+export const UpdateSeetingsUserDocument = gql`
+    mutation UpdateSeetingsUser($options: userSeetingsInput!) {
+        updateSeetingsUser(options: $options) {
+            errors {
+                field
+                message
+                method
+            }
+            user {
+                id
+                name
+                email
+                role {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useUpdateSeetingsUserMutation() {
+    return Urql.useMutation<
+        UpdateSeetingsUserMutation,
+        UpdateSeetingsUserMutationVariables
+    >(UpdateSeetingsUserDocument);
+}
+export const GetAllRolesDocument = gql`
+    query GetAllRoles {
+        getAllRoles {
+            errors {
+                method
+                message
+                field
+            }
+            roles {
+                id
+                name
+                code
+                wage
+            }
+        }
+    }
+`;
+
+export function useGetAllRolesQuery(
+    options: Omit<Urql.UseQueryArgs<GetAllRolesQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetAllRolesQuery>({
+        query: GetAllRolesDocument,
+        ...options,
+    });
+}
+export const GetAllUsersDocument = gql`
+    query getAllUsers($limit: Float, $active: Boolean!) {
+        getAllUsers(active: $active, limit: $limit) {
+            errors {
+                method
+                message
+                field
+            }
+            users {
+                id
+                name
+                email
+                active
+                role {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useGetAllUsersQuery(
+    options: Omit<Urql.UseQueryArgs<GetAllUsersQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetAllUsersQuery>({
+        query: GetAllUsersDocument,
+        ...options,
+    });
+}
+export const GetAppointmentsByItemDocument = gql`
+    query getAppointmentsByItem($limit: Float, $itemId: String!) {
+        getAppointmentsByItem(itemId: $itemId, limit: $limit) {
+            errors {
+                method
+                message
+                field
+            }
+            appointments {
+                id
+                start
+                end
+                user {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useGetAppointmentsByItemQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetAppointmentsByItemQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetAppointmentsByItemQuery>({
+        query: GetAppointmentsByItemDocument,
+        ...options,
+    });
 }
 export const GetItemByIdDocument = gql`
     query GetItemById($id: String!) {
@@ -689,6 +1094,57 @@ export function useGetItemByIdQuery(
 ) {
     return Urql.useQuery<GetItemByIdQuery>({
         query: GetItemByIdDocument,
+        ...options,
+    });
+}
+export const GetItensBacklogDocument = gql`
+    query GetItensBacklog($limit: Float, $cursor: DateTime) {
+        getItensBacklog(limit: $limit, cursor: $cursor) {
+            errors {
+                method
+                message
+                field
+            }
+            total
+            itens {
+                id
+                summary
+                type
+                priority
+                status
+                description
+                updatedAt
+                createdAt
+                responsible {
+                    id
+                    name
+                }
+                reporter {
+                    id
+                    name
+                }
+                sprint {
+                    code
+                    createdAt
+                    length
+                    final
+                    project {
+                        name
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export function useGetItensBacklogQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetItensBacklogQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetItensBacklogQuery>({
+        query: GetItensBacklogDocument,
         ...options,
     });
 }
@@ -831,6 +1287,41 @@ export function useGetUserByIdQuery(
 ) {
     return Urql.useQuery<GetUserByIdQuery>({
         query: GetUserByIdDocument,
+        ...options,
+    });
+}
+export const GetUserSettingsDocument = gql`
+    query GetUserSettings($id: String!) {
+        getUserSettings(id: $id) {
+            errors {
+                method
+                message
+                field
+            }
+            user {
+                id
+                name
+                email
+                password
+                picure
+                role {
+                    id
+                    name
+                    code
+                }
+            }
+        }
+    }
+`;
+
+export function useGetUserSettingsQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetUserSettingsQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetUserSettingsQuery>({
+        query: GetUserSettingsDocument,
         ...options,
     });
 }

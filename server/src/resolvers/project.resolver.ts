@@ -90,7 +90,7 @@ export class ProjectResolver {
         }
 
         /**/
-        const sprint = await em.findOneOrFail(
+        const sprint = await em.findOne(
             Sprint,
 
             { project, active: true },
@@ -99,7 +99,9 @@ export class ProjectResolver {
             }
         );
 
-        project.sprints.add(sprint);
+        if (sprint) {
+            project.sprints.add(sprint);
+        }
 
         return { project };
     }

@@ -8,6 +8,7 @@ mutation Login($email: String!, $password: String!) {
         result {
             accessToken
             userId
+            userRoleCode
         }
     }
 }

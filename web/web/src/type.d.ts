@@ -2,11 +2,15 @@ type GlobalContext = {
     loading: Boolean;
     userId: string;
     userName: string;
+    userRole: string;
+    expanded: Boolean;
+    _setExpanded: (isExpanded: Boolean) => void;
     colorMode: "dark" | "light";
     setIsLoading: (isLoading: boolean) => void;
     setCurrentUserId: (currentUserId: string) => void;
     setTheme: (theme: "dark" | "light") => void;
     setCurrentUserName: (currentUserName: string) => void;
+    setCurrentUserRole: (currentUserRole: string) => void;
 };
 
 interface Item {

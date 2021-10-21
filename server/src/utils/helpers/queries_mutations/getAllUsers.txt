@@ -1,0 +1,17 @@
+{
+    getAllUsers(active: true, limit: 10) {
+        errors {
+            method
+            message
+            field
+        }
+        users {
+            id
+            name
+            email
+            role {
+                name
+            }
+        }
+    }
+}

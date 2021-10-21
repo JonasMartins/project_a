@@ -1,44 +1,241 @@
-import React from "react";
-import { Box, useColorMode, Text, Flex } from "@chakra-ui/react";
+import React, { useContext, useState } from "react";
+import {
+    Box,
+    useColorMode,
+    Text,
+    Flex,
+    Link,
+    IconButton,
+    ScaleFade,
+    Tooltip,
+} from "@chakra-ui/react";
+import { SiCodesandbox } from "react-icons/si";
+import {
+    AiOutlineApartment,
+    AiOutlineOrderedList,
+    AiOutlineProject,
+    AiOutlineHome,
+} from "react-icons/ai";
+import NextLink from "next/link";
+import { RiAdminLine } from "react-icons/ri";
+import { useUser } from "./../../helpers/hooks/useUser";
+import { GlobalContext } from "./../../context/globalContext";
+import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 
-interface SideBarProps {
-    projectName: string;
-    width: string;
-    visibility: "visible" | "hidden";
-}
+interface SideBarProps {}
 
-const SideBar: React.FC<SideBarProps> = ({
-    projectName,
-    width,
-    visibility,
-}) => {
+const SideBar: React.FC<SideBarProps> = ({}) => {
     const { colorMode } = useColorMode();
-    const bgColor = { light: "gray.50", dark: "gray.700" };
+    const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
 
+    const { expanded, _setExpanded } = useContext(GlobalContext);
+    const [iconExpanded, setIconExpanded] = useState<Boolean>(expanded);
+
+    const user = useUser();
+
+    const contractedContent = () => {
+        return (
+            <Flex
+                justifyContent="flex-start"
+                flexDir="column"
+                mt={3}
+                overflowY="hidden"
+                overflowX="hidden"
+                transition="0.5s"
+            >
+                <Flex mb={5} alignItems="center">
+                    <SiCodesandbox size="20px" />
+                </Flex>
+                <Tooltip
+                    hasArrow
+                    aria-label="Home"
+                    label="Home"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <AiOutlineHome size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Tooltip>
+                <Tooltip
+                    hasArrow
+                    aria-label="Sprints"
+                    label="Sprints"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <AiOutlineApartment size="20px" />
+                    </Flex>
+                </Tooltip>
+                <Tooltip
+                    hasArrow
+                    aria-label="Backlog"
+                    label="Backlog"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/backlog">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <AiOutlineOrderedList size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Tooltip>
+                <Tooltip
+                    hasArrow
+                    aria-label="Projects"
+                    label="Projects"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/project">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <AiOutlineProject size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Tooltip>
+
+                {user && user.role === "Admin" ? (
+                    <Tooltip
+                        hasArrow
+                        aria-label="Manage"
+                        label="Manage"
+                        colorScheme="withe"
+                        placement="right"
+                    >
+                        <Flex mb={5} alignItems="center">
+                            <NextLink href="/manage">
+                                <Link textStyle="bold">
+                                    <Flex alignItems="center">
+                                        <RiAdminLine size="20px" />
+                                    </Flex>
+                                </Link>
+                            </NextLink>
+                        </Flex>
+                    </Tooltip>
+                ) : (
+                    <></>
+                )}
+            </Flex>
+        );
+    };
+
+    const expandedContent = () => {
+        return (
+            <Flex
+                justifyContent="flex-start"
+                flexDir="column"
+                mt={3}
+                overflowY="hidden"
+                overflowX="hidden"
+                transition="0.5s"
+            >
+                <Flex mb={5} alignItems="center">
+                    <SiCodesandbox size="35px" />
+                </Flex>
+                <Flex mb={5} alignItems="center">
+                    <NextLink href="/">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <AiOutlineHome size="35px" />
+                                <Text ml={2}>Home</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
+                </Flex>
+                <Flex mb={5} alignItems="center">
+                    <AiOutlineApartment size="35px" />
+                    <Text ml={2}>Sprints</Text>
+                </Flex>
+                <Flex mb={5} alignItems="center">
+                    <NextLink href="/backlog">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <AiOutlineOrderedList size="35px" />
+                                <Text ml={2}>Backlog</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
+                </Flex>
+                <Flex mb={5} alignItems="center">
+                    <NextLink href="/project">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <AiOutlineProject size="35px" />
+                                <Text ml={2}> Projects</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
+                </Flex>
+
+                {user && user.role === "Admin" ? (
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/manage">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <RiAdminLine size="35px" />
+
+                                    <Text ml={2}>Manage</Text>
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                ) : (
+                    <></>
+                )}
+            </Flex>
+        );
+    };
     return (
         <Box
             h="100%"
-            zIndex="1"
+            overflowY="hidden"
             overflowX="hidden"
-            transition="0.3s"
-            pt="5"
-            w={width}
+            transition="0.5s"
+            w={expanded ? "16em" : "50px"}
             bg={bgColor[colorMode]}
             color={color[colorMode]}
-            boxShadow="lg"
+            boxShadow="xl"
             position="fixed"
             mt="0px"
+            // borderRight="2px"
+            // borderRightColor={colorMode === "light" ? "gray.200" : "grey.700"}
         >
-            <Flex
-                visibility={visibility}
-                p={2}
-                mt={10}
-                flexDirection="column"
-                alignItems="center"
-            >
-                <Text fontSize="2xl">{projectName}</Text>
-                <Text fontSize="lg">Software project</Text>
+            <Flex p={0} mt={2} flexDirection="column" alignItems="center">
+                <Flex mb={5} alignItems="center">
+                    <IconButton
+                        isRound={true}
+                        aria-label="Show Side Bar"
+                        mr={1}
+                        icon={
+                            iconExpanded ? (
+                                <ArrowLeftIcon />
+                            ) : (
+                                <ArrowRightIcon />
+                            )
+                        }
+                        onClick={() => {
+                            setIconExpanded(!iconExpanded);
+                            _setExpanded(!expanded);
+                        }}
+                    />
+                </Flex>
+                {expanded ? expandedContent() : contractedContent()}
             </Flex>
         </Box>
     );

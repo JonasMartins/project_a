@@ -1,0 +1,15 @@
+query GetAllRoles {
+    getAllRoles {
+        errors {
+            method
+            message
+            field
+        }
+        roles {
+            id
+            name
+            code
+            wage
+        }
+    }
+}

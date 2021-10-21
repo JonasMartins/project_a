@@ -1,0 +1,19 @@
+query getAllUsers($limit: Float, $active: Boolean!) {
+    getAllUsers(active: $active, limit: $limit) {
+        errors {
+            method
+            message
+            field
+        }
+        users {
+            id
+            name
+            email
+            active
+            role {
+                id
+                name
+            }
+        }
+    }
+}

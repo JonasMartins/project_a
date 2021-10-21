@@ -8,6 +8,9 @@ import {
     FormLabel,
     Input,
     FormErrorMessage,
+    Image,
+    Flex,
+    Text,
 } from "@chakra-ui/react";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -18,11 +21,18 @@ import { GlobalContext } from "./../context/globalContext";
 
 interface loginProps {}
 
+const roleCode = {
+    "001": "Developer Jr 1",
+    "002": "Developer Jr 2",
+    "003": "Tech Leader",
+    "999": "Admin",
+};
+
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
 
-    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
+    const { setIsLoading } = useContext(GlobalContext);
     type errors = {
         email: string;
         password: string;
@@ -46,12 +56,23 @@ const Login: React.FC<loginProps> = ({}) => {
     return (
         <Container>
             <ButtonColorMode size="md" position="fixed" right="1em" top="1em" />
+
             <Box
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
                 minHeight="100vh"
+                flexDir="column"
             >
+                <Flex alignSelf="center" flexDir="column" mt="3">
+                    <Image
+                        boxSize="100px"
+                        src="/favicon/android-chrome-512x512.png"
+                    />
+                    <Text fontSize="3xl" fontWeight="semibold">
+                        Project A
+                    </Text>
+                </Flex>
                 <Box boxShadow="xl" p="6" rounded="md" padding={"2em"}>
                     <Formik
                         initialValues={{ email: "", password: "" }}
@@ -62,20 +83,25 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setErrors(
                                     toErrorMap(response.data.login.errors)
                                 );
-                                console.log("errr", response.data.login.errors);
                             } else if (
                                 response.data?.login.result.accessToken
                             ) {
-                                localStorage.setItem(
-                                    "userId",
-                                    response.data?.login.result.userId
-                                );
-
-                                router.push("/");
                                 setIsLoading(false);
-                                setCurrentUserId(
-                                    response.data?.login.result.userId
+
+                                localStorage.setItem(
+                                    "token",
+                                    response.data?.login.result.accessToken
                                 );
+                                /*
+                                setToken(
+                                    response.data?.login?.result?.accessToken
+                                );*/
+                                // console.log("login");
+
+                                setTimeout(() => {
+                                    router.push("/");
+                                }, 300)
+
                             }
                         }}
                     >

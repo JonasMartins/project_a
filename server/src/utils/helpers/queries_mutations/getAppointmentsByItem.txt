@@ -1,0 +1,20 @@
+{
+    getAppointmentsByItem(
+        itemId: "d22da1a6-b665-40a2-b8e1-b93f0ddc615a"
+        limit: 5
+    ) {
+        errors {
+            method
+            message
+            field
+        }
+        appointments {
+            start
+            end
+            user {
+                id
+                name
+            }
+        }
+    }
+}

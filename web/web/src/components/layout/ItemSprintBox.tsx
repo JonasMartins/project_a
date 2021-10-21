@@ -1,14 +1,14 @@
+import { Box, Flex, Text } from "@chakra-ui/react";
 import React from "react";
-import { Text, Flex, Box, IconButton, Tooltip } from "@chakra-ui/react";
-import { Primary } from "./../layout/ContainerShades";
+import { useDrag } from "react-dnd";
+import { MdDragHandle } from "react-icons/md";
+import { Item } from "./../../generated/graphql";
+import { truncateString } from "./../../helpers/generalUtilitiesFunctions";
 import {
     getItemTypeIcon,
     returnPriorityIconHeaderModal,
 } from "./../../helpers/items/ItemFunctinHelpers";
-import { Item } from "./../../generated/graphql";
-import { MdDragHandle, MdBuild } from "react-icons/md";
-
-import { useDrag } from "react-dnd";
+import { Primary } from "./../layout/ContainerShades";
 
 type itemQuery = {
     __typename?: "Item";
@@ -48,7 +48,7 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                 justifyContent="space-between"
             >
                 <Flex flexDir="row" justifyContent="space-between">
-                    <Text size="md">{item.summary.substr(0, 20)}</Text>
+                    <Text size="md">{truncateString(item.summary, 15)}</Text>
                     <MdDragHandle />
                 </Flex>
                 <Flex flexDir="row" justifyContent="space-between">
@@ -56,17 +56,6 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                         {getItemTypeIcon(item.type)}
                         {returnPriorityIconHeaderModal(item.priority)}
                     </Flex>
-                    <Tooltip
-                        hasArrow
-                        aria-label="Manage appointments"
-                        label="Manage Appointments"
-                    >
-                        <IconButton
-                            rounded="full"
-                            aria-label="Manage appointments"
-                            icon={<MdBuild />}
-                        />
-                    </Tooltip>
                 </Flex>
             </Primary>
         </Box>
