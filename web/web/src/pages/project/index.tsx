@@ -10,22 +10,23 @@ import {
     Th,
     Thead,
     Tr,
-    IconButton,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { useEffect, useState } from "react";
 import { FcWorkflow } from "react-icons/fc";
+import SideBar from "../../components/layout/SideBar";
 import { Container } from "./../../components/Container";
 import Footer from "./../../components/rootComponents/Footer";
-import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
+import { GlobalContext } from "./../../context/globalContext";
 import Navbar from "./../../components/rootComponents/Navbar";
+import React, { useEffect, useState, useContext } from "react";
 import { useGetProjectsQuery } from "./../../generated/graphql";
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import SideBar from "../../components/layout/SideBar";
+import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 
 interface projectsProps {}
 
 const Project: React.FC<projectsProps> = ({}) => {
+    const { expanded } = useContext(GlobalContext);
+
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectsQuery({
         variables: {
             limit: 5,
@@ -33,29 +34,20 @@ const Project: React.FC<projectsProps> = ({}) => {
         pause: true,
     });
 
-    const [expand, setExpand] = useState(true);
-    const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
-    const [navBarWidth, setNavBarWidth] = useState("0px");
-
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("250px");
-            setPageWidth("20em");
-            setNavBarWidth("16em");
-        } else {
-            setSideBarWidth("0px");
-            setPageWidth("3em");
-            setNavBarWidth("0px");
-        }
-    };
+    const [navBarWidth, setNavBarWidth] = useState("50px");
 
     useEffect(() => {
         if (fetching) return;
+        if (expanded) {
+            setPageWidth("20em");
+            setNavBarWidth("16em");
+        } else {
+            setPageWidth("3em");
+            setNavBarWidth("50px");
+        }
         reexecuteQuery({ requestPolicy: "cache-first" });
-    }, [fetching, reexecuteQuery]);
+    }, [fetching, expanded, reexecuteQuery]);
 
     if (error) return <p>Oh no... {error.message}</p>;
 
@@ -64,28 +56,10 @@ const Project: React.FC<projectsProps> = ({}) => {
         <>
             <Container>
                 <Navbar pageWidth={navBarWidth} />
-                <SideBar
-                    width={sideBarWidth}
-                    visibility={expand ? "hidden" : "visible"}
-                />
+                <SideBar />
 
                 <Flex flexDir="column" ml={pageWidth} transition="0.3s">
-                    <Flex p={2} flexDir="row" alignItems="center">
-                        <Flex mt={2}>
-                            <IconButton
-                                isRound={true}
-                                aria-label="Show Side Bar"
-                                mr={1}
-                                icon={
-                                    expand ? (
-                                        <ArrowLeftIcon />
-                                    ) : (
-                                        <ArrowRightIcon />
-                                    )
-                                }
-                                onClick={handleExpandSideBar}
-                            />
-                        </Flex>
+                    <Flex p={2} flexDir="row" alignItems="center" ml={2}>
                         <NextLink href={"/"}>
                             <Link>
                                 <Text>Home</Text>

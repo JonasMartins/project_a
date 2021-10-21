@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState, ChangeEvent } from "react";
+import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
-import { Container } from "./../components/Container";
 import { GlobalContext } from "./../context/globalContext";
+import React, { useContext, useEffect, useState, ChangeEvent } from "react";
 import {
     FormControl,
     Button,
@@ -16,24 +16,22 @@ import {
     FormErrorMessage,
     useToast,
     Switch,
-    IconButton,
 } from "@chakra-ui/react";
-import { Form, Formik, Field } from "formik";
-import Avatar from "react-avatar";
 import Login from "./login";
-import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+import Avatar from "react-avatar";
+import { Form, Formik, Field } from "formik";
 import {
     useGetUserSettingsQuery,
     useGetAllRolesQuery,
     GetAllRolesQuery,
     useUpdateSeetingsUserMutation,
 } from "./../generated/graphql";
-import { useRouter } from "next/dist/client/router";
-import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
 import { toErrorMap } from "../utils/toErrorMap";
 import SideBar from "../components/layout/SideBar";
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/dist/client/router";
 import { useUser } from "./../helpers/hooks/useUser";
+import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 
 interface settingsProps {}
 
@@ -46,38 +44,20 @@ interface userInfo {
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
-    const { userId } = useContext(GlobalContext);
+    const { expanded } = useContext(GlobalContext);
 
     const user = useUser();
 
     const toast = useToast();
     const router = useRouter();
 
-    const [loadingCount, setLoadingCount] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [changePassword, setChangePassword] = useState(false);
-
-    const [userIsAdmin, setUserIsAdmin] = useState(false);
-    const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
-
-    const [expand, setExpand] = useState(true);
-    const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
-    const [navBarWidth, setNavBarWidth] = useState("0px");
-
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("250px");
-            setPageWidth("20em");
-            setNavBarWidth("16em");
-        } else {
-            setSideBarWidth("0px");
-            setPageWidth("3em");
-            setNavBarWidth("0px");
-        }
-    };
+    const [loadingCount, setLoadingCount] = useState(0);
+    const [userIsAdmin, setUserIsAdmin] = useState(false);
+    const [navBarWidth, setNavBarWidth] = useState("50px");
+    const [changePassword, setChangePassword] = useState(false);
+    const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
     const [userInfo, setUserInfo] = useState<userInfo>({
         id: "",
@@ -112,6 +92,14 @@ const Settings: React.FC<settingsProps> = ({}) => {
     useEffect(() => {
         if (fetching && allRoles.fetching) return;
 
+        if (expanded) {
+            setPageWidth("20em");
+            setNavBarWidth("16em");
+        } else {
+            setPageWidth("3em");
+            setNavBarWidth("50px");
+        }
+
         if (
             data?.getUserSettings?.user?.name &&
             roles?.getAllRoles?.roles?.length
@@ -137,7 +125,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         forceDataAndStateReady();
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, allRoles.fetching, loadingCount]);
+    }, [fetching, allRoles.fetching, loadingCount, expanded]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -153,10 +141,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
     ) : (
         <Container>
             <Navbar pageWidth={navBarWidth} />
-            <SideBar
-                width={sideBarWidth}
-                visibility={expand ? "hidden" : "visible"}
-            />
+            <SideBar />
             <Flex
                 flexDir="row"
                 p={3}
@@ -165,15 +150,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
                 ml={pageWidth}
                 transition="0.3s"
             >
-                <Flex mt={2}>
-                    <IconButton
-                        isRound={true}
-                        aria-label="Show Side Bar"
-                        mr={1}
-                        icon={expand ? <ArrowLeftIcon /> : <ArrowRightIcon />}
-                        onClick={handleExpandSideBar}
-                    />
-                </Flex>
                 {data && data?.getUserSettings?.user?.picure ? (
                     <Flex
                         mt={5}

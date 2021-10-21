@@ -1,4 +1,4 @@
-import { Box, Flex, IconButton } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
@@ -7,49 +7,35 @@ import HomeNotifications from "../components/HomeNotifications";
 import { GlobalContext } from "./../context/globalContext";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Login from "./../pages/login";
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import SideBar from "../components/layout/SideBar";
 import { useUser } from "./../helpers/hooks/useUser";
 
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    const { loading } = useContext(GlobalContext);
+    const { loading, expanded } = useContext(GlobalContext);
 
-    const [expand, setExpand] = useState(true);
-    const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
-    const [navBarWidth, setNavBarWidth] = useState("0px");
+    const [navBarWidth, setNavBarWidth] = useState("50px");
 
     const user = useUser();
 
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("250px");
+    useEffect(() => {
+        if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
         } else {
-            setSideBarWidth("0px");
             setPageWidth("3em");
-            setNavBarWidth("0px");
+            setNavBarWidth("50px");
         }
-    };
-
-    useEffect(() => {
-        // console.log("here", user);
-    }, [loading]);
+    }, [loading, expanded]);
 
     const content =
         user && user.userId ? (
             <>
                 <Container>
                     <Navbar pageWidth={navBarWidth} />
-                    <SideBar
-                        width={sideBarWidth}
-                        visibility={expand ? "hidden" : "visible"}
-                    />
+                    <SideBar />
                     <Flex
                         alignSelf="normal"
                         flexDir="column"
@@ -58,22 +44,6 @@ const Index: React.FC<indexProps> = ({}) => {
                         ml={pageWidth}
                         transition="0.3s"
                     >
-                        <Flex mt={2}>
-                            <IconButton
-                                isRound={true}
-                                aria-label="Show Side Bar"
-                                mr={1}
-                                icon={
-                                    expand ? (
-                                        <ArrowLeftIcon />
-                                    ) : (
-                                        <ArrowRightIcon />
-                                    )
-                                }
-                                onClick={handleExpandSideBar}
-                            />
-                        </Flex>
-
                         <HomeNotifications />
                     </Flex>
                     <Box id="footer">

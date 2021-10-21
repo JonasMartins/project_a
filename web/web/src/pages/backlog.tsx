@@ -41,6 +41,7 @@ import {
 } from "./../helpers/items/ItemFunctinHelpers";
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 import { useUser } from "./../helpers/hooks/useUser";
+import { GlobalContext } from "./../context/globalContext";
 
 interface backlogProps {}
 
@@ -71,39 +72,25 @@ const itensPerPage = 10;
 
 const Backlog: React.FC<backlogProps> = ({}) => {
     const user = useUser();
-    const [expand, setExpand] = useState(true);
-    const [sideBarWidth, setSideBarWidth] = useState("0px");
-    const [pageWidth, setPageWidth] = useState("3em");
-    const [navBarWidth, setNavBarWidth] = useState("0px");
+
+    const { expanded } = useContext(GlobalContext);
     const [page, setPage] = useState<number>(0);
-    const [currentPage, setCurrentPage] = useState<number>(0);
-    const [cursor, setCursor] = useState<Date | null>(null);
+    const [pageWidth, setPageWidth] = useState("3em");
+    const [navBarWidth, setNavBarWidth] = useState("50px");
     const [itens, setItens] = useState<itensBacklog>(null);
+    const [cursor, setCursor] = useState<Date | null>(null);
+    const [currentPage, setCurrentPage] = useState<number>(0);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
-    const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
+    const [decrescentStatus, setDecrescentStatus] = useState(true);
     const [decrescentCreated, setDecrescentCreated] = useState(true);
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
     const [decrescentPriority, setDecrescentPriority] = useState(true);
-    const [decrescentStatus, setDecrescentStatus] = useState(true);
+    const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
 
     const closeItemDetail = (): void => {
         setItemDetailOpen(false);
         setItemDetailWidth(0);
-    };
-
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("250px");
-            setPageWidth("20em");
-            setNavBarWidth("16em");
-        } else {
-            setSideBarWidth("0px");
-            setPageWidth("3em");
-            setNavBarWidth("0px");
-        }
     };
 
     const [itensBacklog, reexecuteQuery] = useGetItensBacklogQuery({
@@ -176,6 +163,14 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     useEffect(() => {
         if (itensBacklog.fetching) return;
 
+        if (expanded) {
+            setPageWidth("20em");
+            setNavBarWidth("16em");
+        } else {
+            setPageWidth("3em");
+            setNavBarWidth("50px");
+        }
+
         if (itensBacklog.data?.getItensBacklog) {
             setItens(itensBacklog.data?.getItensBacklog);
             setPage(
@@ -188,6 +183,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
             reexecuteQuery({ requestPolicy: "cache-and-network" });
         }
     }, [
+        expanded,
         itensBacklog.fetching,
         itens?.itens?.length,
         itemDetailed,
@@ -199,10 +195,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const content = (
         <Container>
             <Navbar pageWidth={navBarWidth} />
-            <SideBar
-                width={sideBarWidth}
-                visibility={expand ? "hidden" : "visible"}
-            />
+            <SideBar />
             <Flex
                 alignSelf="normal"
                 flexDir="column"
@@ -211,18 +204,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                 ml={pageWidth}
                 transition="0.3s"
             >
-                <Flex flexDir="row" alignItems="center" p={2}>
-                    <Flex mt={2}>
-                        <IconButton
-                            isRound={true}
-                            aria-label="Show Side Bar"
-                            mr={1}
-                            icon={
-                                expand ? <ArrowLeftIcon /> : <ArrowRightIcon />
-                            }
-                            onClick={handleExpandSideBar}
-                        />
-                    </Flex>
+                <Flex flexDir="row" alignItems="center" p={2} ml={2}>
                     <NextLink href={"/"}>
                         <Link>
                             <Text>Home</Text>

@@ -8,15 +8,16 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
+import { useRouter } from "next/router";
 import { Container } from "../../components/Container";
-import ItemSprintBox from "../../components/layout/ItemSprintBox";
 import SideBar from "../../components/layout/SideBar";
-import Footer from "../../components/rootComponents/Footer";
-import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
 import Navbar from "../../components/rootComponents/Navbar";
+import Footer from "../../components/rootComponents/Footer";
+import React, { useEffect, useState, useContext } from "react";
+import { GlobalContext } from "./../../context/globalContext";
+import ItemSprintBox from "../../components/layout/ItemSprintBox";
+import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
 import {
     Item,
     ItemStatus,
@@ -39,19 +40,17 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     let previousItemStatus: string = "";
 
-    const [dragedItem, setDragedItem] = useState<itemQuery | null>(null);
-    const [expand, setExpand] = useState(true);
+    const { colorMode } = useColorMode();
+    const { expanded } = useContext(GlobalContext);
     const [dataLoaded, setDataLoaded] = useState(1);
     const [fillItens, setFillItens] = useState(false);
-    const [sideBarWidth, setSideBarWidth] = useState("0px");
     const [pageWidth, setPageWidth] = useState("3em");
-    const [navBarWidth, setNavBarWidth] = useState("0px");
-
+    const [navBarWidth, setNavBarWidth] = useState("50px");
+    const [doneItens, setDoneItens] = useState<Array<itemQuery>>([]);
+    const [dragedItem, setDragedItem] = useState<itemQuery | null>(null);
     const [pendingItens, setPendingItens] = useState<Array<itemQuery>>([]);
     const [progressItens, setProgressItens] = useState<Array<itemQuery>>([]);
-    const [doneItens, setDoneItens] = useState<Array<itemQuery>>([]);
 
-    const { colorMode } = useColorMode();
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
 
@@ -223,11 +222,20 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     useEffect(() => {
         if (fetching) return;
+
+        if (expanded) {
+            setPageWidth("20em");
+            setNavBarWidth("16em");
+        } else {
+            setPageWidth("3.5em");
+            setNavBarWidth("50px");
+        }
+
         if (!fillItens) {
             loadItensByTypes();
         }
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, reexecuteQuery, dataLoaded]);
+    }, [fetching, reexecuteQuery, dataLoaded, expanded]);
 
     useEffect(() => {
         return () => {
@@ -237,20 +245,6 @@ const Project: React.FC<projectsProps> = ({}) => {
             setFillItens(false);
         };
     }, []);
-
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
-            setSideBarWidth("250px");
-            setPageWidth("20em");
-            setNavBarWidth("16em");
-        } else {
-            setSideBarWidth("0px");
-            setPageWidth("3em");
-            setNavBarWidth("0px");
-        }
-    };
 
     if (error) {
         return <p>Oh no... {error.message}</p>;
@@ -263,46 +257,43 @@ const Project: React.FC<projectsProps> = ({}) => {
             <Navbar pageWidth={navBarWidth} />
             <SideBar />
             <Flex
-                p={2}
-                margin="1em 2em 1em"
+                p={1}
+                // margin="1em 2em 1em"
                 flexDir="row"
                 alignItems="center"
                 ml={pageWidth}
                 transition="0.3s"
             >
-                <IconButton
-                    isRound={true}
-                    aria-label="Show Side Bar"
-                    mr={1}
-                    icon={expand ? <ArrowLeftIcon /> : <ArrowRightIcon />}
-                    onClick={handleExpandSideBar}
-                />
-                <NextLink href={"/"}>
-                    <Link>
-                        <Text>Home</Text>
-                    </Link>
-                </NextLink>
-                <Text color="gray.500" ml={2} mr={2}>
-                    {">"}
-                </Text>
+                <Flex flexDir="row" alignItems="center" p={2}>
+                    <NextLink href={"/"}>
+                        <Link>
+                            <Text>Home</Text>
+                        </Link>
+                    </NextLink>
+                    <Text color="gray.500" ml={2} mr={2}>
+                        {">"}
+                    </Text>
 
-                <NextLink href={"/project"}>
-                    <Link>
-                        <Text>Project</Text>
-                    </Link>
-                </NextLink>
-                <Text color="gray.500" ml={2} mr={2}>
-                    {">"}
-                </Text>
+                    <NextLink href={"/project"}>
+                        <Link>
+                            <Text>Project</Text>
+                        </Link>
+                    </NextLink>
+                    <Text color="gray.500" ml={2} mr={2}>
+                        {">"}
+                    </Text>
 
-                <NextLink href={`/project/${project}`}>
-                    <Link>
-                        <Text>{data && data.getProjectById.project.name}</Text>
-                    </Link>
-                </NextLink>
-                <Text color="gray.500" ml={2} mr={2}>
-                    {">"}
-                </Text>
+                    <NextLink href={`/project/${project}`}>
+                        <Link>
+                            <Text>
+                                {data && data.getProjectById.project.name}
+                            </Text>
+                        </Link>
+                    </NextLink>
+                    <Text color="gray.500" ml={2} mr={2}>
+                        {">"}
+                    </Text>
+                </Flex>
             </Flex>
 
             <Flex

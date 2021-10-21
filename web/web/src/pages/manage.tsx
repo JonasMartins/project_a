@@ -189,14 +189,6 @@ const Manage: React.FC<manageProps> = ({}) => {
         </Container>
     );
 
-    // if (user.userId) {
-    //     user.role === "Admin" ? content : <Index />;
-    // } else {
-    //     return <Login />;
-    // }
-
-    // return user && user.userId ? content : <Login />;
-
     return users.fetching ? <FullPageSpinner /> : content;
 };
 

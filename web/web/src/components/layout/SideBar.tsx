@@ -26,7 +26,7 @@ interface SideBarProps {}
 
 const SideBar: React.FC<SideBarProps> = ({}) => {
     const { colorMode } = useColorMode();
-    const bgColor = { light: "gray.50", dark: "gray.700" };
+    const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
 
     const { expanded, _setExpanded } = useContext(GlobalContext);
@@ -213,8 +213,8 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
             boxShadow="xl"
             position="fixed"
             mt="0px"
-            borderRight="2px"
-            borderRightColor={colorMode === "light" ? "gray.200" : "grey.600"}
+            // borderRight="2px"
+            // borderRightColor={colorMode === "light" ? "gray.200" : "grey.700"}
         >
             <Flex p={0} mt={2} flexDirection="column" alignItems="center">
                 <Flex mb={5} alignItems="center">
