@@ -5,12 +5,14 @@ import { Provider, createClient } from "urql";
 import GlobalProvider from "./../context/globalContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { multipartFetchExchange } from "@urql/exchange-multipart-fetch";
 
 const client = createClient({
     url: "http://localhost:4001/graphql",
     fetchOptions: {
         credentials: "include",
     },
+    // exchanges: [multipartFetchExchange],
 });
 
 function MyApp({ Component, pageProps }) {

@@ -5,7 +5,7 @@ import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import HomeNotifications from "../components/HomeNotifications";
 import { GlobalContext } from "./../context/globalContext";
-import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+// import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Login from "./../pages/login";
 import SideBar from "../components/layout/SideBar";
 import { useUser } from "./../helpers/hooks/useUser";
@@ -13,7 +13,7 @@ import { useUser } from "./../helpers/hooks/useUser";
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    const { loading, expanded } = useContext(GlobalContext);
+    const { expanded } = useContext(GlobalContext);
 
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
@@ -28,7 +28,7 @@ const Index: React.FC<indexProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [loading, expanded]);
+    }, [expanded]);
 
     const content =
         user && user.userId ? (
@@ -57,7 +57,7 @@ const Index: React.FC<indexProps> = ({}) => {
             </>
         );
 
-    return loading ? <FullPageSpinner /> : content;
+    return content;
 };
 
 export default Index;

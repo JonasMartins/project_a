@@ -29,6 +29,7 @@ class SprintResponse {
 
 @Resolver()
 export class SprintResolver {
+ 
     @Mutation(() => SprintResponse)
     async createSprint(
         @Arg("options") options: SprintValidator,

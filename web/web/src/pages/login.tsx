@@ -96,12 +96,8 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setToken(
                                     response.data?.login?.result?.accessToken
                                 );*/
-                                // console.log("login");
-
-                                setTimeout(() => {
-                                    router.push("/");
-                                }, 300)
-
+                                console.log("pushed to index");
+                                router.push("/");
                             }
                         }}
                     >
