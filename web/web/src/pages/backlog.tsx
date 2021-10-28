@@ -3,6 +3,7 @@ import React, {
     useState,
     useEffect,
     CMouseEventHandler,
+    ChangeEvent,
 } from "react";
 import {
     ArrowLeftIcon,
@@ -87,6 +88,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
     const [decrescentPriority, setDecrescentPriority] = useState(true);
     const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
+    const [searchInput, setSearchInput] = useState("");
 
     const closeItemDetail = (): void => {
         setItemDetailOpen(false);
@@ -232,10 +234,21 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     />
                     <Input
                         onFocus={closeItemDetail}
-                        type="text"
                         maxW="300px"
                         placeholder="Filter info"
                         borderRadius="2em"
+                        value={searchInput}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            setSearchInput(e.target.value);
+                            if (e.target.value.length >= 2) {
+                                let regexTerm =
+                                    "[ˆ,]*" + e.target.value + "[,$]*";
+                                let result = itens.itens.filter((item) =>
+                                    item.summary.match(regexTerm)
+                                );
+                                console.log("result ", result);
+                            }
+                        }}
                     />
                     <Button variant="cyan-gradient" borderRadius="2em" ml={3}>
                         My Itens
@@ -401,8 +414,8 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                         key={item.id}
                                         justifyContent="space-between"
                                         alignItems="center"
-                                        p={1}
                                         boxShadow="md"
+                                        p={1}
                                         m={1}
                                         onClick={() => {
                                             setItemDetailOpen(true);
@@ -435,6 +448,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                             overflowX="hidden"
                             transition="0.3s"
                             boxShadow="md"
+                            mr={2}
                         >
                             {itemDetailed && itemDetailOpen ? (
                                 <Flex flexDir="column" flexGrow={1} p={2}>
@@ -524,8 +538,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                 )}
 
                 <Flex justifyContent="center">
-                    {returnPagination().map((page) => (
-                        <Box m={1}>{page}</Box>
+                    {returnPagination().map((page, index) => (
+                        <Box m={1} key={index}>
+                            {page}
+                        </Box>
                     ))}
                 </Flex>
             </Flex>

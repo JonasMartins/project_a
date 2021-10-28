@@ -51,5 +51,17 @@ sources:
 https://guillaume-martin.github.io/postgresql-backup.html
 https://stackoverflow.com/questions/2732474/restore-a-postgres-backup-file-using-the-command-line
 
+Mac os restore:
 
+https://stackoverflow.com/questions/40632228/input-file-appears-to-be-a-text-format-dump-please-use-psql
+
+Criar backup
+pg_dump pa_dev > db.sql
+
+Deletando o banco original:
+psql -U postgres
+drop database 'pa_dev';
+
+Restore:
+psql -d pa_dev -f db.sql
 
