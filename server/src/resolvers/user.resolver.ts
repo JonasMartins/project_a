@@ -83,6 +83,7 @@ class UserResponse {
     errors?: ErrorFieldHandler[];
     @Field(() => User, { nullable: true })
     user?: User;
+    keys?: null;
 }
 
 @ObjectType()

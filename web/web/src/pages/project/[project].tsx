@@ -1,5 +1,5 @@
 import { Box, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
-import { useMutation } from "urql";
+import { useQuery } from "urql";
 import NextLink from "next/link";
 import { useDrop } from "react-dnd";
 import { useRouter } from "next/router";
@@ -15,7 +15,6 @@ import {
     Item,
     ItemStatus,
     useGetProjectByIdQuery,
-    GetProjectByIdDocument,
 } from "../../generated/graphql";
 
 interface projectsProps {
@@ -50,17 +49,12 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const { project } = router.query;
 
-    const [{ data, fetching, error }, execute] = useMutation(
-        GetProjectByIdDocument
-    );
-
-    /*
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
             id: project && typeof project === "string" ? project : "-1",
         },
         pause: true,
-    }); */
+    });
 
     const [{ canDropPending }, dropRefPending] = useDrop({
         accept: "item",
@@ -220,9 +214,6 @@ const Project: React.FC<projectsProps> = ({}) => {
     };
 
     useEffect(() => {
-        if (project && typeof project === "string") {
-            execute({ id: project });
-        }
         if (fetching) return;
 
         if (expanded) {
@@ -236,9 +227,10 @@ const Project: React.FC<projectsProps> = ({}) => {
         if (!fillItens) {
             loadItensByTypes();
         }
-        // reexecuteQuery({ requestPolicy: "cache-and-network" });
+
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
         // [fetching, reexecuteQuery, dataLoaded, expanded]
-    }, [project, fetching, dataLoaded, expanded]);
+    }, [project, fetching, dataLoaded, expanded, reexecuteQuery]);
 
     useEffect(() => {
         return () => {

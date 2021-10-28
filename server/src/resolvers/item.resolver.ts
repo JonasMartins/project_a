@@ -77,7 +77,7 @@ export class ItemResolver {
                 errors: [
                     {
                         field: "sprint_id",
-                        message: `Could not found a valid sprint with id ${options.sprint_id}`,
+                        message: `Could not found a valid sprpint with id ${options.sprint_id}`,
                         method: `Method: createItem, at ${__filename}`,
                     },
                 ],

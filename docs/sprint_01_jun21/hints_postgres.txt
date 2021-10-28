@@ -39,5 +39,17 @@ Windows
 \! cls
 
 
+Criando um backup do banco localmente:
+
+pg_dump -h localhost -p 5432 -U postgres pa_dev > backup.sql
+
+Restore:
+
+pg_restore -U postgres -d pa_dev -c backup.sql
+
+sources: 
+https://guillaume-martin.github.io/postgresql-backup.html
+https://stackoverflow.com/questions/2732474/restore-a-postgres-backup-file-using-the-command-line
+
 
 

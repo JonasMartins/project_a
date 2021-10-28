@@ -1,18 +1,27 @@
 import { ChakraProvider, ColorModeProvider } from "@chakra-ui/react";
 
 import theme from "../theme";
-import { Provider, createClient } from "urql";
+import { Provider, createClient, dedupExchange, fetchExchange } from "urql";
 import GlobalProvider from "./../context/globalContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { multipartFetchExchange } from "@urql/exchange-multipart-fetch";
+import { cacheExchange } from "@urql/exchange-graphcache";
+import { _keys } from "./../utils/responseKeysNull";
 
 const client = createClient({
     url: "http://localhost:4001/graphql",
     fetchOptions: {
         credentials: "include",
     },
-    // exchanges: [multipartFetchExchange],
+    exchanges: [
+        dedupExchange,
+        cacheExchange({
+            keys: _keys,
+        }),
+        fetchExchange,
+        multipartFetchExchange,
+    ],
 });
 
 function MyApp({ Component, pageProps }) {
