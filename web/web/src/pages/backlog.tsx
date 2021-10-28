@@ -75,20 +75,22 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const user = useUser();
 
     const { expanded } = useContext(GlobalContext);
+
     const [page, setPage] = useState<number>(0);
     const [pageWidth, setPageWidth] = useState("3em");
+    const [searchInput, setSearchInput] = useState("");
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [itens, setItens] = useState<itensBacklog>(null);
     const [cursor, setCursor] = useState<Date | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
+    const [showPagination, setShowPagination] = useState(true);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
     const [decrescentStatus, setDecrescentStatus] = useState(true);
     const [decrescentCreated, setDecrescentCreated] = useState(true);
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
     const [decrescentPriority, setDecrescentPriority] = useState(true);
     const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
-    const [searchInput, setSearchInput] = useState("");
 
     const closeItemDetail = (): void => {
         setItemDetailOpen(false);
@@ -174,12 +176,14 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         }
 
         if (itensBacklog.data?.getItensBacklog) {
-            setItens(itensBacklog.data?.getItensBacklog);
-            setPage(
-                Math.ceil(
-                    itensBacklog.data?.getItensBacklog?.total / itensPerPage
-                )
-            );
+            if (searchInput.length < 2) {
+                setItens(itensBacklog.data?.getItensBacklog);
+                setPage(
+                    Math.ceil(
+                        itensBacklog.data?.getItensBacklog?.total / itensPerPage
+                    )
+                );
+            }
         }
         if (cursor) {
             reexecuteQuery({ requestPolicy: "cache-and-network" });
@@ -235,18 +239,31 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     <Input
                         onFocus={closeItemDetail}
                         maxW="300px"
-                        placeholder="Filter info"
+                        placeholder="Filter info (On this page)"
                         borderRadius="2em"
                         value={searchInput}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             setSearchInput(e.target.value);
                             if (e.target.value.length >= 2) {
+                                setShowPagination(false);
+
                                 let regexTerm =
                                     "[ˆ,]*" + e.target.value + "[,$]*";
                                 let result = itens.itens.filter((item) =>
                                     item.summary.match(regexTerm)
                                 );
-                                console.log("result ", result);
+                                setItens({
+                                    itens: result,
+                                });
+                            } else {
+                                setItens(itensBacklog.data?.getItensBacklog);
+                                setPage(
+                                    Math.ceil(
+                                        itensBacklog.data?.getItensBacklog
+                                            ?.total / itensPerPage
+                                    )
+                                );
+                                setShowPagination(true);
                             }
                         }}
                     />
@@ -537,7 +554,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     </Flex>
                 )}
 
-                <Flex justifyContent="center">
+                <Flex
+                    justifyContent="center"
+                    display={showPagination ? "flex" : "none"}
+                >
                     {returnPagination().map((page, index) => (
                         <Box m={1} key={index}>
                             {page}
