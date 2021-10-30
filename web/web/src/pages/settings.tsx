@@ -25,7 +25,6 @@ import {
     useGetAllRolesQuery,
     GetAllRolesQuery,
     useUpdateSeetingsUserMutation,
-    Upload,
 } from "./../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import SideBar from "../components/layout/SideBar";
@@ -42,7 +41,7 @@ interface userInfo {
     email: string;
     passowrd: string;
     role_id: string;
-    file: Upload;
+    file: File;
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
