@@ -1,7 +1,7 @@
 import { ChakraProvider, ColorModeProvider } from "@chakra-ui/react";
 
 import theme from "../theme";
-import { Provider, createClient, dedupExchange, fetchExchange } from "urql";
+import { Provider, createClient, dedupExchange } from "urql";
 import GlobalProvider from "./../context/globalContext";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -19,7 +19,6 @@ const client = createClient({
         cacheExchange({
             keys: _keys,
         }),
-        fetchExchange,
         multipartFetchExchange,
     ],
 });

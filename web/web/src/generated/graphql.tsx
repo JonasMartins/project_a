@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import { Stream } from "stream";
 import * as Urql from "urql";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -10,6 +11,14 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
     [SubKey in K]: Maybe<T[SubKey]>;
 };
+
+// export interface Upload {
+//     filename: string;
+//     mimetype: string;
+//     encoding: string;
+//     createReadStream: () => Stream;
+// }
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -20,6 +29,8 @@ export type Scalars = {
     Float: number;
     /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
     DateTime: any;
+    /** The `Upload` scalar type represents a file upload. */
+    Upload: any;
 };
 
 export type Appointment = {
@@ -168,7 +179,13 @@ export type MutationLoginArgs = {
 };
 
 export type MutationUpdateSeetingsUserArgs = {
-    options: UserSeetingsInput;
+    file?: Maybe<Scalars["Upload"]>;
+    active?: Maybe<Scalars["Boolean"]>;
+    role_id?: Maybe<Scalars["String"]>;
+    password?: Maybe<Scalars["String"]>;
+    email?: Maybe<Scalars["String"]>;
+    name?: Maybe<Scalars["String"]>;
+    id: Scalars["String"];
 };
 
 export type MutationCreateRoleArgs = {
@@ -407,7 +424,7 @@ export type User = {
     teams: Array<Team>;
     role: Role;
     appointments: Array<Appointment>;
-    picure?: Maybe<Scalars["String"]>;
+    picture?: Maybe<Scalars["String"]>;
     active: Scalars["Boolean"];
 };
 
@@ -437,14 +454,6 @@ export type TokenAndId = {
     userId?: Maybe<Scalars["String"]>;
     name?: Maybe<Scalars["String"]>;
     userRoleCode?: Maybe<Scalars["String"]>;
-};
-
-export type UserSeetingsInput = {
-    id: Scalars["String"];
-    name?: Maybe<Scalars["String"]>;
-    email?: Maybe<Scalars["String"]>;
-    password?: Maybe<Scalars["String"]>;
-    role_id?: Maybe<Scalars["String"]>;
 };
 
 export type CreateItemMutationVariables = Exact<{
@@ -515,7 +524,13 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
 >;
 
 export type UpdateSeetingsUserMutationVariables = Exact<{
-    options: UserSeetingsInput;
+    id: Scalars["String"];
+    email: Scalars["String"];
+    name: Scalars["String"];
+    password: Scalars["String"];
+    role_id: Scalars["String"];
+    active: Scalars["Boolean"];
+    file: Scalars["Upload"];
 }>;
 
 export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
@@ -861,7 +876,7 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
         user?: Maybe<
             { __typename?: "User" } & Pick<
                 User,
-                "id" | "name" | "email" | "password" | "picure"
+                "id" | "name" | "email" | "password" | "picture"
             > & {
                     role: { __typename?: "Role" } & Pick<
                         Role,
@@ -949,8 +964,24 @@ export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
 }
 export const UpdateSeetingsUserDocument = gql`
-    mutation UpdateSeetingsUser($options: userSeetingsInput!) {
-        updateSeetingsUser(options: $options) {
+    mutation UpdateSeetingsUser(
+        $id: String!
+        $email: String!
+        $name: String!
+        $password: String!
+        $role_id: String!
+        $active: Boolean!
+        $file: Upload!
+    ) {
+        updateSeetingsUser(
+            id: $id
+            email: $email
+            name: $name
+            password: $password
+            role_id: $role_id
+            active: $active
+            file: $file
+        ) {
             errors {
                 field
                 message
@@ -1303,7 +1334,7 @@ export const GetUserSettingsDocument = gql`
                 name
                 email
                 password
-                picure
+                picture
                 role {
                     id
                     name

@@ -20,6 +20,7 @@ import { Context } from "./types";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
+import { graphqlUploadExpress } from "graphql-upload";
 
 type failedRefresh = {
     ok: boolean;
@@ -64,7 +65,6 @@ export default class Application {
             } catch (e) {
                 return res.send(failedRefresh);
             }
-
             // token is valid
             const user = await this.orm.em.findOne(User, {
                 id: payload.userId,
@@ -99,7 +99,13 @@ export default class Application {
             }),
             // special object accesible for all resolvers
             context: ({ req, res }): Context => ({ em: this.orm.em, req, res }),
+            introspection: true,
+            uploads: false,
         });
+
+        this.app.use(
+            graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 2 })
+        );
 
         apolloServer.applyMiddleware({
             app: this.app,

@@ -25,6 +25,7 @@ import {
     useGetAllRolesQuery,
     GetAllRolesQuery,
     useUpdateSeetingsUserMutation,
+    Upload,
 } from "./../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import SideBar from "../components/layout/SideBar";
@@ -41,6 +42,7 @@ interface userInfo {
     email: string;
     passowrd: string;
     role_id: string;
+    file: Upload;
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
@@ -65,6 +67,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         email: "",
         passowrd: "",
         role_id: "",
+        file: null,
     });
 
     const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
@@ -150,7 +153,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                 ml={pageWidth}
                 transition="0.3s"
             >
-                {data && data?.getUserSettings?.user?.picure ? (
+                {data && data?.getUserSettings?.user?.picture ? (
                     <Flex
                         mt={5}
                         flexDir="column"
@@ -161,7 +164,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         <Image
                             boxSize="150px"
                             borderRadius="full"
-                            src={data?.getUserSettings?.user?.picure}
+                            src={data?.getUserSettings?.user?.picture}
                         />
                         <Text>{data?.getUserSettings?.user?.role?.name}</Text>
                     </Flex>
@@ -201,11 +204,20 @@ const Settings: React.FC<settingsProps> = ({}) => {
                             email: userInfo.email,
                             password: userInfo.passowrd,
                             role_id: userInfo.role_id,
+                            file: userInfo.file,
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values, { setErrors }) => {
+                            console.log("type ", typeof values.file);
+
                             const response = await updateSeetingsUser({
-                                options: values,
+                                id: values.id,
+                                name: values.name,
+                                email: values.email,
+                                password: values.password,
+                                role_id: values.role_id,
+                                file: values.file,
+                                active: true,
                             });
 
                             if (response.data?.updateSeetingsUser?.errors) {
@@ -227,7 +239,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                             }
                         }}
                     >
-                        {(props) => (
+                        {(props, isSubmitting) => (
                             <Form {...props}>
                                 <Stack spacing={3}>
                                     <Field name="name">
@@ -372,8 +384,44 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                             </FormControl>
                                         )}
                                     </Field>
+
+                                    <Field name="picture">
+                                        {({ field, form }) => (
+                                            <FormControl
+                                                isInvalid={form.errors.picture}
+                                            >
+                                                <FormLabel htmlFor="picture">
+                                                    Profile
+                                                </FormLabel>
+                                                <Input
+                                                    {...field}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    id="picture"
+                                                    onChange={({
+                                                        target: {
+                                                            validity,
+                                                            files,
+                                                        },
+                                                    }) => {
+                                                        if (
+                                                            validity.valid &&
+                                                            files
+                                                        ) {
+                                                            props.setFieldValue(
+                                                                "file",
+                                                                files[0]
+                                                            );
+                                                        }
+                                                    }}
+                                                />
+                                            </FormControl>
+                                        )}
+                                    </Field>
+
                                     <Button
-                                        isLoading={props.isSubmitting}
+                                        disabled={isSubmitting}
+                                        isLoading={isSubmitting}
                                         type="submit"
                                         variant="cyan-gradient"
                                         borderRadius="2em"

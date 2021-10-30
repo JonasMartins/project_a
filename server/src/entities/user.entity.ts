@@ -68,7 +68,7 @@ export class User extends Base<User> {
 
     @Field(() => String, { nullable: true })
     @Property({ nullable: true, length: 255 })
-    public picure: string;
+    public picture: string;
 
     @Field(() => Boolean)
     @Property({ default: true })

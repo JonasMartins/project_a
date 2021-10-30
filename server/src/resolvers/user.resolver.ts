@@ -20,7 +20,8 @@ import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
-
+import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { createWriteStream } from "fs";
 @InputType()
 class UserBasicData {
     @Field()
@@ -52,6 +53,9 @@ class userSeetingsInput {
 
     @Field(() => Boolean, { nullable: true })
     active?: boolean;
+
+    @Field(() => GraphQLUpload, { nullable: true })
+    file?: FileUpload;
 }
 
 @ObjectType()
@@ -372,17 +376,28 @@ export class UserResolver {
     // userSeetingsInput
     @Mutation(() => UserResponse)
     async updateSeetingsUser(
-        @Arg("options") options: userSeetingsInput,
+        @Arg("id", () => String) id: string,
+        @Arg("name", () => String, { nullable: true }) name: string,
+        @Arg("email", () => String, { nullable: true }) email: string,
+        @Arg("password", () => String, { nullable: true }) password: string,
+        @Arg("role_id", () => String, { nullable: true }) role_id: string,
+        @Arg("active", () => Boolean, { nullable: true }) active: boolean,
+        @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload,
         @Ctx() { em }: Context
     ): Promise<UserResponse> {
-        const user = await em.findOne(User, { id: options.id });
+        // const user = await em.findOne(User, { id: options.id });
+        const user = await em.findOne(User, { id });
+
+        if (active && file) {
+            const b = 1;
+        }
 
         if (!user) {
             return {
                 errors: [
                     {
                         field: "id",
-                        message: `Could not found user with id: ${options.id}`,
+                        message: `Could not found user with id: ${id}`,
                         method: `Method: updateSeetingsUser, at ${__filename}`,
                     },
                 ],
@@ -390,17 +405,17 @@ export class UserResolver {
         }
 
         if (
-            options.email.toLocaleLowerCase().replace(/ /g, "") !==
+            email.toLocaleLowerCase().replace(/ /g, "") !==
             user.email.toLocaleLowerCase().replace(/ /g, "")
         ) {
-            const userEmail = await em.findOne(User, { email: options.email });
+            const userEmail = await em.findOne(User, { email: email });
 
             if (userEmail) {
                 return {
                     errors: [
                         {
                             field: "email",
-                            message: `Email ${options.email} already takken.`,
+                            message: `Email ${email} already takken.`,
                             method: `Method: updateSeetingsUser, at ${__filename}`,
                         },
                     ],
@@ -408,22 +423,22 @@ export class UserResolver {
             }
         }
 
-        const role = await em.findOne(Role, { id: options.role_id });
+        const role = await em.findOne(Role, { id: role_id });
 
         if (!role) {
             return {
                 errors: [
                     {
                         field: "role_id",
-                        message: `Could not found role with id: ${options.role_id}`,
+                        message: `Could not found role with id: ${role_id}`,
                         method: `Method: updateSeetingsUser, at ${__filename}`,
                     },
                 ],
             };
         }
 
-        if (options.password) {
-            if (options.password.length <= 3) {
+        if (password) {
+            if (password.length <= 3) {
                 return {
                     errors: [
                         {
@@ -436,14 +451,20 @@ export class UserResolver {
                 };
             }
 
-            const hashedPassword = await argon2.hash(options.password);
-            options.password = hashedPassword;
-            user.password = options.password;
+            const hashedPassword = await argon2.hash(password);
+            password = hashedPassword;
+            user.password = password;
         }
 
-        user.name = options.name;
-        user.email = options.email;
+        user.name = name;
+        user.email = email;
         user.role = role;
+
+        if (file) {
+            file.createReadStream().pipe(
+                createWriteStream(__dirname + `/../../images/${file.filename}`)
+            );
+        }
 
         try {
             await em.persistAndFlush(user);

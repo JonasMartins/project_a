@@ -10,7 +10,7 @@ query GetUserSettings($id: String!) {
             name
             email
             password
-            picure
+            picture
             role {
                 id
                 name
