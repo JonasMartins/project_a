@@ -98,6 +98,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                 );*/
                                 console.log("pushed to index");
                                 router.push("/");
+                                console.log("path ", router.pathname);
                             }
                         }}
                     >

@@ -53,3 +53,8 @@ export const getPastOrFutureDate = (
 
     return futureOrPastDate;
 };
+
+export const getUniqueFolderName = (): string => {
+    const unit32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    return unit32.toString(16);
+};

@@ -19,9 +19,15 @@ import { createAcessToken } from "../utils/auth";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
-import { genericError } from "./../utils/generalAuxiliaryMethods";
+import {
+    genericError,
+    getUniqueFolderName,
+} from "./../utils/generalAuxiliaryMethods";
 import { FileUpload, GraphQLUpload } from "graphql-upload";
 import { createWriteStream } from "fs";
+import { manageUploadFile } from "./../utils/helpers/uploader.helper";
+import { v4 as uuidV4 } from "uuid";
+
 @InputType()
 class UserBasicData {
     @Field()
@@ -461,9 +467,18 @@ export class UserResolver {
         user.role = role;
 
         if (file) {
-            file.createReadStream().pipe(
-                createWriteStream(__dirname + `/../../images/${file.filename}`)
+            let result = await manageUploadFile(
+                file,
+                "file",
+                "getUniqueFolderName",
+                __filename
             );
+
+            // throw an error if the file could note been uploaded
+            if (result.path) {
+                user.picture = result.path;
+            }
+            console.log("picture: ", user.picture);
         }
 
         try {

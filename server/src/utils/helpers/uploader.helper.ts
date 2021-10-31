@@ -9,8 +9,8 @@ export class FileResponse {
     @Field(() => [ErrorFieldHandler], { nullable: true })
     errors?: ErrorFieldHandler[];
 
-    @Field(() => Boolean, { nullable: true })
-    success?: boolean;
+    @Field(() => String, { nullable: true })
+    path?: string;
 }
 
 /**
@@ -27,20 +27,23 @@ export class FileResponse {
  */
 export const manageUploadFile = async (
     { createReadStream, filename }: FileUpload,
-    path: string,
     field: string,
     method: string,
     callerFile: string
 ): Promise<FileResponse> => {
     let success: boolean = false;
+    let path: string = "";
 
     try {
+        path = process.cwd() + `/images/${new Date().getTime()}`;
+
         if (!existsSync(path)) {
             mkdirSync(path, { recursive: true });
         }
+
         success = await new Promise(async (resolve, reject) =>
             createReadStream()
-                .pipe(createWriteStream(path + filename))
+                .pipe(createWriteStream(path + "/" + filename))
                 .on("finish", () => resolve(true))
                 .on("error", () => reject(false))
         );
@@ -50,5 +53,5 @@ export const manageUploadFile = async (
         };
     }
 
-    return { success };
+    return { path: path + filename };
 };
