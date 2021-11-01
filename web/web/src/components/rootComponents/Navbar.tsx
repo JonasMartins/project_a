@@ -13,6 +13,7 @@ import {
     Link,
     Text,
     Flex,
+    Image,
     useDisclosure,
 } from "@chakra-ui/react";
 import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
@@ -26,6 +27,8 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { BsGear, BsBook } from "react-icons/bs";
 import ModalAboutProject from "./../modal/ModalAboutProject";
 import { useUser } from "./../../helpers/hooks/useUser";
+import { getServerPathImage } from "./../../utils/handleServerImagePaths";
+
 interface NavbarProps {
     pageWidth?: string;
 }
@@ -90,11 +93,19 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
             <Flex justifyContent="flex-end">
                 <Menu>
                     <Box mr={2}>
-                        <Avatar
-                            name={user.name || "Foo Bar"}
-                            size="40px"
-                            round={true}
-                        />
+                        {user.picture ? (
+                            <Image
+                                borderRadius="full"
+                                boxSize="40px"
+                                src={getServerPathImage(user.picture)}
+                            />
+                        ) : (
+                            <Avatar
+                                name={user.name || "Foo Bar"}
+                                size="40px"
+                                round={true}
+                            />
+                        )}
                     </Box>
                     <Box mr={2}>
                         <IconButton

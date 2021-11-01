@@ -1,5 +1,4 @@
 import gql from "graphql-tag";
-import { Stream } from "stream";
 import * as Urql from "urql";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {

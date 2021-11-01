@@ -32,6 +32,7 @@ import { useRouter } from "next/dist/client/router";
 import { useUser } from "./../helpers/hooks/useUser";
 import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+import { getServerPathImage } from "./../utils/handleServerImagePaths";
 
 interface settingsProps {}
 
@@ -163,7 +164,9 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         <Image
                             boxSize="150px"
                             borderRadius="full"
-                            src={data?.getUserSettings?.user?.picture}
+                            src={getServerPathImage(
+                                data?.getUserSettings?.user?.picture
+                            )}
                         />
                         <Text>{data?.getUserSettings?.user?.role?.name}</Text>
                     </Flex>

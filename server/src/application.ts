@@ -21,6 +21,7 @@ import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
 import { graphqlUploadExpress } from "graphql-upload";
+import path from "path/posix";
 
 type failedRefresh = {
     ok: boolean;
@@ -106,6 +107,8 @@ export default class Application {
         this.app.use(
             graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 2 })
         );
+
+        this.app.use("/images", express.static("images"));
 
         apolloServer.applyMiddleware({
             app: this.app,

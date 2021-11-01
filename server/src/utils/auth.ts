@@ -2,7 +2,12 @@ import { User } from "../entities/user.entity";
 import { sign } from "jsonwebtoken";
 export const createAcessToken = (user: User) => {
     return sign(
-        { userId: user.id, role: user.role.name, name: user.name },
+        {
+            userId: user.id,
+            role: user.role.name,
+            name: user.name,
+            picture: user.picture,
+        },
         process.env.ACCESS_TOKEN_SECRET!,
         {
             expiresIn: "2d",

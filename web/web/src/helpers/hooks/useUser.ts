@@ -5,6 +5,7 @@ type user = {
     userId: string;
     role: string;
     name: string;
+    picture: string;
     iat: number;
     exp: number;
 };
