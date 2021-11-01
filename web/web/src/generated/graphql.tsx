@@ -10,14 +10,6 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
     [SubKey in K]: Maybe<T[SubKey]>;
 };
-
-// export interface Upload {
-//     filename: string;
-//     mimetype: string;
-//     encoding: string;
-//     createReadStream: () => Stream;
-// }
-
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -261,7 +253,7 @@ export type QueryGetItemByIdArgs = {
 };
 
 export type QueryGetItensBacklogArgs = {
-    cursor?: Maybe<Scalars["DateTime"]>;
+    offset?: Maybe<Scalars["Float"]>;
     limit?: Maybe<Scalars["Float"]>;
 };
 
@@ -669,7 +661,7 @@ export type GetItemByIdQuery = { __typename?: "Query" } & {
 
 export type GetItensBacklogQueryVariables = Exact<{
     limit?: Maybe<Scalars["Float"]>;
-    cursor?: Maybe<Scalars["DateTime"]>;
+    offset?: Maybe<Scalars["Float"]>;
 }>;
 
 export type GetItensBacklogQuery = { __typename?: "Query" } & {
@@ -1128,8 +1120,8 @@ export function useGetItemByIdQuery(
     });
 }
 export const GetItensBacklogDocument = gql`
-    query GetItensBacklog($limit: Float, $cursor: DateTime) {
-        getItensBacklog(limit: $limit, cursor: $cursor) {
+    query GetItensBacklog($limit: Float, $offset: Float) {
+        getItensBacklog(limit: $limit, offset: $offset) {
             errors {
                 method
                 message

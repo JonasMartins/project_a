@@ -251,10 +251,11 @@ export class ItemResolver {
     @Query(() => ItensResponse)
     async getItensBacklog(
         @Arg("limit", () => Number, { nullable: true }) limit: number,
-        @Arg("cursor", () => Date, { nullable: true }) cursor: Date,
+        @Arg("offset", () => Number, { nullable: true }) offset: number,
         @Ctx() { em }: Context
     ): Promise<ItensResponse> {
         const max = Math.min(10, limit);
+        const maxOffset = Math.min(10, offset);
 
         const qb = (em as EntityManager).createQueryBuilder(Item, "i");
 
@@ -275,6 +276,7 @@ export class ItemResolver {
                 .orderBy({ updatedAt: "DESC" });
         } */
 
+        /*
         if (cursor) {
             qb.select(["i.*"])
                 .where({ updatedAt: { $lt: cursor } })
@@ -286,7 +288,13 @@ export class ItemResolver {
                 .where({ "1": "1" })
                 .limit(max)
                 .orderBy({ updatedAt: "DESC" });
-        }
+        } */
+
+        qb.select(["i.*"])
+            .where("1 = 1")
+            .orderBy({ updatedAt: "DESC" })
+            .limit(max)
+            .offset(maxOffset);
 
         try {
             const itens = await qb.getResult();

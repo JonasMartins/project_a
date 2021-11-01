@@ -1,10 +1,4 @@
-import React, {
-    useContext,
-    useState,
-    useEffect,
-    CMouseEventHandler,
-    ChangeEvent,
-} from "react";
+import React, { useContext, useState, useEffect, ChangeEvent } from "react";
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
@@ -81,7 +75,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [searchInput, setSearchInput] = useState("");
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [itens, setItens] = useState<itensBacklog>(null);
-    const [cursor, setCursor] = useState<Date | null>(null);
+    const [offset, setOffset] = useState(0);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [showPagination, setShowPagination] = useState(true);
@@ -100,31 +94,17 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [itensBacklog, reexecuteQuery] = useGetItensBacklogQuery({
         variables: {
             limit: itensPerPage,
-            cursor: cursor,
+            offset: offset,
         },
     });
 
-    const handlePagination = (e: CMouseEventHandler<HTMLButtonElement>) => {
-        let lastIten = 0;
-        let _cursor: Date | null = null;
-
-        if (e.target.name == "1") {
-            setCursor(null);
+    const handlePagination = (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+        if (e.target["name"] === "1") {
+            setOffset(0);
         } else {
-            lastIten =
-                itensPerPage <=
-                itensBacklog.data?.getItensBacklog?.itens?.length
-                    ? itensPerPage
-                    : itensBacklog.data?.getItensBacklog?.itens?.length;
-
-            if (lastIten) {
-                _cursor = new Date(
-                    itensBacklog.data?.getItensBacklog?.itens[
-                        lastIten - 1
-                    ].createdAt
-                );
-                setCursor(_cursor);
-            }
+            setOffset(Number(e.target["name"]) * itensPerPage);
         }
     };
 
@@ -134,8 +114,13 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         if (page) {
             _pages.push(
                 <IconButton
+                    disabled={currentPage === 0 ? true : false}
                     aria-label="Previous Itens page"
                     icon={<ArrowLeftIcon />}
+                    onClick={() => {
+                        setOffset((currentPage - 1) * itensPerPage);
+                        setCurrentPage(currentPage - 1);
+                    }}
                 />
             );
 
@@ -156,8 +141,13 @@ const Backlog: React.FC<backlogProps> = ({}) => {
 
             _pages.push(
                 <IconButton
+                    disabled={currentPage === page - 1 ? true : false}
                     aria-label="Next Itens page"
                     icon={<ArrowRightIcon />}
+                    onClick={() => {
+                        setOffset((currentPage + 1) * itensPerPage);
+                        setCurrentPage(currentPage + 1);
+                    }}
                 />
             );
         }
@@ -185,7 +175,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                 );
             }
         }
-        if (cursor) {
+        if (offset) {
             reexecuteQuery({ requestPolicy: "cache-and-network" });
         }
     }, [
@@ -194,7 +184,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         itens?.itens?.length,
         itemDetailed,
         itemDetailOpen,
-        cursor,
+        offset,
         currentPage,
     ]);
 
@@ -267,9 +257,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                             }
                         }}
                     />
-                    <Button variant="cyan-gradient" borderRadius="2em" ml={3}>
-                        My Itens
-                    </Button>
                 </InputGroup>
                 <Flex
                     flexGrow={1}

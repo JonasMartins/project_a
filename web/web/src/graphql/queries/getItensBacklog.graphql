@@ -1,5 +1,5 @@
-query GetItensBacklog($limit: Float, $cursor: DateTime) {
-    getItensBacklog(limit: $limit, cursor: $cursor) {
+query GetItensBacklog($limit: Float, $offset: Float) {
+    getItensBacklog(limit: $limit, offset: $offset) {
         errors {
             method
             message
