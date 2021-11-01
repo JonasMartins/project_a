@@ -18,6 +18,7 @@ import {
     Select,
     Stack,
     Checkbox,
+    Image,
 } from "@chakra-ui/react";
 import Avatar from "react-avatar";
 import { Form, Formik, Field } from "formik";
@@ -28,12 +29,15 @@ import {
 } from "./../../generated/graphql";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { toErrorMap } from "../../utils/toErrorMap";
+import { getServerPathImage } from "./../../utils/handleServerImagePaths";
 
 interface ModalManagerUpdateUserProps {
     onClose: () => void;
     isOpen: boolean;
     user: userManageInfo | null;
     roles: GetAllRolesQuery | null;
+    countUpdate: number;
+    updateCallback: (number) => void;
 }
 
 interface userInfo {
@@ -42,6 +46,7 @@ interface userInfo {
     email: string;
     role_id: string;
     active: string;
+    picture: string;
 }
 
 const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
@@ -49,6 +54,8 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
     onClose,
     user,
     roles,
+    countUpdate,
+    updateCallback,
 }) => {
     const { colorMode } = useColorMode();
     const color = { light: "black", dark: "white" };
@@ -60,6 +67,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
         email: user?.user?.email,
         role_id: user?.user?.role?.id,
         active: user?.user?.active ? "active" : "",
+        picture: user?.user?.picture,
     });
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
@@ -81,6 +89,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
             email: user?.user?.email,
             role_id: user?.user?.role?.id,
             active: user?.user?.active ? "active" : "",
+            picture: user?.user?.picture,
         }));
     }, [user]);
 
@@ -101,10 +110,10 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                 <ModalCloseButton />
                 <ModalBody>
                     <Flex p={2} m={2} justifyContent="center">
-                        <Avatar
-                            name={user?.user?.name}
-                            round={true}
-                            size="80px"
+                        <Image
+                            boxSize="80px"
+                            borderRadius="full"
+                            src={getServerPathImage(user?.user.picture)}
                         />
                     </Flex>
                     <Flex p={2} m={2} justifyContent="center">
@@ -119,7 +128,13 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                             enableReinitialize={true}
                             onSubmit={async (values, { setErrors }) => {
                                 const response = await updateSeetingsUser({
-                                    options: values,
+                                    id: values.id,
+                                    name: values.name,
+                                    email: values.email,
+                                    password: "",
+                                    role_id: values.role_id,
+                                    file: null,
+                                    active: values.active,
                                 });
 
                                 if (response.data?.updateSeetingsUser?.errors) {
@@ -130,6 +145,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                         )
                                     );
                                 } else {
+                                    updateCallback(countUpdate + 1);
                                     toast({
                                         title: "User Updated",
                                         description:
@@ -228,7 +244,9 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                     </FormLabel>
                                                     <Checkbox
                                                         {...field}
-                                                        isChecked={userInfo.active}
+                                                        isChecked={
+                                                            userInfo.active
+                                                        }
                                                         id="active"
                                                         size="sm"
                                                         value={userInfo.active}
@@ -238,10 +256,9 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                                     prevUserInfo
                                                                 ) => ({
                                                                     ...prevUserInfo,
-                                                                    active: 
-                                                                        e.target
-                                                                            .value
-                                                                    ,
+                                                                    active: prevUserInfo.active
+                                                                        ? ""
+                                                                        : "active",
                                                                 })
                                                             );
                                                         }}

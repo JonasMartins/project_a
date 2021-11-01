@@ -10,6 +10,8 @@ import {
     Th,
     Thead,
     Tooltip,
+    Image,
+    Button,
     Tr,
     useDisclosure,
 } from "@chakra-ui/react";
@@ -32,7 +34,7 @@ import {
 } from "./../generated/graphql";
 import { useUser } from "./../helpers/hooks/useUser";
 import { userManageInfo } from "./../helpers/users/userFunctonHelpers";
-
+import { getServerPathImage } from "./../utils/handleServerImagePaths";
 interface manageProps {}
 
 const Manage: React.FC<manageProps> = ({}) => {
@@ -44,12 +46,19 @@ const Manage: React.FC<manageProps> = ({}) => {
     const [seletedUser, setSelectedUser] = useState<userManageInfo | null>(
         null
     );
+    const [activeUsers, setActiveUsers] = useState(true);
+    const [countUpdate, setCountUpdate] = useState(0);
+
     const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
-    const [users] = useGetAllUsersQuery({
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
+
+    const [users, reexecuteQuery] = useGetAllUsersQuery({
         variables: {
             limit: 10,
-            active: true,
+            active: activeUsers,
         },
     });
 
@@ -75,7 +84,8 @@ const Manage: React.FC<manageProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [users.fetching, allRoles.fetching, expanded]);
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+    }, [users.fetching, allRoles.fetching, expanded, activeUsers, countUpdate]);
 
     const content = (
         <Container>
@@ -125,6 +135,20 @@ const Manage: React.FC<manageProps> = ({}) => {
                             icon={<IoPersonAddOutline />}
                         />
                     </Tooltip>
+                    <Tooltip
+                        hasArrow
+                        aria-label="list disabled/enabled users"
+                        label="List Enabled/Disabled users"
+                        colorScheme="withe"
+                    >
+                        <Button
+                            onClick={() => {
+                                setActiveUsers(!activeUsers);
+                            }}
+                        >
+                            {activeUsers ? "Disabled?" : "Activated?"}
+                        </Button>
+                    </Tooltip>
                 </Flex>
 
                 {users.data?.getAllUsers?.users ? (
@@ -132,6 +156,7 @@ const Manage: React.FC<manageProps> = ({}) => {
                         <Table variant="striped" size="sm">
                             <Thead>
                                 <Tr>
+                                    <Th></Th>
                                     <Th>Name</Th>
                                     <Th>Email</Th>
                                     <Th>Role</Th>
@@ -142,6 +167,17 @@ const Manage: React.FC<manageProps> = ({}) => {
                             <Tbody>
                                 {users.data?.getAllUsers?.users?.map((user) => (
                                     <Tr key={user.id}>
+                                        <Td>
+                                            {
+                                                <Image
+                                                    boxSize="40px"
+                                                    borderRadius="full"
+                                                    src={getServerPathImage(
+                                                        user.picture
+                                                    )}
+                                                />
+                                            }
+                                        </Td>
                                         <Td>{user.name}</Td>
                                         <Td>{user.email}</Td>
                                         <Td>{user.role.name}</Td>
@@ -185,6 +221,8 @@ const Manage: React.FC<manageProps> = ({}) => {
                 isOpen={isOpen}
                 roles={roles}
                 onClose={onClose}
+                countUpdate={countUpdate}
+                updateCallback={updatedCallback}
             />
         </Container>
     );

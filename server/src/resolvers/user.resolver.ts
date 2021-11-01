@@ -394,10 +394,6 @@ export class UserResolver {
         // const user = await em.findOne(User, { id: options.id });
         const user = await em.findOne(User, { id });
 
-        if (active && file) {
-            const b = 1;
-        }
-
         if (!user) {
             return {
                 errors: [
@@ -409,6 +405,8 @@ export class UserResolver {
                 ],
             };
         }
+
+        user.active = active;
 
         if (
             email.toLocaleLowerCase().replace(/ /g, "") !==

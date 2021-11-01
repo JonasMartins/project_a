@@ -4,7 +4,7 @@ export type userManageInfo = {
     user?: Maybe<
         { __typename?: "User" } & Pick<
             User,
-            "id" | "name" | "email" | "active"
+            "id" | "name" | "email" | "active" | "picture"
         > & { role: { __typename?: "Role" } & Pick<Role, "id" | "name"> }
     >;
 };

@@ -5,7 +5,7 @@ mutation UpdateSeetingsUser(
     $password: String!
     $role_id: String!
     $active: Boolean!
-    $file: Upload!
+    $file: Upload
 ) {
     updateSeetingsUser(
         id: $id

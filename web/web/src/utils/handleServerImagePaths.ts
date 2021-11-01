@@ -7,7 +7,7 @@ export const getServerPathImage = (path: string): string => {
     // esse valor retornado será visível ao react
 
     if (!path) {
-        return "localhost:4001/images/default-user-image.png";
+        return "http://localhost:4001/images/default-user-image.png";
     }
 
     let result = "";

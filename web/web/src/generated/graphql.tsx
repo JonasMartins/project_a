@@ -521,7 +521,7 @@ export type UpdateSeetingsUserMutationVariables = Exact<{
     password: Scalars["String"];
     role_id: Scalars["String"];
     active: Scalars["Boolean"];
-    file: Scalars["Upload"];
+    file?: Maybe<Scalars["Upload"]>;
 }>;
 
 export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
@@ -584,7 +584,7 @@ export type GetAllUsersQuery = { __typename?: "Query" } & {
             Array<
                 { __typename?: "User" } & Pick<
                     User,
-                    "id" | "name" | "email" | "active"
+                    "id" | "name" | "email" | "active" | "picture"
                 > & {
                         role: { __typename?: "Role" } & Pick<
                             Role,
@@ -962,7 +962,7 @@ export const UpdateSeetingsUserDocument = gql`
         $password: String!
         $role_id: String!
         $active: Boolean!
-        $file: Upload!
+        $file: Upload
     ) {
         updateSeetingsUser(
             id: $id
@@ -1036,6 +1036,7 @@ export const GetAllUsersDocument = gql`
                 name
                 email
                 active
+                picture
                 role {
                     id
                     name
