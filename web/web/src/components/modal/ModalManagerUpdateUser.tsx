@@ -25,10 +25,12 @@ import { userManageInfo } from "./../../helpers/users/userFunctonHelpers";
 import {
     useUpdateSeetingsUserMutation,
     GetAllRolesQuery,
+    useCreateUserMutation,
 } from "./../../generated/graphql";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { toErrorMap } from "../../utils/toErrorMap";
 import { getServerPathImage } from "./../../utils/handleServerImagePaths";
+import { generateRandomPassword } from "./../../helpers/users/userFunctonHelpers";
 
 interface ModalManagerUpdateUserProps {
     onClose: () => void;
@@ -37,6 +39,7 @@ interface ModalManagerUpdateUserProps {
     roles: GetAllRolesQuery | null;
     countUpdate: number;
     updateCallback: (number) => void;
+    context: "update" | "create";
 }
 
 interface userInfo {
@@ -55,6 +58,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
     roles,
     countUpdate,
     updateCallback,
+    context,
 }) => {
     const { colorMode } = useColorMode();
     const color = { light: "black", dark: "white" };
@@ -68,8 +72,10 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
         active: user?.user?.active ? "active" : "",
         picture: user?.user?.picture,
     });
+    const [randomPassword, setRandomPassword] = useState("");
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
+    const [{}, createUser] = useCreateUserMutation();
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -79,17 +85,29 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
     };
 
     useEffect(() => {
-        if (!user) return;
+        setRandomPassword(generateRandomPassword(8));
 
-        setUserInfo((prevUser) => ({
-            ...prevUser,
-            id: user?.user?.id,
-            name: user?.user?.name,
-            email: user?.user?.email,
-            role_id: user?.user?.role?.id,
-            active: user?.user?.active ? "active" : "",
-            picture: user?.user?.picture,
-        }));
+        if (!user) {
+            setUserInfo((prevUser) => ({
+                ...prevUser,
+                id: "",
+                name: "",
+                email: "",
+                role_id: "",
+                active: "active",
+                picture: "",
+            }));
+        } else {
+            setUserInfo((prevUser) => ({
+                ...prevUser,
+                id: user?.user?.id,
+                name: user?.user?.name,
+                email: user?.user?.email,
+                role_id: user?.user?.role?.id,
+                active: user?.user?.active ? "active" : "",
+                picture: user?.user?.picture,
+            }));
+        }
     }, [user]);
 
     return (
@@ -103,7 +121,11 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
             <ModalContent>
                 <ModalHeader>
                     <Flex>
-                        <Text color={color[colorMode]}>{user?.user?.name}</Text>
+                        <Text color={color[colorMode]}>{`${
+                            context === "create" ? "Create" : "Update"
+                        }  ${
+                            user?.user?.name ? user?.user?.name : "User"
+                        }`}</Text>
                     </Flex>
                 </ModalHeader>
                 <ModalCloseButton color={color[colorMode]} />
@@ -126,35 +148,66 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                             }}
                             enableReinitialize={true}
                             onSubmit={async (values, { setErrors }) => {
-                                const response = await updateSeetingsUser({
-                                    id: values.id,
-                                    name: values.name,
-                                    email: values.email,
-                                    password: "",
-                                    role_id: values.role_id,
-                                    file: null,
-                                    active: values.active,
-                                });
-
-                                if (response.data?.updateSeetingsUser?.errors) {
-                                    setErrors(
-                                        toErrorMap(
-                                            response.data.updateSeetingsUser
-                                                .errors
-                                        )
-                                    );
-                                } else {
-                                    updateCallback(countUpdate + 1);
-                                    toast({
-                                        title: "User Updated",
-                                        description:
-                                            "User successfully updated",
-                                        status: "success",
-                                        duration: 8000,
-                                        isClosable: true,
-                                        position: "bottom-right",
+                                if (context === "update") {
+                                    const response = await updateSeetingsUser({
+                                        id: values.id,
+                                        name: values.name,
+                                        email: values.email,
+                                        password: "",
+                                        role_id: values.role_id,
+                                        file: null,
+                                        active: values.active,
                                     });
-                                    onClose();
+
+                                    if (
+                                        response.data?.updateSeetingsUser
+                                            ?.errors
+                                    ) {
+                                        setErrors(
+                                            toErrorMap(
+                                                response.data.updateSeetingsUser
+                                                    .errors
+                                            )
+                                        );
+                                    } else {
+                                        updateCallback(countUpdate + 1);
+                                        toast({
+                                            title: "User Updated",
+                                            description:
+                                                "User successfully updated",
+                                            status: "success",
+                                            duration: 8000,
+                                            isClosable: true,
+                                            position: "bottom-right",
+                                        });
+                                        onClose();
+                                    }
+                                } else {
+                                    const response = await createUser({
+                                        name: values.name,
+                                        email: values.email,
+                                        password: randomPassword,
+                                        role_id: values.role_id,
+                                    });
+
+                                    if (response.data?.createUser?.errors) {
+                                        setErrors(
+                                            toErrorMap(
+                                                response.data.createUser.errors
+                                            )
+                                        );
+                                    } else {
+                                        toast({
+                                            title: "User Created",
+                                            description:
+                                                "User successfully created",
+                                            status: "success",
+                                            duration: 8000,
+                                            isClosable: true,
+                                            position: "bottom-right",
+                                        });
+                                        onClose();
+                                    }
                                 }
                             }}
                         >

@@ -22,7 +22,6 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
 import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
-import ModalManagerCreateUser from "./../components/modal/ModalManagerCreateUser";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import Footer from "./../components/rootComponents/Footer";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
@@ -38,6 +37,7 @@ import { userManageInfo } from "./../helpers/users/userFunctonHelpers";
 import { getServerPathImage } from "./../utils/handleServerImagePaths";
 
 interface manageProps {}
+type manageContext = "update" | "create";
 
 const Manage: React.FC<manageProps> = ({}) => {
     const user = useUser();
@@ -50,6 +50,7 @@ const Manage: React.FC<manageProps> = ({}) => {
     );
     const [activeUsers, setActiveUsers] = useState(true);
     const [countUpdate, setCountUpdate] = useState(0);
+    const [context, setContext] = useState<manageContext>("update");
 
     const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
@@ -67,14 +68,9 @@ const Manage: React.FC<manageProps> = ({}) => {
     const [allRoles] = useGetAllRolesQuery();
 
     const modalUpdateUser = useDisclosure();
-    const modalCreateUser = useDisclosure();
 
     const customOnOpenUpdateUser = (): void => {
         modalUpdateUser.onOpen();
-    };
-
-    const customOnOpenCreateUser = (): void => {
-        modalCreateUser.onOpen();
     };
 
     useEffect(() => {
@@ -143,7 +139,6 @@ const Manage: React.FC<manageProps> = ({}) => {
                             {activeUsers ? "Disabled?" : "Activated?"}
                         </Button>
                     </Tooltip>
-
                     <Tooltip
                         hasArrow
                         aria-label="Add new user"
@@ -155,10 +150,12 @@ const Manage: React.FC<manageProps> = ({}) => {
                             aria-label="Add new user"
                             variant="cyan-gradient"
                             mr={1}
-                            onClick={() => {
-                                customOnOpenCreateUser();
-                            }}
                             icon={<IoPersonAddOutline />}
+                            onClick={() => {
+                                setContext("create");
+                                customOnOpenUpdateUser();
+                                setSelectedUser(null);
+                            }}
                         />
                     </Tooltip>
                 </Flex>
@@ -208,6 +205,7 @@ const Manage: React.FC<manageProps> = ({}) => {
                                                     mr={1}
                                                     icon={<AiFillEdit />}
                                                     onClick={() => {
+                                                        setContext("update");
                                                         customOnOpenUpdateUser();
                                                         setSelectedUser({
                                                             user,
@@ -229,18 +227,13 @@ const Manage: React.FC<manageProps> = ({}) => {
                 <Footer />
             </Box>
             <ModalManagerUpdateUser
+                context={context}
                 user={seletedUser}
                 isOpen={modalUpdateUser.isOpen}
                 roles={roles}
                 onClose={modalUpdateUser.onClose}
                 countUpdate={countUpdate}
                 updateCallback={updatedCallback}
-            />
-
-            <ModalManagerCreateUser
-                isOpen={modalCreateUser.isOpen}
-                onClose={modalCreateUser.onClose}
-                roles={roles}
             />
         </Container>
     );

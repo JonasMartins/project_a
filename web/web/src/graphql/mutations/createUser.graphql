@@ -13,7 +13,9 @@ mutation CreateUser(
         }
     ) {
         errors {
+            field
             message
+            method
         }
         user {
             id

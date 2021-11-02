@@ -496,7 +496,7 @@ export type CreateUserMutation = { __typename?: "Mutation" } & {
             Array<
                 { __typename?: "ErrorFieldHandler" } & Pick<
                     ErrorFieldHandler,
-                    "message"
+                    "field" | "message" | "method"
                 >
             >
         >;
@@ -964,7 +964,9 @@ export const CreateUserDocument = gql`
             }
         ) {
             errors {
+                field
                 message
+                method
             }
             user {
                 id

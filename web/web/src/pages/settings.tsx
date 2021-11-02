@@ -128,7 +128,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         forceDataAndStateReady();
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, allRoles.fetching, loadingCount, expanded]);
+    }, [fetching, allRoles.fetching, loadingCount, expanded, user]);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -159,11 +159,12 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         flexDir="column"
                         alignItems="center"
                         justifyContent="flex-start"
-                        flexGrow={1}
+                        flexGrow={0.3}
                     >
                         <Image
                             boxSize="150px"
                             borderRadius="full"
+                            border="1px solid grey"
                             src={getServerPathImage(
                                 data?.getUserSettings?.user?.picture
                             )}
@@ -210,7 +211,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values, { setErrors }) => {
-                            console.log("type ", typeof values.file);
+                            // console.log("type ", typeof values.file);
 
                             const response = await updateSeetingsUser({
                                 id: values.id,
