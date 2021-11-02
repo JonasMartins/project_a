@@ -19,14 +19,9 @@ import { createAcessToken } from "../utils/auth";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
-import {
-    genericError,
-    getUniqueFolderName,
-} from "./../utils/generalAuxiliaryMethods";
+import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { FileUpload, GraphQLUpload } from "graphql-upload";
-import { createWriteStream } from "fs";
 import { manageUploadFile } from "./../utils/helpers/uploader.helper";
-import { v4 as uuidV4 } from "uuid";
 
 @InputType()
 class UserBasicData {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Flex, Box, useColorMode } from "@chakra-ui/react";
+import { Text, Flex, Box, useColorMode, Image } from "@chakra-ui/react";
 interface FooterProps {}
 
 const Footer: React.FC<FooterProps> = ({}) => {
@@ -21,9 +21,18 @@ const Footer: React.FC<FooterProps> = ({}) => {
             color={color[colorMode]}
             // zIndex="2"
         >
-            <Box p="3">
-                <Text>@Copyright 2021</Text>
-            </Box>
+            <Flex alignItems="center" mb={2}>
+                <Image
+                    boxSize="100px"
+                    src="/favicon/android-chrome-512x512.png"
+                />
+                <Text fontSize="3xl" fontWeight="semibold" ml={2}>
+                    Project A
+                </Text>
+                <Box p="3" ml={2}>
+                    <Text>@Copyright 2021</Text>
+                </Box>
+            </Flex>
         </Flex>
     );
 };

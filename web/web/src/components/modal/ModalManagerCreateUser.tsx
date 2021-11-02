@@ -8,89 +8,58 @@ import {
     ModalOverlay,
     Text,
     Flex,
+    Stack,
     useColorMode,
-    useToast,
-    Button,
     FormControl,
     FormErrorMessage,
     FormLabel,
     Input,
+    Button,
     Select,
-    Stack,
-    Checkbox,
-    Image,
 } from "@chakra-ui/react";
+import React, { useState, ChangeEvent } from "react";
 import { Form, Formik, Field } from "formik";
-import { userManageInfo } from "./../../helpers/users/userFunctonHelpers";
 import {
-    useUpdateSeetingsUserMutation,
+    useCreateUserMutation,
     GetAllRolesQuery,
 } from "./../../generated/graphql";
-import React, { useState, ChangeEvent, useEffect } from "react";
-import { toErrorMap } from "../../utils/toErrorMap";
-import { getServerPathImage } from "./../../utils/handleServerImagePaths";
+import { generateRandomPassword } from "./../../helpers/users/userFunctonHelpers";
 
-interface ModalManagerUpdateUserProps {
+interface ModalManagerCreateUserProps {
     onClose: () => void;
     isOpen: boolean;
-    user: userManageInfo | null;
     roles: GetAllRolesQuery | null;
-    countUpdate: number;
-    updateCallback: (number) => void;
 }
 
-interface userInfo {
-    id: string;
-    name: string;
-    email: string;
-    role_id: string;
-    active: string;
-    picture: string;
+interface userInput {
+    create_name: string;
+    create_email: string;
+    create_role_id: string;
 }
 
-const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
+const ModalManagerCreateUser: React.FC<ModalManagerCreateUserProps> = ({
     isOpen,
     onClose,
-    user,
     roles,
-    countUpdate,
-    updateCallback,
 }) => {
     const { colorMode } = useColorMode();
     const color = { light: "black", dark: "white" };
-    const toast = useToast();
+    const [randomPassword, setRandomPassword] = useState("");
 
-    const [userInfo, setUserInfo] = useState<userInfo>({
-        id: user?.user?.id,
-        name: user?.user?.name,
-        email: user?.user?.email,
-        role_id: user?.user?.role?.id,
-        active: user?.user?.active ? "active" : "",
-        picture: user?.user?.picture,
+    setRandomPassword(generateRandomPassword(8));
+
+    const [userInput, setUserInput] = useState<userInput>({
+        create_name: "",
+        create_email: "",
+        create_role_id: "",
     });
 
-    const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
-
-    const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
-        setUserInfo((prevUser) => ({
+    const handleCreateUser = (e: ChangeEvent<HTMLInputElement>) => {
+        setUserInput((prevUser) => ({
             ...prevUser,
             [e.target.name]: e.target.value,
         }));
     };
-
-    useEffect(() => {
-        if (!user) return;
-
-        setUserInfo((prevUser) => ({
-            ...prevUser,
-            id: user?.user?.id,
-            name: user?.user?.name,
-            email: user?.user?.email,
-            role_id: user?.user?.role?.id,
-            active: user?.user?.active ? "active" : "",
-            picture: user?.user?.picture,
-        }));
-    }, [user]);
 
     return (
         <Modal
@@ -103,70 +72,33 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
             <ModalContent>
                 <ModalHeader>
                     <Flex>
-                        <Text color={color[colorMode]}>{user?.user?.name}</Text>
+                        <Text color={color[colorMode]}>CreateUser</Text>
                     </Flex>
                 </ModalHeader>
                 <ModalCloseButton color={color[colorMode]} />
                 <ModalBody>
                     <Flex p={2} m={2} justifyContent="center">
-                        <Image
-                            boxSize="80px"
-                            borderRadius="full"
-                            src={getServerPathImage(user?.user.picture)}
-                        />
-                    </Flex>
-                    <Flex p={2} m={2} justifyContent="center">
                         <Formik
-                            initialValues={{
-                                id: userInfo.id,
-                                name: userInfo.name,
-                                email: userInfo.email,
-                                role_id: userInfo.role_id,
-                                active: userInfo.active ? true : false,
-                            }}
                             enableReinitialize={true}
-                            onSubmit={async (values, { setErrors }) => {
-                                const response = await updateSeetingsUser({
-                                    id: values.id,
-                                    name: values.name,
-                                    email: values.email,
-                                    password: "",
-                                    role_id: values.role_id,
-                                    file: null,
-                                    active: values.active,
-                                });
-
-                                if (response.data?.updateSeetingsUser?.errors) {
-                                    setErrors(
-                                        toErrorMap(
-                                            response.data.updateSeetingsUser
-                                                .errors
-                                        )
-                                    );
-                                } else {
-                                    updateCallback(countUpdate + 1);
-                                    toast({
-                                        title: "User Updated",
-                                        description:
-                                            "User successfully updated",
-                                        status: "success",
-                                        duration: 8000,
-                                        isClosable: true,
-                                        position: "bottom-right",
-                                    });
-                                    onClose();
-                                }
+                            initialValues={{
+                                create_name: userInput.create_name,
+                                create_email: userInput.create_email,
+                                create_role_id: userInput.create_role_id,
+                                create_password: randomPassword,
+                            }}
+                            onSubmit={(values) => {
+                                console.log("values", values);
                             }}
                         >
                             {(props) => (
                                 <Form {...props}>
                                     <Stack spacing={3}>
-                                        <Field name="name">
+                                        <Field name="create_name">
                                             {({ field, form }) => (
                                                 <FormControl
-                                                    isInvalid={form.errors.name}
+                                                // isInvalid={form.errors.name}
                                                 >
-                                                    <FormLabel htmlFor="name">
+                                                    <FormLabel htmlFor="create_name">
                                                         <Text
                                                             color={
                                                                 color[colorMode]
@@ -177,29 +109,31 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                     </FormLabel>
                                                     <Input
                                                         {...field}
-                                                        id="name"
+                                                        id="create_name"
                                                         borderRadius="2em"
                                                         size="sm"
                                                         color={color[colorMode]}
                                                         onChange={
-                                                            handlerUpdateUser
+                                                            handleCreateUser
                                                         }
-                                                        value={userInfo.name}
+                                                        value={
+                                                            userInput.create_name
+                                                        }
                                                     />
                                                     <FormErrorMessage>
-                                                        {form.errors.name}
+                                                        {/* {form.errors.name} */}
                                                     </FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
-                                        <Field name="email">
+                                        <Field name="create_email">
                                             {({ field, form }) => (
                                                 <FormControl
-                                                    isInvalid={
-                                                        form.errors.email
-                                                    }
+                                                // isInvalid={
+                                                //     form.errors.email
+                                                // }
                                                 >
-                                                    <FormLabel htmlFor="email">
+                                                    <FormLabel htmlFor="create_email">
                                                         <Text
                                                             color={
                                                                 color[colorMode]
@@ -210,67 +144,29 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                     </FormLabel>
                                                     <Input
                                                         {...field}
-                                                        id="email"
+                                                        id="create_email"
                                                         borderRadius="2em"
                                                         size="sm"
                                                         color={color[colorMode]}
                                                         onChange={
-                                                            handlerUpdateUser
+                                                            handleCreateUser
                                                         }
-                                                        value={userInfo.email}
+                                                        value={
+                                                            userInput.create_email
+                                                        }
                                                     />
                                                     <FormErrorMessage>
-                                                        {form.errors.email}
+                                                        {/* {form.errors.email} */}
                                                     </FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
-                                        <Field name="active">
+                                        <Field name="create_role">
                                             {({ field, form }) => (
                                                 <FormControl
-                                                    isInvalid={
-                                                        form.errors.active
-                                                    }
+                                                // isInvalid={form.errors.role}
                                                 >
-                                                    <FormLabel htmlFor="active">
-                                                        <Text
-                                                            color={
-                                                                color[colorMode]
-                                                            }
-                                                        >
-                                                            Active ?
-                                                        </Text>
-                                                    </FormLabel>
-                                                    <Checkbox
-                                                        {...field}
-                                                        isChecked={
-                                                            userInfo.active
-                                                        }
-                                                        id="active"
-                                                        size="sm"
-                                                        value={userInfo.active}
-                                                        onChange={(e) => {
-                                                            setUserInfo(
-                                                                (
-                                                                    prevUserInfo
-                                                                ) => ({
-                                                                    ...prevUserInfo,
-                                                                    active: prevUserInfo.active
-                                                                        ? ""
-                                                                        : "active",
-                                                                })
-                                                            );
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                            )}
-                                        </Field>
-                                        <Field name="role">
-                                            {({ field, form }) => (
-                                                <FormControl
-                                                    isInvalid={form.errors.role}
-                                                >
-                                                    <FormLabel htmlFor="role">
+                                                    <FormLabel htmlFor="create_role">
                                                         <Text
                                                             color={
                                                                 color[colorMode]
@@ -283,19 +179,21 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                     <Select
                                                         placeholder="Role"
                                                         {...field}
-                                                        id="role"
+                                                        id="create_role"
                                                         borderRadius="2em"
                                                         size="sm"
                                                         textColor={
                                                             color[colorMode]
                                                         }
-                                                        value={userInfo.role_id}
+                                                        value={
+                                                            userInput.create_role_id
+                                                        }
                                                         onChange={(e) => {
-                                                            setUserInfo(
+                                                            setUserInput(
                                                                 (
-                                                                    prevUserInfo
+                                                                    prevuserInput
                                                                 ) => ({
-                                                                    ...prevUserInfo,
+                                                                    ...prevuserInput,
                                                                     role_id:
                                                                         e.target
                                                                             .value,
@@ -323,12 +221,12 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                                     </Select>
 
                                                     <FormErrorMessage>
-                                                        {form.errors.role}
+                                                        {/* {form.errors.role} */}
                                                     </FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
-                                        <Button
+                                        {/*<Button
                                             isLoading={props.isSubmitting}
                                             type="submit"
                                             variant="cyan-gradient"
@@ -338,7 +236,7 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
                                             mt={4}
                                         >
                                             Save
-                                        </Button>
+                                        </Button> */}
                                     </Stack>
                                 </Form>
                             )}
@@ -353,4 +251,4 @@ const ModalManagerUpdateUser: React.FC<ModalManagerUpdateUserProps> = ({
     );
 };
 
-export default ModalManagerUpdateUser;
+export default ModalManagerCreateUser;

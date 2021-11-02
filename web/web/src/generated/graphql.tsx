@@ -483,6 +483,31 @@ export type CreateItemMutation = { __typename?: "Mutation" } & {
     };
 };
 
+export type CreateUserMutationVariables = Exact<{
+    name: Scalars["String"];
+    email: Scalars["String"];
+    password: Scalars["String"];
+    role_id: Scalars["String"];
+}>;
+
+export type CreateUserMutation = { __typename?: "Mutation" } & {
+    createUser: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<User, "id" | "name"> & {
+                    role: { __typename?: "Role" } & Pick<Role, "name" | "code">;
+                }
+        >;
+    };
+};
+
 export type LoginMutationVariables = Exact<{
     email: Scalars["String"];
     password: Scalars["String"];
@@ -921,6 +946,41 @@ export const CreateItemDocument = gql`
 export function useCreateItemMutation() {
     return Urql.useMutation<CreateItemMutation, CreateItemMutationVariables>(
         CreateItemDocument
+    );
+}
+export const CreateUserDocument = gql`
+    mutation CreateUser(
+        $name: String!
+        $email: String!
+        $password: String!
+        $role_id: String!
+    ) {
+        createUser(
+            options: {
+                name: $name
+                password: $password
+                email: $email
+                role_id: $role_id
+            }
+        ) {
+            errors {
+                message
+            }
+            user {
+                id
+                name
+                role {
+                    name
+                    code
+                }
+            }
+        }
+    }
+`;
+
+export function useCreateUserMutation() {
+    return Urql.useMutation<CreateUserMutation, CreateUserMutationVariables>(
+        CreateUserDocument
     );
 }
 export const LoginDocument = gql`
