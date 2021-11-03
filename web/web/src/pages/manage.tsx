@@ -21,7 +21,7 @@ import { AiFillEdit } from "react-icons/ai";
 import { IoPersonAddOutline } from "react-icons/io5";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
-import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
+import ModalManagerUpdateCreate from "../components/modal/ModalManagerUpdateCreateUser";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import Footer from "./../components/rootComponents/Footer";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
@@ -226,7 +226,7 @@ const Manage: React.FC<manageProps> = ({}) => {
             <Box id="footer">
                 <Footer />
             </Box>
-            <ModalManagerUpdateUser
+            <ModalManagerUpdateCreate
                 context={context}
                 user={seletedUser}
                 isOpen={modalUpdateUser.isOpen}
