@@ -5,7 +5,6 @@ import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import HomeNotifications from "../components/HomeNotifications";
 import { GlobalContext } from "./../context/globalContext";
-// import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import Login from "./../pages/login";
 import SideBar from "../components/layout/SideBar";
 import { useUser } from "./../helpers/hooks/useUser";

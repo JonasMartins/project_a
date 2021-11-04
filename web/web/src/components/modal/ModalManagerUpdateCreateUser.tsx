@@ -29,11 +29,12 @@ import {
     useCreateUserMutation,
 } from "../../generated/graphql";
 import React, { useState, ChangeEvent, useEffect } from "react";
-import { toErrorMap } from "../../utils/toErrorMap";
+import { toErrorMap, definedErrorMap } from "../../utils/toErrorMap";
 import { getServerPathImage } from "../../utils/handleServerImagePaths";
 import { generateRandomPassword } from "../../helpers/users/userFunctonHelpers";
 import ModalCopyNewUsersPassword from "./ModalCopyNewUsersPassword";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
+import { error } from "console";
 
 interface ModalManagerUpdateCreateUserProps {
     onClose: () => void;
@@ -53,6 +54,11 @@ interface userInfo {
     active: string;
     picture: string;
 }
+interface customErrors {
+    name: string | null;
+    email: string | null;
+    role: string | null;
+}
 
 const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
     isOpen,
@@ -68,6 +74,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
     const toast = useToast();
 
     const [loading, setLoading] = useState(false);
+    const [hasSubmit, setHasSubmit] = useState(0);
     const [userInfo, setUserInfo] = useState<userInfo>({
         id: user?.user?.id,
         name: user?.user?.name,
@@ -80,6 +87,12 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
     const [{}, createUser] = useCreateUserMutation();
+
+    const [customErrors, setCustonErrors] = useState<customErrors>({
+        name: "",
+        email: "",
+        role: "",
+    });
 
     const modalCopyUserPassword = useDisclosure();
 
@@ -102,17 +115,39 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                 picture: "",
             }));
         } else {
+            if (!userInfo.name) {
+                setUserInfo((prevUser) => ({
+                    ...prevUser,
+                    id: user?.user?.id,
+                    name: user?.user?.name,
+                    email: user?.user?.email,
+                    role_id: user?.user?.role?.id,
+                    active: user?.user?.active ? "active" : "",
+                    picture: user?.user?.picture,
+                }));
+            }
+        }
+    }, [user, hasSubmit]);
+
+    useEffect(() => {
+        return () => {
+            setHasSubmit(0);
             setUserInfo((prevUser) => ({
                 ...prevUser,
-                id: user?.user?.id,
-                name: user?.user?.name,
-                email: user?.user?.email,
-                role_id: user?.user?.role?.id,
-                active: user?.user?.active ? "active" : "",
-                picture: user?.user?.picture,
+                id: "",
+                name: "",
+                email: "",
+                role_id: "",
+                active: "active",
+                picture: "",
             }));
-        }
-    }, [user]);
+            setCustonErrors({
+                name: "",
+                email: "",
+                role: "",
+            });
+        };
+    }, []);
 
     const content = (
         <React.Fragment>
@@ -149,12 +184,26 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                 });
 
                                 if (response.data?.updateSeetingsUser?.errors) {
-                                    setErrors(
-                                        toErrorMap(
-                                            response.data.updateSeetingsUser
-                                                .errors
-                                        )
+                                    console.log(
+                                        "erros",
+                                        response.data?.updateSeetingsUser
+                                            ?.errors
                                     );
+
+                                    let result = definedErrorMap(
+                                        response.data?.updateSeetingsUser
+                                            ?.errors
+                                    );
+
+                                    setCustonErrors((prevErrors) => ({
+                                        ...prevErrors,
+                                        [result[0]["field"]]:
+                                            result[0]["message"],
+                                    }));
+
+                                    setTimeout(() => {
+                                        setLoading(false);
+                                    }, 300);
                                 } else {
                                     setTimeout(() => {
                                         updateCallback(countUpdate + 1);
@@ -202,9 +251,9 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                             <Form {...props}>
                                 <Stack spacing={3}>
                                     <Field name="name">
-                                        {({ field, form }) => (
+                                        {({ field }) => (
                                             <FormControl
-                                                isInvalid={form.errors.name}
+                                                isInvalid={!!customErrors.name}
                                             >
                                                 <FormLabel htmlFor="name">
                                                     <Text
@@ -216,6 +265,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                                 <Input
                                                     {...field}
                                                     id="name"
+                                                    isRequired
                                                     borderRadius="2em"
                                                     size="sm"
                                                     color={color[colorMode]}
@@ -223,7 +273,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                                     value={userInfo.name}
                                                 />
                                                 <FormErrorMessage>
-                                                    {form.errors.name}
+                                                    {customErrors.name}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}
@@ -231,7 +281,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                     <Field name="email">
                                         {({ field, form }) => (
                                             <FormControl
-                                                isInvalid={form.errors.email}
+                                                isInvalid={!!customErrors.email}
                                             >
                                                 <FormLabel htmlFor="email">
                                                     <Text
@@ -250,7 +300,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                                     value={userInfo.email}
                                                 />
                                                 <FormErrorMessage>
-                                                    {form.errors.email}
+                                                    {customErrors.email}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}
@@ -290,7 +340,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                     <Field name="role">
                                         {({ field, form }) => (
                                             <FormControl
-                                                isInvalid={form.errors.role}
+                                                isInvalid={!!customErrors.role}
                                             >
                                                 <FormLabel htmlFor="role">
                                                     <Text
@@ -305,6 +355,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                                     {...field}
                                                     id="role"
                                                     borderRadius="2em"
+                                                    isRequired
                                                     size="sm"
                                                     textColor={color[colorMode]}
                                                     value={userInfo.role_id}
@@ -337,7 +388,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                                 </Select>
 
                                                 <FormErrorMessage>
-                                                    {form.errors.role}
+                                                    {customErrors.role}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}

@@ -36,24 +36,20 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
     const router = useRouter();
 
-    const { setIsLoading, setCurrentUserId, setTheme } =
-        useContext(GlobalContext);
+    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
 
     const user = useUser();
 
-    const { toggleColorMode } = useColorMode();
-    const [darkMode, setDarkMode] = useState(false);
+    const { toggleColorMode, colorMode } = useColorMode();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleDarkMode = () => {
-        setDarkMode(!darkMode);
-        setTheme(darkMode ? "dark" : "light");
         toggleColorMode();
     };
 
     const logout = () => {
-        setIsLoading(true);
+        setIsLoading(false);
         localStorage.clear();
         setCurrentUserId("");
         router.push("/login");
@@ -111,10 +107,17 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                         <IconButton
                             aria-label="Switch Theme"
                             isRound={true}
-                            isActive={darkMode}
                             onClick={handleDarkMode}
-                            colorScheme={darkMode ? "grey" : "yellow"}
-                            icon={darkMode ? <MoonIcon /> : <SunIcon />}
+                            colorScheme={
+                                colorMode === "dark" ? "grey" : "yellow"
+                            }
+                            icon={
+                                colorMode === "dark" ? (
+                                    <MoonIcon />
+                                ) : (
+                                    <SunIcon />
+                                )
+                            }
                         />
                     </Box>
 
