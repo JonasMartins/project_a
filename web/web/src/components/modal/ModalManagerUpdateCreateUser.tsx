@@ -97,6 +97,13 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
     const modalCopyUserPassword = useDisclosure();
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
+        setCustonErrors((prevErrors) => ({
+            ...prevErrors,
+            name: "",
+            email: "",
+            role: "",
+        }));
+
         setUserInfo((prevUser) => ({
             ...prevUser,
             [e.target.name]: e.target.value,
@@ -184,16 +191,12 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                 });
 
                                 if (response.data?.updateSeetingsUser?.errors) {
-                                    console.log(
-                                        "erros",
-                                        response.data?.updateSeetingsUser
-                                            ?.errors
-                                    );
-
                                     let result = definedErrorMap(
                                         response.data?.updateSeetingsUser
                                             ?.errors
                                     );
+
+                                    console.log("result ", result);
 
                                     setCustonErrors((prevErrors) => ({
                                         ...prevErrors,
@@ -231,11 +234,21 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                 });
 
                                 if (response.data?.createUser?.errors) {
-                                    setErrors(
-                                        toErrorMap(
-                                            response.data.createUser.errors
-                                        )
+                                    let result = definedErrorMap(
+                                        response.data?.createUser?.errors
                                     );
+
+                                    console.log("result ", result);
+
+                                    setCustonErrors((prevErrors) => ({
+                                        ...prevErrors,
+                                        [result[0]["field"]]:
+                                            result[0]["message"],
+                                    }));
+
+                                    setTimeout(() => {
+                                        setLoading(false);
+                                    }, 300);
                                 } else {
                                     setTimeout(() => {
                                         onClose();
@@ -360,6 +373,12 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                                     textColor={color[colorMode]}
                                                     value={userInfo.role_id}
                                                     onChange={(e) => {
+                                                        setCustonErrors(
+                                                            (prevErrors) => ({
+                                                                ...prevErrors,
+                                                                role: "",
+                                                            })
+                                                        );
                                                         setUserInfo(
                                                             (prevUserInfo) => ({
                                                                 ...prevUserInfo,

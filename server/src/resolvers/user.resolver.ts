@@ -19,7 +19,10 @@ import { createAcessToken } from "../utils/auth";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
-import { genericError } from "./../utils/generalAuxiliaryMethods";
+import {
+    genericError,
+    validateEmail,
+} from "./../utils/generalAuxiliaryMethods";
 import { FileUpload, GraphQLUpload } from "graphql-upload";
 import { manageUploadFile } from "./../utils/helpers/uploader.helper";
 
@@ -233,13 +236,38 @@ export class UserResolver {
         @Arg("options") options: UserBasicData,
         @Ctx() { em }: Context
     ): Promise<UserResponse> {
+        if (!validateEmail(options.email)) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: `Email ${options.email} wrong email format.`,
+                        method: `Method: createUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        const userEmail = await em.findOne(User, { email: options.email });
+
+        if (userEmail) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: `Email ${options.email} already takken.`,
+                        method: `Method: createUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
         if (options.name.length <= 2) {
             return {
                 errors: [
                     {
-                        field: "username",
-                        message:
-                            "A username must have length greater than 2 charachters.",
+                        field: "name",
+                        message: "A user name must have length greater than 2.",
                         method: `Method: createUser, at ${__filename}`,
                     },
                 ],
@@ -251,7 +279,7 @@ export class UserResolver {
                     {
                         field: "password",
                         message:
-                            "A user password must have length greater than 3 charachters.",
+                            "A user password must have length greater than 3.",
                         method: `Method: createUser, at ${__filename}`,
                     },
                 ],
@@ -386,7 +414,42 @@ export class UserResolver {
         @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload,
         @Ctx() { em }: Context
     ): Promise<UserResponse> {
-        // const user = await em.findOne(User, { id: options.id });
+        if (name.length <= 2) {
+            return {
+                errors: [
+                    {
+                        field: "name",
+                        message: "A user name must have length greater than 2.",
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+        if (password && password.length <= 3) {
+            return {
+                errors: [
+                    {
+                        field: "password",
+                        message:
+                            "A user password must have length greater than 3.",
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        if (!validateEmail(email)) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: `Email ${email} wrong email format.`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
         const user = await em.findOne(User, { id });
 
         if (!user) {

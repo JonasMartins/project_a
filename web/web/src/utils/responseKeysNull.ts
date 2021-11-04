@@ -12,4 +12,5 @@ export const _keys = {
     TeamResponse: () => null,
     Project: () => null,
     Sprint: () => null,
+    Role: () => null,
 };
