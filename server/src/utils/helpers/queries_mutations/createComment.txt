@@ -1,0 +1,18 @@
+mutation {
+    createComment(
+        body: "comment Test 5"
+        itemId: "85495243-c981-4ee5-995e-0d29aafd4e22"
+    	parentId: "1f8c73ad-9586-4659-b7bf-6dff14946c1b"
+    ) {
+        errors {
+            method
+            message
+            field
+        }
+        comment {
+            id
+      		body
+        }
+    }
+}
+

@@ -16,6 +16,7 @@ import { TeamResolver } from "./resolvers/team.resolvers";
 import { AppointmentResolver } from "./resolvers/appointment.resolver";
 import { SprintResolver } from "./resolvers/sprint.resolver";
 import { ProjectResolver } from "./resolvers/project.resolver";
+import { CommentResolver } from "./resolvers/comment.resolver";
 import { Context } from "./types";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
@@ -95,6 +96,7 @@ export default class Application {
                     SprintResolver,
                     ProjectResolver,
                     AppointmentResolver,
+                    CommentResolver,
                 ],
                 validate: false,
             }),

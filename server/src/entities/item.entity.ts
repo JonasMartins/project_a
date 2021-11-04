@@ -14,6 +14,7 @@ import { ItemPriority } from "../enums/itemPriority.enum";
 import { ItemType } from "../enums/itemType.enum";
 import { Base } from "./../utils/entities/base.entity";
 import { Appointment } from "./appointment.entity";
+import { Comment } from "./comments.entity";
 import ItemValidator from "./../validators/item.validator";
 
 @ObjectType()
@@ -76,6 +77,13 @@ export class Item extends Base<Item> {
     public appointments: Collection<Appointment> = new Collection<Appointment>(
         this
     );
+
+    @Field(() => [Comment], { nullable: true })
+    @OneToMany(() => Comment, (comments: Comment) => comments.item, {
+        lazy: true,
+        nullable: true,
+    })
+    public comments: Collection<Comment> = new Collection<Comment>(this);
 
     constructor(body: ItemValidator) {
         super(body);
