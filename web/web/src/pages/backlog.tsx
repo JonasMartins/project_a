@@ -37,6 +37,7 @@ import {
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 import { useUser } from "./../helpers/hooks/useUser";
 import { GlobalContext } from "./../context/globalContext";
+import Comments from "./../components/Comments";
 
 interface backlogProps {}
 
@@ -80,6 +81,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [showPagination, setShowPagination] = useState(true);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
+    const [countUpdateComments, setCountUpdateComments] = useState(0);
     const [decrescentStatus, setDecrescentStatus] = useState(true);
     const [decrescentCreated, setDecrescentCreated] = useState(true);
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
@@ -89,6 +91,10 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const closeItemDetail = (): void => {
         setItemDetailOpen(false);
         setItemDetailWidth(0);
+    };
+
+    const updatedCommentsCallback = (value: number): void => {
+        setCountUpdateComments(value);
     };
 
     const [itensBacklog, reexecuteQuery] = useGetItensBacklogQuery({
@@ -186,6 +192,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         itemDetailOpen,
         offset,
         currentPage,
+        countUpdateComments,
     ]);
 
     const content = (
@@ -533,6 +540,15 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                     <Flex p={2} mt={2}>
                                         <Text>{itemDetailed.description}</Text>
                                     </Flex>
+                                    <Flex>
+                                        <Comments
+                                            itemId={itemDetailed.id}
+                                            updateCallback={
+                                                setCountUpdateComments
+                                            }
+                                            countUpdate={countUpdateComments}
+                                        />
+                                    </Flex>
                                 </Flex>
                             ) : (
                                 <></>
@@ -544,6 +560,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                 <Flex
                     justifyContent="center"
                     display={showPagination ? "flex" : "none"}
+                    mt={3}
                 >
                     {returnPagination().map((page, index) => (
                         <Box m={1} key={index}>

@@ -13,4 +13,5 @@ export const _keys = {
     Project: () => null,
     Sprint: () => null,
     Role: () => null,
+    CommentsResponse: () => null,
 };

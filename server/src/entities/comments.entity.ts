@@ -3,11 +3,11 @@ import {
     Entity,
     OneToMany,
     Property,
-    ManyToMany,
     ManyToOne,
 } from "@mikro-orm/core";
 import { Base } from "./../utils/entities/base.entity";
 import { Item } from "./item.entity";
+import { User } from "./user.entity";
 import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
@@ -20,6 +20,10 @@ export class Comment extends Base<Comment> {
     @Field(() => Item)
     @ManyToOne(() => Item, { lazy: true })
     public item!: Item;
+
+    @Field(() => User)
+    @ManyToOne(() => User)
+    public author!: User;
 
     @Field(() => [Comment])
     @OneToMany(() => Comment, (replies: Comment) => replies.parent, {

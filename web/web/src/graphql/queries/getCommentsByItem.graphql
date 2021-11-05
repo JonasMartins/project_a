@@ -1,5 +1,5 @@
-{
-    getCommentsByItem(itemId: "85495243-c981-4ee5-995e-0d29aafd4e22") {
+query GetCommentsByItem($itemId: String!) {
+    getCommentsByItem(itemId: $itemId) {
         errors {
             message
             method
@@ -11,10 +11,10 @@
             parent {
                 id
                 body
-                author {
-                    name
-                    picture
-                }
+            }
+            author {
+                name
+                picture
             }
             item {
                 id
@@ -22,4 +22,3 @@
         }
     }
 }
-

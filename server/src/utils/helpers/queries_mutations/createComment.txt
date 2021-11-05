@@ -1,8 +1,9 @@
 mutation {
     createComment(
-        body: "comment Test 5"
-        itemId: "85495243-c981-4ee5-995e-0d29aafd4e22"
-    	parentId: "1f8c73ad-9586-4659-b7bf-6dff14946c1b"
+        body: "comment Test 10"
+        itemId: "88124290-3733-4f46-9a79-b99b263c0b86"
+        authorId: "ff71e2ad-9d46-4701-a16b-c0f17910f1af"
+    	parentId: "c8bdb307-0096-46ff-a27a-46decd31ade9"
     ) {
         errors {
             method
@@ -11,8 +12,11 @@ mutation {
         }
         comment {
             id
-      		body
+            body
+            author {
+                name
+                picture
+            }
         }
     }
 }
-

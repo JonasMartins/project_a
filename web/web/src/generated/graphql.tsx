@@ -53,6 +53,31 @@ export type AppointmentsResponse = {
     appointments?: Maybe<Array<Appointment>>;
 };
 
+export type Comment = {
+    __typename?: "Comment";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    body: Scalars["String"];
+    item: Item;
+    author: User;
+    replies: Array<Comment>;
+    parent?: Maybe<Comment>;
+};
+
+export type CommentResponse = {
+    __typename?: "CommentResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    comment?: Maybe<Comment>;
+};
+
+export type CommentsResponse = {
+    __typename?: "CommentsResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    comments?: Maybe<Array<Comment>>;
+    total: Scalars["Float"];
+};
+
 export type ErrorFieldHandler = {
     __typename?: "ErrorFieldHandler";
     field: Scalars["String"];
@@ -78,6 +103,7 @@ export type Item = {
     approver_id: Scalars["String"];
     sprint: Sprint;
     appointments: Array<Appointment>;
+    comments?: Maybe<Array<Comment>>;
 };
 
 /** The basic directions */
@@ -147,6 +173,7 @@ export type Mutation = {
     createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
     createProject: ProjectResponse;
+    createComment: CommentResponse;
 };
 
 export type MutationCreateItemArgs = {
@@ -199,6 +226,13 @@ export type MutationCreateProjectArgs = {
     options: ProjectValidator;
 };
 
+export type MutationCreateCommentArgs = {
+    parentId?: Maybe<Scalars["String"]>;
+    authorId: Scalars["String"];
+    itemId: Scalars["String"];
+    body: Scalars["String"];
+};
+
 export type Project = {
     __typename?: "Project";
     id: Scalars["ID"];
@@ -239,6 +273,8 @@ export type Query = {
     getSprintById: SprintResponse;
     getProjects?: Maybe<Array<Project>>;
     getProjectById: ProjectResponse;
+    getCommentById: CommentResponse;
+    getCommentsByItem: CommentsResponse;
 };
 
 export type QueryGetItensRelatedToUserByPeriodArgs = {
@@ -303,6 +339,14 @@ export type QueryGetProjectsArgs = {
 
 export type QueryGetProjectByIdArgs = {
     id: Scalars["String"];
+};
+
+export type QueryGetCommentByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetCommentsByItemArgs = {
+    itemId: Scalars["String"];
 };
 
 export type RevokeResponse = {
@@ -415,6 +459,7 @@ export type User = {
     teams: Array<Team>;
     role: Role;
     appointments: Array<Appointment>;
+    comments?: Maybe<Array<Comment>>;
     picture?: Maybe<Scalars["String"]>;
     active: Scalars["Boolean"];
 };
@@ -567,6 +612,29 @@ export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
     };
 };
 
+export type CreateCommentMutationVariables = Exact<{
+    body: Scalars["String"];
+    itemId: Scalars["String"];
+    authorId: Scalars["String"];
+    parentId?: Maybe<Scalars["String"]>;
+}>;
+
+export type CreateCommentMutation = { __typename?: "Mutation" } & {
+    createComment: { __typename?: "CommentResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        comment?: Maybe<
+            { __typename?: "Comment" } & Pick<Comment, "id" | "body">
+        >;
+    };
+};
+
 export type GetAllRolesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetAllRolesQuery = { __typename?: "Query" } & {
@@ -646,6 +714,40 @@ export type GetAppointmentsByItemQuery = { __typename?: "Query" } & {
                             User,
                             "id" | "name"
                         >;
+                    }
+            >
+        >;
+    };
+};
+
+export type GetCommentsByItemQueryVariables = Exact<{
+    itemId: Scalars["String"];
+}>;
+
+export type GetCommentsByItemQuery = { __typename?: "Query" } & {
+    getCommentsByItem: { __typename?: "CommentsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        comments?: Maybe<
+            Array<
+                { __typename?: "Comment" } & Pick<Comment, "id" | "body"> & {
+                        parent?: Maybe<
+                            { __typename?: "Comment" } & Pick<
+                                Comment,
+                                "id" | "body"
+                            >
+                        >;
+                        author: { __typename?: "User" } & Pick<
+                            User,
+                            "name" | "picture"
+                        >;
+                        item: { __typename?: "Item" } & Pick<Item, "id">;
                     }
             >
         >;
@@ -1059,6 +1161,38 @@ export function useUpdateSeetingsUserMutation() {
         UpdateSeetingsUserMutationVariables
     >(UpdateSeetingsUserDocument);
 }
+export const CreateCommentDocument = gql`
+    mutation CreateComment(
+        $body: String!
+        $itemId: String!
+        $authorId: String!
+        $parentId: String
+    ) {
+        createComment(
+            body: $body
+            itemId: $itemId
+            parentId: $parentId
+            authorId: $authorId
+        ) {
+            errors {
+                method
+                message
+                field
+            }
+            comment {
+                id
+                body
+            }
+        }
+    }
+`;
+
+export function useCreateCommentMutation() {
+    return Urql.useMutation<
+        CreateCommentMutation,
+        CreateCommentMutationVariables
+    >(CreateCommentDocument);
+}
 export const GetAllRolesDocument = gql`
     query GetAllRoles {
         getAllRoles {
@@ -1145,6 +1279,44 @@ export function useGetAppointmentsByItemQuery(
 ) {
     return Urql.useQuery<GetAppointmentsByItemQuery>({
         query: GetAppointmentsByItemDocument,
+        ...options,
+    });
+}
+export const GetCommentsByItemDocument = gql`
+    query GetCommentsByItem($itemId: String!) {
+        getCommentsByItem(itemId: $itemId) {
+            errors {
+                message
+                method
+                field
+            }
+            comments {
+                id
+                body
+                parent {
+                    id
+                    body
+                }
+                author {
+                    name
+                    picture
+                }
+                item {
+                    id
+                }
+            }
+        }
+    }
+`;
+
+export function useGetCommentsByItemQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetCommentsByItemQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetCommentsByItemQuery>({
+        query: GetCommentsByItemDocument,
         ...options,
     });
 }

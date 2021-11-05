@@ -14,6 +14,7 @@ import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { EntityManager } from "@mikro-orm/postgresql"; // or any other driver package
 import { Item } from "../entities/item.entity";
 import e from "express";
+import { User } from "../entities/user.entity";
 
 @ObjectType()
 class CommentResponse {
@@ -92,6 +93,7 @@ export class CommentResolver {
         try {
             const comments = await qb.getResult();
             await em.populate(comments, ["replies"]);
+            await em.populate(comments, ["author"]);
 
             const total = comments.length;
 
@@ -112,13 +114,38 @@ export class CommentResolver {
     async createComment(
         @Arg("body", () => String) body: string,
         @Arg("itemId", () => String) itemId: string,
+        @Arg("authorId", () => String) authorId: string,
         @Arg("parentId", () => String, { nullable: true }) parentId: string,
         @Ctx() { em }: Context
     ): Promise<CommentResponse> {
-        if (!itemId) {
+        if (!authorId) {
             return {
                 errors: genericError(
                     "id",
+                    "createComment",
+                    __filename,
+                    "An User id must be passed as argument"
+                ),
+            };
+        }
+
+        const author: User | null = await em.findOne(User, { id: authorId });
+
+        if (!author) {
+            return {
+                errors: genericError(
+                    "authorId",
+                    "createComment",
+                    __filename,
+                    `The author with id ${authorId} could not been found.`
+                ),
+            };
+        }
+
+        if (!itemId) {
+            return {
+                errors: genericError(
+                    "itemId",
                     "createComment",
                     __filename,
                     "An Id must be passed as argument"
@@ -165,6 +192,7 @@ export class CommentResolver {
         });
 
         comment.body = body;
+        comment.author = author;
 
         try {
             await em.persistAndFlush(comment);

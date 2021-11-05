@@ -12,6 +12,7 @@ import { Item } from "./item.entity";
 import { Base } from "./../utils/entities/base.entity";
 import { Team } from "./team.entity";
 import { Role } from "./role.entity";
+import { Comment } from "./comments.entity";
 import { Appointment } from "./appointment.entity";
 
 @ObjectType()
@@ -65,6 +66,13 @@ export class User extends Base<User> {
     public appointments: Collection<Appointment> = new Collection<Appointment>(
         this
     );
+
+    @Field(() => [Comment], { nullable: true })
+    @OneToMany(() => Comment, (comments: Comment) => comments.author, {
+        nullable: true,
+        lazy: true,
+    })
+    public comments: Collection<Comment> = new Collection<Comment>(this);
 
     @Field(() => String, { nullable: true })
     @Property({ nullable: true, length: 255 })

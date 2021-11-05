@@ -27,7 +27,7 @@ const Index: React.FC<indexProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [expanded]);
+    }, [expanded, user.userId]);
 
     const content =
         user && user.userId ? (

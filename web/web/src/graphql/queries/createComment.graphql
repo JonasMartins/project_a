@@ -1,0 +1,23 @@
+mutation CreateComment(
+    $body: String!
+    $itemId: String!
+    $authorId: String!
+    $parentId: String
+) {
+    createComment(
+        body: $body
+        itemId: $itemId
+        parentId: $parentId
+        authorId: $authorId
+    ) {
+        errors {
+            method
+            message
+            field
+        }
+        comment {
+            id
+            body
+        }
+    }
+}
