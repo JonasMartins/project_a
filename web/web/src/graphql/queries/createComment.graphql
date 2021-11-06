@@ -3,12 +3,14 @@ mutation CreateComment(
     $itemId: String!
     $authorId: String!
     $parentId: String
+    $order: Float
 ) {
     createComment(
         body: $body
         itemId: $itemId
         parentId: $parentId
         authorId: $authorId
+        order: $order
     ) {
         errors {
             method

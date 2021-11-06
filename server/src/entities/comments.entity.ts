@@ -25,6 +25,10 @@ export class Comment extends Base<Comment> {
     @ManyToOne(() => User)
     public author!: User;
 
+    @Field()
+    @Property({ type: "number", default: 1 })
+    public order: number;
+
     @Field(() => [Comment])
     @OneToMany(() => Comment, (replies: Comment) => replies.parent, {
         eager: true,

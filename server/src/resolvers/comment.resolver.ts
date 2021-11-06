@@ -116,6 +116,7 @@ export class CommentResolver {
         @Arg("itemId", () => String) itemId: string,
         @Arg("authorId", () => String) authorId: string,
         @Arg("parentId", () => String, { nullable: true }) parentId: string,
+        @Arg("order", () => Number, { nullable: true }) order: number,
         @Ctx() { em }: Context
     ): Promise<CommentResponse> {
         if (!authorId) {
@@ -193,6 +194,7 @@ export class CommentResolver {
 
         comment.body = body;
         comment.author = author;
+        order && order > 1 ? (comment.order = order) : (comment.order = 1);
 
         try {
             await em.persistAndFlush(comment);

@@ -8,6 +8,7 @@ query GetCommentsByItem($itemId: String!) {
         comments {
             id
             body
+            order
             parent {
                 id
                 body
@@ -18,6 +19,15 @@ query GetCommentsByItem($itemId: String!) {
             }
             item {
                 id
+            }
+            replies {
+                id
+                body
+                order
+                author {
+                    name
+                    picture
+                }
             }
         }
     }

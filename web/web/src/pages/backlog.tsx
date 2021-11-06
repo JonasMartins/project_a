@@ -124,6 +124,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     aria-label="Previous Itens page"
                     icon={<ArrowLeftIcon />}
                     onClick={() => {
+                        closeItemDetail();
                         setOffset((currentPage - 1) * itensPerPage);
                         setCurrentPage(currentPage - 1);
                     }}
@@ -136,6 +137,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         variant={currentPage === i ? "cyan-gradient" : "ghost"}
                         name={`${i + 1}`}
                         onClick={(e) => {
+                            closeItemDetail();
                             setCurrentPage(i);
                             handlePagination(e);
                         }}
@@ -151,6 +153,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     aria-label="Next Itens page"
                     icon={<ArrowRightIcon />}
                     onClick={() => {
+                        closeItemDetail();
                         setOffset((currentPage + 1) * itensPerPage);
                         setCurrentPage(currentPage + 1);
                     }}

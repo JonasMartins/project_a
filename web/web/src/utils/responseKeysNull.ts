@@ -14,4 +14,5 @@ export const _keys = {
     Sprint: () => null,
     Role: () => null,
     CommentsResponse: () => null,
+    User: () => null,
 };

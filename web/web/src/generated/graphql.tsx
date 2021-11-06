@@ -61,6 +61,7 @@ export type Comment = {
     body: Scalars["String"];
     item: Item;
     author: User;
+    order: Scalars["Float"];
     replies: Array<Comment>;
     parent?: Maybe<Comment>;
 };
@@ -227,6 +228,7 @@ export type MutationCreateProjectArgs = {
 };
 
 export type MutationCreateCommentArgs = {
+    order?: Maybe<Scalars["Float"]>;
     parentId?: Maybe<Scalars["String"]>;
     authorId: Scalars["String"];
     itemId: Scalars["String"];
@@ -617,6 +619,7 @@ export type CreateCommentMutationVariables = Exact<{
     itemId: Scalars["String"];
     authorId: Scalars["String"];
     parentId?: Maybe<Scalars["String"]>;
+    order?: Maybe<Scalars["Float"]>;
 }>;
 
 export type CreateCommentMutation = { __typename?: "Mutation" } & {
@@ -736,7 +739,10 @@ export type GetCommentsByItemQuery = { __typename?: "Query" } & {
         >;
         comments?: Maybe<
             Array<
-                { __typename?: "Comment" } & Pick<Comment, "id" | "body"> & {
+                { __typename?: "Comment" } & Pick<
+                    Comment,
+                    "id" | "body" | "order"
+                > & {
                         parent?: Maybe<
                             { __typename?: "Comment" } & Pick<
                                 Comment,
@@ -748,6 +754,17 @@ export type GetCommentsByItemQuery = { __typename?: "Query" } & {
                             "name" | "picture"
                         >;
                         item: { __typename?: "Item" } & Pick<Item, "id">;
+                        replies: Array<
+                            { __typename?: "Comment" } & Pick<
+                                Comment,
+                                "id" | "body" | "order"
+                            > & {
+                                    author: { __typename?: "User" } & Pick<
+                                        User,
+                                        "name" | "picture"
+                                    >;
+                                }
+                        >;
                     }
             >
         >;
@@ -1167,12 +1184,14 @@ export const CreateCommentDocument = gql`
         $itemId: String!
         $authorId: String!
         $parentId: String
+        $order: Float
     ) {
         createComment(
             body: $body
             itemId: $itemId
             parentId: $parentId
             authorId: $authorId
+            order: $order
         ) {
             errors {
                 method
@@ -1293,6 +1312,7 @@ export const GetCommentsByItemDocument = gql`
             comments {
                 id
                 body
+                order
                 parent {
                     id
                     body
@@ -1303,6 +1323,15 @@ export const GetCommentsByItemDocument = gql`
                 }
                 item {
                     id
+                }
+                replies {
+                    id
+                    body
+                    order
+                    author {
+                        name
+                        picture
+                    }
                 }
             }
         }
