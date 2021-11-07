@@ -11,7 +11,6 @@ import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
-import Login from "./../pages/login";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import {
     Box,
@@ -71,30 +70,26 @@ const Backlog: React.FC<backlogProps> = ({}) => {
 
     const { expanded } = useContext(GlobalContext);
 
+    const [offset, setOffset] = useState(0);
     const [page, setPage] = useState<number>(0);
     const [pageWidth, setPageWidth] = useState("3em");
     const [searchInput, setSearchInput] = useState("");
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [itens, setItens] = useState<itensBacklog>(null);
-    const [offset, setOffset] = useState(0);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
     const [showPagination, setShowPagination] = useState(true);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
-    const [countUpdateComments, setCountUpdateComments] = useState(0);
     const [decrescentStatus, setDecrescentStatus] = useState(true);
     const [decrescentCreated, setDecrescentCreated] = useState(true);
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
     const [decrescentPriority, setDecrescentPriority] = useState(true);
+
     const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
 
     const closeItemDetail = (): void => {
         setItemDetailOpen(false);
         setItemDetailWidth(0);
-    };
-
-    const updatedCommentsCallback = (value: number): void => {
-        setCountUpdateComments(value);
     };
 
     const [itensBacklog, reexecuteQuery] = useGetItensBacklogQuery({
@@ -195,7 +190,6 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         itemDetailOpen,
         offset,
         currentPage,
-        countUpdateComments,
     ]);
 
     const content = (
@@ -544,13 +538,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                         <Text>{itemDetailed.description}</Text>
                                     </Flex>
                                     <Flex>
-                                        <Comments
-                                            itemId={itemDetailed.id}
-                                            updateCallback={
-                                                setCountUpdateComments
-                                            }
-                                            countUpdate={countUpdateComments}
-                                        />
+                                        <Comments itemId={itemDetailed.id} />
                                     </Flex>
                                 </Flex>
                             ) : (
@@ -578,7 +566,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         </Container>
     );
 
-    return user.userId ? content : <Login />;
+    return content;
 };
 
 export default Backlog;

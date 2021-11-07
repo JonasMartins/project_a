@@ -23,7 +23,7 @@ const Footer: React.FC<FooterProps> = ({}) => {
         >
             <Flex alignItems="center" mb={2}>
                 <Image
-                    boxSize="100px"
+                    boxSize="50px"
                     src="/favicon/android-chrome-512x512.png"
                 />
                 <Text fontSize="3xl" fontWeight="semibold" ml={2}>

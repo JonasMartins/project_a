@@ -78,7 +78,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                             {">"}
                         </Text>
                     </Flex>
-                    <Flex p={2} mb="150px">
+                    <Flex p={2} mb="250px">
                         <Table size="lg" variant="striped">
                             <Thead>
                                 <Tr>

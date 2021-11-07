@@ -1,10 +1,11 @@
 import React, { ChangeEvent, useEffect, useState, useRef } from "react";
-import FlexSpinner from "./../components/rootComponents/FlexSpinner";
+import MiniSpinner from "./../components/rootComponents/MiniSpinner";
 import {
     Maybe,
     Comment,
     User,
     useGetCommentsByItemQuery,
+    useCreateCommentMutation,
 } from "./../generated/graphql";
 import {
     Flex,
@@ -23,11 +24,11 @@ import { Form, Formik, Field } from "formik";
 import { getServerPathImage } from "./../utils/handleServerImagePaths";
 import { HiOutlineReply } from "react-icons/hi";
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
+import { useUser } from "./../helpers/hooks/useUser";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface commentsProps {
     itemId: string;
-    updateCallback: (number) => void;
-    countUpdate: number;
 }
 
 interface newComment {
@@ -56,11 +57,11 @@ type commentsType = Array<
         }
 >;
 
-const Comments: React.FC<commentsProps> = ({
-    itemId,
-    updateCallback,
-    countUpdate,
-}) => {
+const Comments: React.FC<commentsProps> = ({ itemId }) => {
+    const user = useUser();
+    const [hasCreatedComment, setHasCreatedComment] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [parentCommentId, setParentCommentId] = useState<string>("");
     const [comments, setComments] = useState<commentsType>(null);
     const [newComment, setNewComment] = useState<newComment>({
         itemId: itemId,
@@ -72,7 +73,9 @@ const Comments: React.FC<commentsProps> = ({
 
     const bodyCommentRef = useRef<HTMLInputElement>(null);
 
-    const [itemComments] = useGetCommentsByItemQuery({
+    const [{}, createComment] = useCreateCommentMutation();
+
+    const [itemComments, reexecuteQuery] = useGetCommentsByItemQuery({
         variables: {
             itemId: itemId,
         },
@@ -86,13 +89,19 @@ const Comments: React.FC<commentsProps> = ({
     };
 
     useEffect(() => {
+        console.log("here?");
         if (itemComments.fetching) {
             return;
         }
 
-        bodyCommentRef.current.focus();
+        //bodyCommentRef && bodyCommentRef.current.focus();
 
         if (itemComments?.data?.getCommentsByItem?.comments) {
+            console.log(
+                "length ",
+                itemComments?.data?.getCommentsByItem.comments.length
+            );
+
             setComments(
                 itemComments.data.getCommentsByItem.comments.filter(
                     (comment) => {
@@ -100,11 +109,8 @@ const Comments: React.FC<commentsProps> = ({
                     }
                 )
             );
-            // setComments(itemComments.data.getCommentsByItem.comments);
-            updateCallback(countUpdate + 1);
         }
-        console.log("comments ", itemComments.data.getCommentsByItem.comments);
-    }, [itemId, itemComments.fetching]);
+    }, [itemId, itemComments.fetching, hasCreatedComment, loading]);
 
     const content = (
         <Flex
@@ -123,8 +129,34 @@ const Comments: React.FC<commentsProps> = ({
                         body: newComment.body,
                     }}
                     enableReinitialize={true}
-                    onSubmit={(values) => {
-                        console.log("values ", values);
+                    onSubmit={async (values, { setErrors }) => {
+                        setLoading(true);
+                        const response = await createComment({
+                            body: values.body,
+                            itemId: values.itemId,
+                            authorId: user.userId,
+                            parentId: parentCommentId,
+                            order: parentCommentId ? 2 : 1,
+                        });
+
+                        if (response.data?.createComment?.errors) {
+                            setErrors(
+                                toErrorMap(response.data.createComment.errors)
+                            );
+                            setLoading(false);
+                        } else {
+                            setNewComment((comment) => ({
+                                ...comment,
+                                body: "",
+                            }));
+                            reexecuteQuery({
+                                requestPolicy: "cache-and-network",
+                            });
+                            setHasCreatedComment(hasCreatedComment + 1);
+                            setTimeout(() => {
+                                setLoading(false);
+                            }, 300);
+                        }
                     }}
                 >
                     {(props) => (
@@ -153,6 +185,7 @@ const Comments: React.FC<commentsProps> = ({
                                 <Flex justifyContent="flex-end">
                                     <Button
                                         type="submit"
+                                        isLoading={props.isSubmitting}
                                         isDisabled={newComment.body.length < 3}
                                         variant="cyan-gradient"
                                         size="sm"
@@ -242,6 +275,10 @@ const Comments: React.FC<commentsProps> = ({
                                         variant="cyan-gradient"
                                         aria-label="reply"
                                         icon={<HiOutlineReply />}
+                                        onClick={() => {
+                                            setParentCommentId(comment.id);
+                                            bodyCommentRef.current.focus();
+                                        }}
                                     />
                                 </Tooltip>
                             </Flex>
@@ -251,7 +288,7 @@ const Comments: React.FC<commentsProps> = ({
         </Flex>
     );
 
-    return itemComments.fetching ? <FlexSpinner /> : content;
+    return itemComments.fetching || loading ? <MiniSpinner /> : content;
 };
 
 export default Comments;

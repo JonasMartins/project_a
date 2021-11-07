@@ -86,8 +86,8 @@ const Manage: React.FC<manageProps> = ({}) => {
         } else {
             setPageWidth("3em");
             setNavBarWidth("50px");
+            reexecuteQuery({ requestPolicy: "cache-and-network" });
         }
-        reexecuteQuery({ requestPolicy: "cache-and-network" });
     }, [users.fetching, allRoles.fetching, expanded, activeUsers, countUpdate]);
 
     const content = (

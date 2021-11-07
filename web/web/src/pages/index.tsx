@@ -20,6 +20,8 @@ const Index: React.FC<indexProps> = ({}) => {
     const user = useUser();
 
     useEffect(() => {
+        if (!user) return;
+
         if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
