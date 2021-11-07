@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useState, useRef } from "react";
+import { formatDistance } from "date-fns";
 import MiniSpinner from "./../components/rootComponents/MiniSpinner";
 import {
     Maybe,
@@ -19,6 +20,9 @@ import {
     useColorMode,
     Tooltip,
     IconButton,
+    useDisclosure,
+    Fade,
+    Box,
 } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import { getServerPathImage } from "./../utils/handleServerImagePaths";
@@ -26,6 +30,7 @@ import { HiOutlineReply } from "react-icons/hi";
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 import { useUser } from "./../helpers/hooks/useUser";
 import { toErrorMap } from "../utils/toErrorMap";
+import { CloseButton } from "@chakra-ui/react";
 
 interface commentsProps {
     itemId: string;
@@ -33,11 +38,17 @@ interface commentsProps {
 
 interface newComment {
     itemId: string;
+    parentId?: string;
     body: string;
+    parentName?: string;
+    parentCreated?: Date;
 }
 
 type commentsType = Array<
-    { __typename?: "Comment" } & Pick<Comment, "id" | "body" | "order"> & {
+    { __typename?: "Comment" } & Pick<
+        Comment,
+        "id" | "body" | "order" | "createdAt"
+    > & {
             parent?: Maybe<
                 { __typename?: "Comment" } & Pick<Comment, "id" | "body">
             >;
@@ -46,7 +57,7 @@ type commentsType = Array<
             replies: Array<
                 { __typename?: "Comment" } & Pick<
                     Comment,
-                    "id" | "body" | "order"
+                    "id" | "body" | "order" | "createdAt"
                 > & {
                         author: { __typename?: "User" } & Pick<
                             User,
@@ -59,9 +70,17 @@ type commentsType = Array<
 
 const Comments: React.FC<commentsProps> = ({ itemId }) => {
     const user = useUser();
+
+    const handleReplyInfo = useDisclosure();
     const [hasCreatedComment, setHasCreatedComment] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [parentCommentId, setParentCommentId] = useState<string>("");
+    const [parentComment, setParentComment] = useState<newComment>({
+        itemId: "",
+        body: "",
+        parentName: "",
+        parentId: "",
+        parentCreated: null,
+    });
     const [comments, setComments] = useState<commentsType>(null);
     const [newComment, setNewComment] = useState<newComment>({
         itemId: itemId,
@@ -89,19 +108,11 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
     };
 
     useEffect(() => {
-        console.log("here?");
         if (itemComments.fetching) {
             return;
         }
 
-        //bodyCommentRef && bodyCommentRef.current.focus();
-
         if (itemComments?.data?.getCommentsByItem?.comments) {
-            console.log(
-                "length ",
-                itemComments?.data?.getCommentsByItem.comments.length
-            );
-
             setComments(
                 itemComments.data.getCommentsByItem.comments.filter(
                     (comment) => {
@@ -121,6 +132,46 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
             flexGrow={1}
         >
             <Text fontWeight="semibold">Comments</Text>
+            <Fade in={handleReplyInfo.isOpen}>
+                <Flex p={1} m={1} flexDir="column">
+                    <Flex justifyContent="space-between">
+                        <Text
+                            as="em"
+                            fontWeight="semibold"
+                            fontSize="sm"
+                            textShadow="#f6ad55 1px 0 10px"
+                        >
+                            Replying to:
+                        </Text>
+                        <CloseButton
+                            size="sm"
+                            onClick={() => {
+                                setParentComment((parent) => ({
+                                    ...parent,
+                                    parentId: "",
+                                    body: "",
+                                    parentName: "",
+                                }));
+                                handleReplyInfo.onClose();
+                            }}
+                        />
+                    </Flex>
+                    <Box bg={darkerBg[colorMode]} p={2}>
+                        <Text as="em" fontSize="sm">
+                            {truncateString(parentComment.body, 50)}
+                        </Text>
+                        <Flex justifyContent="flex-end">
+                            <Text as="em" fontSize="sm">{`${
+                                parentComment.parentName
+                            }, ${formatDistance(
+                                new Date(parentComment.parentCreated),
+                                new Date(),
+                                { addSuffix: true }
+                            )}`}</Text>{" "}
+                        </Flex>
+                    </Box>
+                </Flex>
+            </Fade>
 
             <Flex p={2} justifyContent="center" flexGrow={1} flexFlow="inherit">
                 <Formik
@@ -135,8 +186,8 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                             body: values.body,
                             itemId: values.itemId,
                             authorId: user.userId,
-                            parentId: parentCommentId,
-                            order: parentCommentId ? 2 : 1,
+                            parentId: parentComment.parentId,
+                            order: parentComment.parentId ? 2 : 1,
                         });
 
                         if (response.data?.createComment?.errors) {
@@ -145,6 +196,13 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                             );
                             setLoading(false);
                         } else {
+                            setParentComment((parent) => ({
+                                ...parent,
+                                parentId: "",
+                                body: "",
+                                parentName: "",
+                            }));
+                            handleReplyInfo.onClose();
                             setNewComment((comment) => ({
                                 ...comment,
                                 body: "",
@@ -262,6 +320,13 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                         )}
                                     />
                                 </Tooltip>
+                                <Text fontSize="xs" as="em" mr={1} ml={2}>
+                                    {formatDistance(
+                                        new Date(comment.createdAt),
+                                        new Date(),
+                                        { addSuffix: true }
+                                    )}
+                                </Text>
 
                                 <Tooltip
                                     hasArrow
@@ -276,8 +341,16 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                         aria-label="reply"
                                         icon={<HiOutlineReply />}
                                         onClick={() => {
-                                            setParentCommentId(comment.id);
+                                            setParentComment((parent) => ({
+                                                ...parent,
+                                                parentId: comment.id,
+                                                body: comment.body,
+                                                parentName: comment.author.name,
+                                                parentCreated:
+                                                    comment.createdAt,
+                                            }));
                                             bodyCommentRef.current.focus();
+                                            handleReplyInfo.onOpen();
                                         }}
                                     />
                                 </Tooltip>

@@ -741,7 +741,7 @@ export type GetCommentsByItemQuery = { __typename?: "Query" } & {
             Array<
                 { __typename?: "Comment" } & Pick<
                     Comment,
-                    "id" | "body" | "order"
+                    "id" | "body" | "order" | "createdAt"
                 > & {
                         parent?: Maybe<
                             { __typename?: "Comment" } & Pick<
@@ -757,7 +757,7 @@ export type GetCommentsByItemQuery = { __typename?: "Query" } & {
                         replies: Array<
                             { __typename?: "Comment" } & Pick<
                                 Comment,
-                                "id" | "body" | "order"
+                                "id" | "body" | "createdAt" | "order"
                             > & {
                                     author: { __typename?: "User" } & Pick<
                                         User,
@@ -1313,6 +1313,7 @@ export const GetCommentsByItemDocument = gql`
                 id
                 body
                 order
+                createdAt
                 parent {
                     id
                     body
@@ -1327,6 +1328,7 @@ export const GetCommentsByItemDocument = gql`
                 replies {
                     id
                     body
+                    createdAt
                     order
                     author {
                         name

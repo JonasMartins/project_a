@@ -16,6 +16,7 @@
         "@urql/core": "^2.1.5",
         "@urql/exchange-graphcache": "^4.3.5",
         "@urql/exchange-multipart-fetch": "^0.1.13",
+        "date-fns": "^2.25.0",
         "formik": "^2.2.9",
         "framer-motion": "^4.0.3",
         "graphql": "^15.6.1",

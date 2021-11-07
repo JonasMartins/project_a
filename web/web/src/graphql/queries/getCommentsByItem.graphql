@@ -9,6 +9,7 @@ query GetCommentsByItem($itemId: String!) {
             id
             body
             order
+            createdAt
             parent {
                 id
                 body
@@ -23,6 +24,7 @@ query GetCommentsByItem($itemId: String!) {
             replies {
                 id
                 body
+                createdAt
                 order
                 author {
                     name
