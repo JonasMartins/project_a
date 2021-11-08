@@ -75,7 +75,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                     );
                                     setTimeout(() => {
                                         router.push("/");
-                                    }, 200);
+                                    }, 500);
                                 }
                             }, 400);
                         }}

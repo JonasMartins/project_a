@@ -23,6 +23,7 @@ import {
     useDisclosure,
     Fade,
     Box,
+    Collapse,
 } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import { getServerPathImage } from "./../utils/handleServerImagePaths";
@@ -72,8 +73,10 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
     const user = useUser();
 
     const handleReplyInfo = useDisclosure();
+    const handleShowReply = useDisclosure();
     const [hasCreatedComment, setHasCreatedComment] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [currentParentCommentId, setCurrentParentCommentId] = useState("");
     const [parentComment, setParentComment] = useState<newComment>({
         itemId: "",
         body: "",
@@ -264,11 +267,7 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                         p={4}
                         key={comment.id}
                         flexDir="column"
-                        bg={
-                            comment.order > 1
-                                ? darkerBg[colorMode]
-                                : normalBg[colorMode]
-                        }
+                        bg={normalBg[colorMode]}
                     >
                         <Text>{comment.body}</Text>
 
@@ -284,7 +283,15 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                         label="Show replies"
                                         colorScheme="withe"
                                     >
-                                        <Button size="xs">{`Replies (${comment.replies.length})`}</Button>
+                                        <Button
+                                            size="xs"
+                                            onClick={() => {
+                                                handleShowReply.onToggle();
+                                                setCurrentParentCommentId(
+                                                    comment.id
+                                                );
+                                            }}
+                                        >{`Replies (${comment.replies.length})`}</Button>
                                     </Tooltip>
                                 ) : (
                                     <></>
@@ -356,6 +363,55 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                 </Tooltip>
                             </Flex>
                         </Flex>
+                        <Collapse in={handleShowReply.isOpen}>
+                            {comment.replies &&
+                                comment.id == currentParentCommentId &&
+                                comment.replies.map((reply) => (
+                                    <Flex
+                                        bg={darkerBg[colorMode]}
+                                        p={4}
+                                        mt={2}
+                                        key={reply.id}
+                                        flexDir="column"
+                                    >
+                                        <Text>{reply.body}</Text>
+                                        <Flex
+                                            alignItems="center"
+                                            justifyContent="flex-end"
+                                        >
+                                            <Text fontSize="xs" as="em" mr={1}>
+                                                Author:
+                                            </Text>
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label="Author"
+                                                label={reply.author.name}
+                                                colorScheme="withe"
+                                            >
+                                                <Image
+                                                    borderRadius="full"
+                                                    boxSize="24px"
+                                                    src={getServerPathImage(
+                                                        reply.author.picture
+                                                    )}
+                                                />
+                                            </Tooltip>
+                                            <Text
+                                                fontSize="xs"
+                                                as="em"
+                                                mr={1}
+                                                ml={2}
+                                            >
+                                                {formatDistance(
+                                                    new Date(reply.createdAt),
+                                                    new Date(),
+                                                    { addSuffix: true }
+                                                )}
+                                            </Text>
+                                        </Flex>
+                                    </Flex>
+                                ))}
+                        </Collapse>
                     </Flex>
                 ))}
         </Flex>
