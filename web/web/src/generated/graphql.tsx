@@ -1022,6 +1022,13 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
     };
 };
 
+export type LogedInTestQueryVariables = Exact<{ [key: string]: never }>;
+
+export type LogedInTestQuery = { __typename?: "Query" } & Pick<
+    Query,
+    "logedInTest"
+>;
+
 export const CreateItemDocument = gql`
     mutation CreateItem(
         $approverId: String!
@@ -1610,6 +1617,20 @@ export function useGetUserSettingsQuery(
 ) {
     return Urql.useQuery<GetUserSettingsQuery>({
         query: GetUserSettingsDocument,
+        ...options,
+    });
+}
+export const LogedInTestDocument = gql`
+    query LogedInTest {
+        logedInTest
+    }
+`;
+
+export function useLogedInTestQuery(
+    options: Omit<Urql.UseQueryArgs<LogedInTestQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<LogedInTestQuery>({
+        query: LogedInTestDocument,
         ...options,
     });
 }

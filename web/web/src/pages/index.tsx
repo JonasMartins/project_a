@@ -8,10 +8,13 @@ import { GlobalContext } from "./../context/globalContext";
 import Login from "./../pages/login";
 import SideBar from "../components/layout/SideBar";
 import { useUser } from "./../helpers/hooks/useUser";
+import { useLogedInTestQuery } from "../generated/graphql";
 
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
+    const [loginTest] = useLogedInTestQuery();
+
     const { expanded } = useContext(GlobalContext);
 
     const [pageWidth, setPageWidth] = useState("3em");
@@ -20,6 +23,8 @@ const Index: React.FC<indexProps> = ({}) => {
     const user = useUser();
 
     useEffect(() => {
+        console.log("logged ? ", loginTest?.data?.logedInTest);
+
         if (!user) return;
 
         if (expanded) {

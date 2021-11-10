@@ -22,7 +22,6 @@ import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
 import { graphqlUploadExpress } from "graphql-upload";
-import path from "path/posix";
 
 type failedRefresh = {
     ok: boolean;
@@ -46,7 +45,7 @@ export default class Application {
     public init = async (): Promise<void> => {
         this.app = express();
 
-        this.app.use(cookieParser());
+        // this.app.use(cookieParser());
 
         this.app.use(
             cors({
@@ -55,6 +54,7 @@ export default class Application {
             })
         );
 
+        /*
         this.app.post("/refresh_token", async (req, res) => {
             const token = req.cookies[COOKIE_NAME];
             const failedRefresh: failedRefresh = { ok: false, accessToken: "" };
@@ -84,7 +84,7 @@ export default class Application {
             sendRefreshToken(res, createRefreshToken(user));
 
             return res.send({ ok: true, accessToken: createAcessToken(user) });
-        });
+        }); */
 
         const apolloServer = new ApolloServer({
             schema: await buildSchema({
@@ -101,7 +101,11 @@ export default class Application {
                 validate: false,
             }),
             // special object accesible for all resolvers
-            context: ({ req, res }): Context => ({ em: this.orm.em, req, res }),
+            context: ({ req, res }): Context => ({
+                em: this.orm.em,
+                req,
+                res,
+            }),
             introspection: true,
             uploads: false,
         });

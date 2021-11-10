@@ -152,7 +152,7 @@ export class UserResolver {
     @Query(() => String)
     @UseMiddleware(isAuth)
     logedInTest(@Ctx() { payload }: Context) {
-        return `Hi, yout id is : ${payload!.userId}`;
+        return `Hi, your id is : ${payload!.userId}`;
     }
 
     @Query(() => UsersResponse)
