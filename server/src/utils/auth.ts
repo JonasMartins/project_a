@@ -1,5 +1,8 @@
 import { User } from "../entities/user.entity";
 import { sign } from "jsonwebtoken";
+import { Field, ObjectType } from "type-graphql";
+import { ErrorFieldHandler } from "./errorFieldHandler";
+
 export const createAcessToken = (user: User) => {
     return sign(
         {
@@ -24,3 +27,11 @@ export const createRefreshToken = (user: User) => {
         }
     );
 };
+
+@ObjectType()
+export class authUserResponse {
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => String, { nullable: true })
+    result?: string;
+}

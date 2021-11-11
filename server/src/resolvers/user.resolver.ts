@@ -15,7 +15,7 @@ import {
 import { COOKIE_NAME } from "../constants";
 import { User } from "../entities/user.entity";
 import { Context } from "../types";
-import { createAcessToken } from "../utils/auth";
+import { createAcessToken, authUserResponse } from "../utils/auth";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
@@ -149,10 +149,23 @@ export class UserResolver {
         return result;
     }
 
-    @Query(() => String)
+    @Query(() => authUserResponse)
     @UseMiddleware(isAuth)
-    logedInTest(@Ctx() { payload }: Context) {
-        return `Hi, your id is : ${payload!.userId}`;
+    logedInTest(@Ctx() { payload }: Context): authUserResponse {
+        if (!payload?.userId) {
+            return {
+                errors: genericError(
+                    "-",
+                    "logedInTest",
+                    __filename,
+                    "Not Authenticated"
+                ),
+            };
+        }
+
+        let result = JSON.stringify(payload);
+
+        return { result };
     }
 
     @Query(() => UsersResponse)

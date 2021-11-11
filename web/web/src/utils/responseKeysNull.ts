@@ -15,4 +15,6 @@ export const _keys = {
     Role: () => null,
     CommentsResponse: () => null,
     User: () => null,
+    authUserResponse: () => null,
+    ErrorFieldHandler: () => null,
 };

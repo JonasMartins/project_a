@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
     Box,
     useColorMode,
@@ -6,7 +6,6 @@ import {
     Flex,
     Link,
     IconButton,
-    ScaleFade,
     Tooltip,
 } from "@chakra-ui/react";
 import { SiCodesandbox } from "react-icons/si";
@@ -21,6 +20,7 @@ import { RiAdminLine } from "react-icons/ri";
 import { useUser } from "./../../helpers/hooks/useUser";
 import { GlobalContext } from "./../../context/globalContext";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import { useLogedInTestQuery } from "./../../generated/graphql";
 
 interface SideBarProps {}
 
@@ -28,6 +28,14 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
+
+    const [loginTest] = useLogedInTestQuery();
+
+    useEffect(() => {
+        if (loginTest?.fetching) {
+            return;
+        }
+    }, [loginTest.fetching]);
 
     const { expanded, _setExpanded } = useContext(GlobalContext);
     const [iconExpanded, setIconExpanded] = useState<Boolean>(expanded);
@@ -201,7 +209,9 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
             </Flex>
         );
     };
-    return (
+    const content = loginTest?.data?.logedInTest?.errors ? (
+        <></>
+    ) : (
         <Box
             h="100%"
             overflowY="hidden"
@@ -239,6 +249,8 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
             </Flex>
         </Box>
     );
+
+    return loginTest.fetching ? <></> : content;
 };
 
 export default SideBar;

@@ -262,7 +262,7 @@ export type Query = {
     getItemById: ItemResponse;
     getItensBacklog: ItensResponse;
     hello: Scalars["String"];
-    logedInTest: Scalars["String"];
+    logedInTest: AuthUserResponse;
     getAllUsers: UsersResponse;
     getUserById: UserResponse;
     getUserSettings: UserResponse;
@@ -484,6 +484,12 @@ export type UsersResponse = {
     errors?: Maybe<Array<ErrorFieldHandler>>;
     users?: Maybe<Array<User>>;
     total: Scalars["Float"];
+};
+
+export type AuthUserResponse = {
+    __typename?: "authUserResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    result?: Maybe<Scalars["String"]>;
 };
 
 export type TokenAndId = {
@@ -1024,10 +1030,21 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
 
 export type LogedInTestQueryVariables = Exact<{ [key: string]: never }>;
 
-export type LogedInTestQuery = { __typename?: "Query" } & Pick<
-    Query,
-    "logedInTest"
->;
+export type LogedInTestQuery = { __typename?: "Query" } & {
+    logedInTest: { __typename?: "authUserResponse" } & Pick<
+        AuthUserResponse,
+        "result"
+    > & {
+            errors?: Maybe<
+                Array<
+                    { __typename?: "ErrorFieldHandler" } & Pick<
+                        ErrorFieldHandler,
+                        "method" | "message" | "field"
+                    >
+                >
+            >;
+        };
+};
 
 export const CreateItemDocument = gql`
     mutation CreateItem(
@@ -1622,7 +1639,14 @@ export function useGetUserSettingsQuery(
 }
 export const LogedInTestDocument = gql`
     query LogedInTest {
-        logedInTest
+        logedInTest {
+            errors {
+                method
+                message
+                field
+            }
+            result
+        }
     }
 `;
 

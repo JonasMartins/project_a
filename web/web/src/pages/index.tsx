@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, useToast } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
@@ -6,26 +6,39 @@ import Footer from "./../components/rootComponents/Footer";
 import HomeNotifications from "../components/HomeNotifications";
 import { GlobalContext } from "./../context/globalContext";
 import SideBar from "../components/layout/SideBar";
-import { useUser } from "./../helpers/hooks/useUser";
 import { useLogedInTestQuery } from "../generated/graphql";
+import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+import Login from "./login";
+import { useRouter } from "next/dist/client/router";
+
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
     const [loginTest] = useLogedInTestQuery();
+    const toast = useToast();
+    const router = useRouter();
 
     const { expanded } = useContext(GlobalContext);
 
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
 
-    const user = useUser();
-
     useEffect(() => {
-        // executar esse metodo a tempo do campo authorization ?
+        if (loginTest?.fetching) {
+            return;
+        }
 
-        console.log("logged ? ", loginTest?.data?.logedInTest);
-
-        if (!user) return;
+        if (loginTest?.data?.logedInTest?.errors) {
+            toast({
+                title: "Not Authorized",
+                description: "Please Log in to access this page",
+                status: "error",
+                duration: 8000,
+                isClosable: true,
+                position: "bottom-right",
+            });
+            router.push("/login");
+        }
 
         if (expanded) {
             setPageWidth("20em");
@@ -36,7 +49,9 @@ const Index: React.FC<indexProps> = ({}) => {
         }
     }, [expanded, loginTest.fetching]);
 
-    const content = (
+    const content = loginTest?.data?.logedInTest?.errors ? (
+        <Login />
+    ) : (
         <>
             <Container>
                 <Navbar pageWidth={navBarWidth} />
@@ -58,7 +73,7 @@ const Index: React.FC<indexProps> = ({}) => {
         </>
     );
 
-    return content;
+    return loginTest.fetching ? <FullPageSpinner /> : content;
 };
 
 export default Index;

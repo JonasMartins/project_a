@@ -1,5 +1,11 @@
-import { Box, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
-import { useQuery } from "urql";
+import {
+    Box,
+    Flex,
+    Link,
+    Text,
+    useColorMode,
+    useToast,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useDrop } from "react-dnd";
 import { useRouter } from "next/router";
@@ -15,7 +21,9 @@ import {
     Item,
     ItemStatus,
     useGetProjectByIdQuery,
+    useLogedInTestQuery,
 } from "../../generated/graphql";
+import Login from "./../login";
 
 interface projectsProps {
     id: string;
@@ -29,6 +37,26 @@ type itemQuery = {
 >;
 
 const Project: React.FC<projectsProps> = ({}) => {
+    const [loginTest] = useLogedInTestQuery();
+    const toast = useToast();
+
+    useEffect(() => {
+        if (loginTest?.fetching) {
+            return;
+        }
+
+        if (loginTest?.data?.logedInTest?.errors) {
+            toast({
+                title: "Not Authorized",
+                description: "Please Log in to access this page",
+                status: "error",
+                duration: 8000,
+                isClosable: true,
+                position: "bottom-right",
+            });
+        }
+    }, [loginTest.fetching]);
+
     const router = useRouter();
 
     let previousItemStatus: string = "";
@@ -247,7 +275,9 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const loading = <FullPageSpinner />;
 
-    const content = (
+    const content = loginTest?.data?.logedInTest?.errors ? (
+        <Login />
+    ) : (
         <Container>
             <Navbar pageWidth={navBarWidth} />
             <SideBar />
@@ -387,7 +417,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             </Box>
         </Container>
     );
-    return fetching || !project ? loading : content;
+    return fetching || !project || loginTest.fetching ? loading : content;
 };
 
 export default Project;

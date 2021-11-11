@@ -10,6 +10,7 @@ import { authExchange } from "@urql/exchange-auth";
 import { _keys } from "./../utils/responseKeysNull";
 import {
     getAuth,
+    willAuthError,
     addAuthToOperation,
     didAuthError,
 } from "./../utils/auth/authOptions";
@@ -26,6 +27,7 @@ const client = createClient({
             keys: _keys,
         }),
         authExchange({
+            willAuthError,
             getAuth,
             addAuthToOperation,
             didAuthError,

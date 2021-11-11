@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
     useColorMode,
     Icon,
@@ -15,6 +15,7 @@ import {
     Flex,
     Image,
     useDisclosure,
+    useToast,
 } from "@chakra-ui/react";
 import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
@@ -28,13 +29,36 @@ import { BsGear, BsBook } from "react-icons/bs";
 import ModalAboutProject from "./../modal/ModalAboutProject";
 import { useUser } from "./../../helpers/hooks/useUser";
 import { getServerPathImage } from "./../../utils/handleServerImagePaths";
+import Login from "./../../pages/login";
+import FullPageSpinner from "./../rootComponents/FullPageSpinner";
 
+import { useLogedInTestQuery } from "./../../generated/graphql";
 interface NavbarProps {
     pageWidth?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
     const router = useRouter();
+    const [loginTest] = useLogedInTestQuery();
+    const toast = useToast();
+
+    useEffect(() => {
+        if (loginTest?.fetching) {
+            return;
+        }
+
+        if (loginTest?.data?.logedInTest?.errors) {
+            toast({
+                title: "Not Authorized",
+                description: "Please Log in to access this page",
+                status: "error",
+                duration: 8000,
+                isClosable: true,
+                position: "bottom-right",
+            });
+            router.push("/login");
+        }
+    }, [loginTest.fetching]);
 
     const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
 
@@ -55,7 +79,9 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         router.push("/login");
     };
 
-    const content = (
+    const content = loginTest?.data?.logedInTest?.errors ? (
+        <Login />
+    ) : (
         <Flex
             overflow="hidden"
             top="0"
@@ -89,7 +115,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
             <Flex justifyContent="flex-end">
                 <Menu>
                     <Box mr={2}>
-                        {user.picture ? (
+                        {user && user.picture ? (
                             <Image
                                 borderRadius="full"
                                 boxSize="40px"
@@ -97,7 +123,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                             />
                         ) : (
                             <Avatar
-                                name={user.name || "Foo Bar"}
+                                name={(user && user.name) || "Foo Bar"}
                                 size="40px"
                                 round={true}
                             />
@@ -174,7 +200,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         </Flex>
     );
 
-    return content;
+    return loginTest.fetching ? <FullPageSpinner /> : content;
 };
 
 export default Navbar;
