@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Box, Stack } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
 import {
@@ -11,7 +11,7 @@ import {
     Flex,
     Text,
 } from "@chakra-ui/react";
-import { useLoginMutation, useLogedInTestQuery } from "../generated/graphql";
+import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
 import { Container } from "./../components/Container";
@@ -31,13 +31,11 @@ const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
     const [{}, login] = useLoginMutation();
 
-    const [loginTest] = useLogedInTestQuery();
+    // const [loginTest] = useLogedInTestQuery();
 
     const { setIsLoading, loading } = useContext(GlobalContext);
 
-    useEffect(() => {
-        console.log("logged ? ", loginTest?.data?.logedInTest);
-    }, [loginTest?.data?.logedInTest]);
+    // useEffect(() => {}, [loginTest.fetching]);
 
     return (
         <Container>

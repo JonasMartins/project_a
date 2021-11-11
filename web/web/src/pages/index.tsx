@@ -5,11 +5,9 @@ import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
 import HomeNotifications from "../components/HomeNotifications";
 import { GlobalContext } from "./../context/globalContext";
-import Login from "./../pages/login";
 import SideBar from "../components/layout/SideBar";
 import { useUser } from "./../helpers/hooks/useUser";
 import { useLogedInTestQuery } from "../generated/graphql";
-
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
@@ -23,6 +21,8 @@ const Index: React.FC<indexProps> = ({}) => {
     const user = useUser();
 
     useEffect(() => {
+        // executar esse metodo a tempo do campo authorization ?
+
         console.log("logged ? ", loginTest?.data?.logedInTest);
 
         if (!user) return;
@@ -34,34 +34,29 @@ const Index: React.FC<indexProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [expanded, user.userId]);
+    }, [expanded, loginTest.fetching]);
 
-    const content =
-        user && user.userId ? (
-            <>
-                <Container>
-                    <Navbar pageWidth={navBarWidth} />
-                    <SideBar />
-                    <Flex
-                        alignSelf="normal"
-                        flexDir="column"
-                        flexGrow={1}
-                        mb="150px"
-                        ml={pageWidth}
-                        transition="0.3s"
-                    >
-                        <HomeNotifications />
-                    </Flex>
-                    <Box id="footer">
-                        <Footer />
-                    </Box>
-                </Container>
-            </>
-        ) : (
-            <>
-                <Login />
-            </>
-        );
+    const content = (
+        <>
+            <Container>
+                <Navbar pageWidth={navBarWidth} />
+                <SideBar />
+                <Flex
+                    alignSelf="normal"
+                    flexDir="column"
+                    flexGrow={1}
+                    mb="150px"
+                    ml={pageWidth}
+                    transition="0.3s"
+                >
+                    <HomeNotifications />
+                </Flex>
+                <Box id="footer">
+                    <Footer />
+                </Box>
+            </Container>
+        </>
+    );
 
     return content;
 };

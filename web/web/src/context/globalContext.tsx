@@ -12,6 +12,7 @@ const roleCode = {
 const GlobalProvider: React.FC<React.ReactNode> = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const [isLogged, setIsLogged] = useState(false);
     const [userId, setUserId] = useState("");
     const [userRole, setUserRole] = useState("");
     const [userName, setUserName] = useState("");
@@ -21,9 +22,13 @@ const GlobalProvider: React.FC<React.ReactNode> = ({ children }) => {
         setLoading(isLoading);
     };
 
+    const _setIsLogged = (isLogged: boolean): void => {
+        setIsLogged(isLogged);
+    };
+
     const _setExpanded = (isExpanded: boolean) => {
         setExpanded(isExpanded);
-    }
+    };
 
     const setCurrentUserRole = (currentUserRole: string) => {
         setUserRole(roleCode[currentUserRole]);
@@ -50,6 +55,8 @@ const GlobalProvider: React.FC<React.ReactNode> = ({ children }) => {
                 userName,
                 userRole,
                 expanded,
+                isLogged,
+                _setIsLogged,
                 _setExpanded,
                 setTheme,
                 setCurrentUserId,

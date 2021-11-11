@@ -6,6 +6,7 @@ import {
     Field,
     Ctx,
     Query,
+    UseMiddleware,
 } from "type-graphql";
 import { Item } from "../entities/item.entity";
 import { Sprint } from "../entities/sprint.entity";
@@ -15,6 +16,7 @@ import ItemValidator from "./../validators/item.validator";
 import { User } from "./../entities/user.entity";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { EntityManager } from "@mikro-orm/postgresql"; // or any other driver package
+import { isAuth } from "../utils/isAuth";
 
 @ObjectType()
 class ItemResponse {
@@ -249,6 +251,7 @@ export class ItemResolver {
      * @returns
      */
     @Query(() => ItensResponse)
+    @UseMiddleware(isAuth)
     async getItensBacklog(
         @Arg("limit", () => Number, { nullable: true }) limit: number,
         @Arg("offset", () => Number, { nullable: true }) offset: number,
