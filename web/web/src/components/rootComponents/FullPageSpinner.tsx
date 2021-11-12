@@ -1,11 +1,18 @@
 import React from "react";
-import { Container } from "../Container";
-import { Spinner, Box } from "@chakra-ui/react";
+import { Spinner, Box, Flex, useColorMode } from "@chakra-ui/react";
 interface SpinnerProps {}
 
 const FullPageSpinner: React.FC<SpinnerProps> = ({}) => {
+    const { colorMode } = useColorMode();
+    const bgColor = { light: "gray.50", dark: "gray.700" };
+    const color = { light: "black", dark: "white" };
+
     return (
-        <Container>
+        <Flex
+            direction="column"
+            bg={bgColor[colorMode]}
+            color={color[colorMode]}
+        >
             <Box
                 display="flex"
                 justifyContent="center"
@@ -14,7 +21,7 @@ const FullPageSpinner: React.FC<SpinnerProps> = ({}) => {
             >
                 <Spinner size="xl" />
             </Box>
-        </Container>
+        </Flex>
     );
 };
 export default FullPageSpinner;

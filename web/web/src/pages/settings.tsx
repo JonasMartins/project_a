@@ -17,13 +17,13 @@ import {
     useToast,
     Switch,
 } from "@chakra-ui/react";
-import Login from "./login";
 import Avatar from "react-avatar";
 import { Form, Formik, Field } from "formik";
 import {
-    useGetUserSettingsQuery,
-    useGetAllRolesQuery,
     GetAllRolesQuery,
+    useGetAllRolesQuery,
+    useLogedInTestQuery,
+    useGetUserSettingsQuery,
     useUpdateSeetingsUserMutation,
 } from "./../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -52,6 +52,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
     const toast = useToast();
     const router = useRouter();
+    const [loginTest] = useLogedInTestQuery();
 
     const [loading, setLoading] = useState(true);
     const [pageWidth, setPageWidth] = useState("3em");
@@ -70,13 +71,29 @@ const Settings: React.FC<settingsProps> = ({}) => {
         file: null,
     });
 
-    const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
-        {
-            variables: {
-                id: user.userId ? user.userId : "-1",
-            },
+    useEffect(() => {
+        if (loginTest?.fetching) {
+            return;
         }
-    );
+
+        if (loginTest?.data?.logedInTest?.errors) {
+            toast({
+                title: "Not Authorized",
+                description: "Please Log in to access this page",
+                status: "error",
+                duration: 8000,
+                isClosable: true,
+                position: "bottom-right",
+            });
+            router.push("/login");
+        }
+    }, [loginTest.fetching]);
+
+    const [{ data, fetching }, reexecuteQuery] = useGetUserSettingsQuery({
+        variables: {
+            id: user && user.userId ? user.userId : "-1",
+        },
+    });
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
 
@@ -137,7 +154,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         }));
     };
 
-    if (error) return <p>Oh no... {error.message}</p>;
+    // if (error) return <p>Oh no... {error.message}</p>;
 
     const content = loading ? (
         <FullPageSpinner />
@@ -444,7 +461,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         </Container>
     );
 
-    return user.userId ? content : <Login />;
+    return content;
 };
 
 export default Settings;

@@ -10,35 +10,31 @@ import {
     Image,
     Flex,
     Text,
+    useColorMode,
 } from "@chakra-ui/react";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
-import { Container } from "./../components/Container";
 import ButtonColorMode from "../components/ButtonColorMode";
 import { GlobalContext } from "./../context/globalContext";
 
 interface loginProps {}
 
-const roleCode = {
-    "001": "Developer Jr 1",
-    "002": "Developer Jr 2",
-    "003": "Tech Leader",
-    "999": "Admin",
-};
-
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
+    const { colorMode } = useColorMode();
+    const bgColor = { light: "gray.50", dark: "gray.700" };
+    const color = { light: "black", dark: "white" };
     const [{}, login] = useLoginMutation();
-
-    // const [loginTest] = useLogedInTestQuery();
 
     const { setIsLoading, loading } = useContext(GlobalContext);
 
-    // useEffect(() => {}, [loginTest.fetching]);
-
     return (
-        <Container>
+        <Flex
+            direction="column"
+            bg={bgColor[colorMode]}
+            color={color[colorMode]}
+        >
             <ButtonColorMode size="md" position="fixed" right="1em" top="1em" />
             <Box
                 display="flex"
@@ -62,24 +58,23 @@ const Login: React.FC<loginProps> = ({}) => {
                         onSubmit={async (values, { setErrors }) => {
                             const response = await login(values);
                             setIsLoading(true);
-                            setTimeout(() => {
-                                setIsLoading(false);
-                                if (response.data?.login.errors) {
-                                    setErrors(
-                                        toErrorMap(response.data.login.errors)
-                                    );
-                                } else if (
+
+                            if (response.data?.login.errors) {
+                                setErrors(
+                                    toErrorMap(response.data.login.errors)
+                                );
+                            } else if (
+                                response.data?.login.result.accessToken
+                            ) {
+                                localStorage.setItem(
+                                    "token",
                                     response.data?.login.result.accessToken
-                                ) {
-                                    localStorage.setItem(
-                                        "token",
-                                        response.data?.login.result.accessToken
-                                    );
-                                    setTimeout(() => {
-                                        router.push("/");
-                                    }, 500);
-                                }
-                            }, 400);
+                                );
+                                setTimeout(() => {
+                                    setIsLoading(false);
+                                    router.push("/");
+                                }, 500);
+                            }
                         }}
                     >
                         {(props) => (
@@ -146,7 +141,7 @@ const Login: React.FC<loginProps> = ({}) => {
                     </Formik>
                 </Box>
             </Box>
-        </Container>
+        </Flex>
     );
 };
 export default Login;

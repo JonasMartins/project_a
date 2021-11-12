@@ -1,64 +1,47 @@
-import React, { useContext, useEffect } from "react";
 import {
-    useColorMode,
-    Icon,
+    BellIcon,
+    DragHandleIcon,
+    MoonIcon,
+    SettingsIcon,
+    SunIcon,
+} from "@chakra-ui/icons";
+import {
     Box,
+    Flex,
+    Icon,
+    IconButton,
+    Image,
+    Link,
     Menu,
     MenuButton,
-    MenuItem,
-    MenuList,
-    IconButton,
     MenuDivider,
     MenuGroup,
-    Link,
+    MenuItem,
+    MenuList,
     Text,
-    Flex,
-    Image,
+    useColorMode,
     useDisclosure,
-    useToast,
 } from "@chakra-ui/react";
-import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
-import NextLink from "next/link";
 import { useRouter } from "next/dist/client/router";
-import { GlobalContext } from "./../../context/globalContext";
+import NextLink from "next/link";
+import React, { useContext } from "react";
 import Avatar from "react-avatar";
-import { SunIcon, MoonIcon } from "@chakra-ui/icons";
-import { SiCodesandbox } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
-import { BsGear, BsBook } from "react-icons/bs";
-import ModalAboutProject from "./../modal/ModalAboutProject";
+import { BsBook, BsGear } from "react-icons/bs";
+import { SiCodesandbox } from "react-icons/si";
+import { GlobalContext } from "./../../context/globalContext";
 import { useUser } from "./../../helpers/hooks/useUser";
 import { getServerPathImage } from "./../../utils/handleServerImagePaths";
-import Login from "./../../pages/login";
-import FullPageSpinner from "./../rootComponents/FullPageSpinner";
+import ModalAboutProject from "./../modal/ModalAboutProject";
 
-import { useLogedInTestQuery } from "./../../generated/graphql";
 interface NavbarProps {
     pageWidth?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
     const router = useRouter();
-    const [loginTest] = useLogedInTestQuery();
-    const toast = useToast();
 
-    useEffect(() => {
-        if (loginTest?.fetching) {
-            return;
-        }
-
-        if (loginTest?.data?.logedInTest?.errors) {
-            toast({
-                title: "Not Authorized",
-                description: "Please Log in to access this page",
-                status: "error",
-                duration: 8000,
-                isClosable: true,
-                position: "bottom-right",
-            });
-            router.push("/login");
-        }
-    }, [loginTest.fetching]);
+    // reexecuteQuery({ requestPolicy: "network-only" });
 
     const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
 
@@ -79,9 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         router.push("/login");
     };
 
-    const content = loginTest?.data?.logedInTest?.errors ? (
-        <Login />
-    ) : (
+    const content = (
         <Flex
             overflow="hidden"
             top="0"
@@ -200,7 +181,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         </Flex>
     );
 
-    return loginTest.fetching ? <FullPageSpinner /> : content;
+    return content;
 };
 
 export default Navbar;
