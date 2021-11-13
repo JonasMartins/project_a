@@ -1,29 +1,20 @@
-import {
-    Box,
-    Flex,
-    Link,
-    Text,
-    useColorMode,
-    useToast,
-} from "@chakra-ui/react";
+import { Box, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useDrop } from "react-dnd";
 import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import { useDrop } from "react-dnd";
 import { Container } from "../../components/Container";
-import SideBar from "../../components/layout/SideBar";
-import Navbar from "../../components/rootComponents/Navbar";
-import Footer from "../../components/rootComponents/Footer";
-import React, { useEffect, useState, useContext } from "react";
-import { GlobalContext } from "./../../context/globalContext";
 import ItemSprintBox from "../../components/layout/ItemSprintBox";
+import SideBar from "../../components/layout/SideBar";
+import Footer from "../../components/rootComponents/Footer";
 import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
+import Navbar from "../../components/rootComponents/Navbar";
 import {
     Item,
     ItemStatus,
     useGetProjectByIdQuery,
-    useLogedInTestQuery,
 } from "../../generated/graphql";
-import Login from "./../login";
+import { GlobalContext } from "./../../context/globalContext";
 
 interface projectsProps {
     id: string;
@@ -37,26 +28,6 @@ type itemQuery = {
 >;
 
 const Project: React.FC<projectsProps> = ({}) => {
-    const [loginTest] = useLogedInTestQuery();
-    const toast = useToast();
-
-    useEffect(() => {
-        if (loginTest?.fetching) {
-            return;
-        }
-
-        if (loginTest?.data?.logedInTest?.errors) {
-            toast({
-                title: "Not Authorized",
-                description: "Please Log in to access this page",
-                status: "error",
-                duration: 8000,
-                isClosable: true,
-                position: "bottom-right",
-            });
-        }
-    }, [loginTest.fetching]);
-
     const router = useRouter();
 
     let previousItemStatus: string = "";
@@ -77,7 +48,11 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const { project } = router.query;
 
-    let url = project && typeof project === "string" ? project : project[0];
+    let url = "";
+
+    if (project && project !== undefined) {
+        url = typeof project === "string" ? project : project[0];
+    }
 
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
@@ -278,9 +253,7 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const loading = <FullPageSpinner />;
 
-    const content = loginTest?.data?.logedInTest?.errors ? (
-        <Login />
-    ) : (
+    const content = (
         <Container>
             <Navbar pageWidth={navBarWidth} />
             <SideBar />
@@ -420,7 +393,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             </Box>
         </Container>
     );
-    return fetching || !project || loginTest.fetching ? loading : content;
+    return fetching || !project ? loading : content;
 };
 
 export default Project;

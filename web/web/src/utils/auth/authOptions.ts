@@ -1,5 +1,11 @@
 import { makeOperation } from "@urql/core";
 
+export const routesWithRoles = [
+    {
+        route: "manage",
+        roles: ["admin"],
+    },
+];
 export const didAuthError = ({ error }) => {
     return error.graphQLErrors.some((e) => e.extensions?.code === "FORBIDDEN");
 };

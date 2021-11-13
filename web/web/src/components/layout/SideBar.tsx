@@ -17,7 +17,6 @@ import {
 } from "react-icons/ai";
 import NextLink from "next/link";
 import { RiAdminLine } from "react-icons/ri";
-import { useUser } from "./../../helpers/hooks/useUser";
 import { GlobalContext } from "./../../context/globalContext";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 
@@ -30,8 +29,6 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
 
     const { expanded, _setExpanded } = useContext(GlobalContext);
     const [iconExpanded, setIconExpanded] = useState<Boolean>(expanded);
-
-    const user = useUser();
 
     const contractedContent = () => {
         return (
@@ -108,28 +105,23 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                         </NextLink>
                     </Flex>
                 </Tooltip>
-
-                {user && user.role === "Admin" ? (
-                    <Tooltip
-                        hasArrow
-                        aria-label="Manage"
-                        label="Manage"
-                        colorScheme="withe"
-                        placement="right"
-                    >
-                        <Flex mb={5} alignItems="center">
-                            <NextLink href="/manage">
-                                <Link textStyle="bold">
-                                    <Flex alignItems="center">
-                                        <RiAdminLine size="20px" />
-                                    </Flex>
-                                </Link>
-                            </NextLink>
-                        </Flex>
-                    </Tooltip>
-                ) : (
-                    <></>
-                )}
+                <Tooltip
+                    hasArrow
+                    aria-label="Manage"
+                    label="Manage"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/manage">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <RiAdminLine size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Tooltip>
             </Flex>
         );
     };
@@ -182,21 +174,17 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                     </NextLink>
                 </Flex>
 
-                {user && user.role === "Admin" ? (
-                    <Flex mb={5} alignItems="center">
-                        <NextLink href="/manage">
-                            <Link textStyle="bold">
-                                <Flex alignItems="center">
-                                    <RiAdminLine size="35px" />
+                <Flex mb={5} alignItems="center">
+                    <NextLink href="/manage">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <RiAdminLine size="35px" />
 
-                                    <Text ml={2}>Manage</Text>
-                                </Flex>
-                            </Link>
-                        </NextLink>
-                    </Flex>
-                ) : (
-                    <></>
-                )}
+                                <Text ml={2}>Manage</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
+                </Flex>
             </Flex>
         );
     };

@@ -40,3 +40,7 @@ export const compareTwoStrings = (str1: string, str2: string): boolean => {
         str2.toLocaleLowerCase().replace(/ /g, "")
     );
 };
+
+export const getMainPageFromFullPath = (path: string): string => {
+    return path.split("/")[1];
+};
