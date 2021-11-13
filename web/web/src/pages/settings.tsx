@@ -22,7 +22,6 @@ import { Form, Formik, Field } from "formik";
 import {
     GetAllRolesQuery,
     useGetAllRolesQuery,
-    useLogedInTestQuery,
     useGetUserSettingsQuery,
     useUpdateSeetingsUserMutation,
 } from "./../generated/graphql";
@@ -52,7 +51,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
     const toast = useToast();
     const router = useRouter();
-    const [loginTest] = useLogedInTestQuery();
 
     const [loading, setLoading] = useState(true);
     const [pageWidth, setPageWidth] = useState("3em");
@@ -71,28 +69,11 @@ const Settings: React.FC<settingsProps> = ({}) => {
         file: null,
     });
 
-    useEffect(() => {
-        if (loginTest?.fetching) {
-            return;
-        }
-
-        if (loginTest?.data?.logedInTest?.errors) {
-            toast({
-                title: "Not Authorized",
-                description: "Please Log in to access this page",
-                status: "error",
-                duration: 8000,
-                isClosable: true,
-                position: "bottom-right",
-            });
-            router.push("/login");
-        }
-    }, [loginTest.fetching]);
-
     const [{ data, fetching }, reexecuteQuery] = useGetUserSettingsQuery({
         variables: {
             id: user && user.userId ? user.userId : "-1",
         },
+        pause: !user || !user.userId,
     });
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
@@ -228,8 +209,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values, { setErrors }) => {
-                            // console.log("type ", typeof values.file);
-
                             const response = await updateSeetingsUser({
                                 id: values.id,
                                 name: values.name,

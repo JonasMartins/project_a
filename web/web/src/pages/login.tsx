@@ -63,6 +63,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                 setErrors(
                                     toErrorMap(response.data.login.errors)
                                 );
+                                setIsLoading(false);
                             } else if (
                                 response.data?.login.result.accessToken
                             ) {

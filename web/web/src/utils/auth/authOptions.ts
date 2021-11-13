@@ -11,12 +11,9 @@ export const willAuthError = ({ authState }) => {
 
 export const getAuth = async ({ authState }) => {
     if (typeof window !== "undefined") {
-        console.log("token from authOptions ", localStorage.getItem("token"));
-
         if (!authState) {
             const token = localStorage.getItem("token");
             if (token) {
-                console.log("tokennnn ", token);
                 return { token };
             }
             return null;

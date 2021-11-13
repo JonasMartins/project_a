@@ -4,7 +4,6 @@ import { verify } from "jsonwebtoken";
 
 export const isAuth: MiddlewareFn<Context> = async ({ context }, next) => {
     const authorization = context.req.headers["authorization"];
-    console.log("Auth from isAuth: ", authorization);
     if (!authorization) {
         //throw new Error("Authentication error");
         return next();

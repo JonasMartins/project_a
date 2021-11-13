@@ -14,25 +14,35 @@ export const Container: React.FC<ContainerProps> = ({ children }) => {
 
     const toast = useToast();
     const router = useRouter();
-    const [loginTest] = useLogedInTestQuery();
+    const [loginTest, reexecuteQuery] = useLogedInTestQuery();
 
     useEffect(() => {
-        if (loginTest?.fetching) {
-            return;
-        }
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+        if (loginTest?.fetching) return;
+
+        handleRedirect();
+    }, [loginTest.fetching]);
+
+    const handleRedirect = () => {
+        if (loginTest.fetching) return;
 
         if (loginTest?.data?.logedInTest?.errors) {
-            toast({
-                title: "Not Authorized",
-                description: "Please Log in to access this page",
-                status: "error",
-                duration: 8000,
-                isClosable: true,
-                position: "bottom-right",
-            });
-            router.push("/login");
+            if (
+                typeof window !== "undefined" &&
+                !localStorage.getItem("token")
+            ) {
+                toast({
+                    title: "Not Authorized",
+                    description: "Please Log in to access this page",
+                    status: "error",
+                    duration: 8000,
+                    isClosable: true,
+                    position: "bottom-right",
+                });
+                router.push("/login");
+            }
         }
-    }, [loginTest.fetching]);
+    };
 
     const content = loginTest.fetching ? (
         <FullPageSpinner />

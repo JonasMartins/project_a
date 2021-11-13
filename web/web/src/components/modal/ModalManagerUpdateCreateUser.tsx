@@ -1,4 +1,12 @@
 import {
+    Button,
+    Checkbox,
+    Flex,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Image,
+    Input,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -6,35 +14,28 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
-    Text,
-    Flex,
-    useColorMode,
-    useToast,
-    Button,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    Input,
     Select,
     Stack,
-    Checkbox,
-    Image,
+    Text,
+    useColorMode,
     useDisclosure,
+    useToast,
 } from "@chakra-ui/react";
-import { Form, Formik, Field } from "formik";
-import { userManageInfo } from "../../helpers/users/userFunctonHelpers";
+import { Field, Form, Formik } from "formik";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
-    useUpdateSeetingsUserMutation,
     GetAllRolesQuery,
     useCreateUserMutation,
+    useUpdateSeetingsUserMutation,
 } from "../../generated/graphql";
-import React, { useState, ChangeEvent, useEffect } from "react";
-import { toErrorMap, definedErrorMap } from "../../utils/toErrorMap";
+import {
+    generateRandomPassword,
+    userManageInfo,
+} from "../../helpers/users/userFunctonHelpers";
 import { getServerPathImage } from "../../utils/handleServerImagePaths";
-import { generateRandomPassword } from "../../helpers/users/userFunctonHelpers";
-import ModalCopyNewUsersPassword from "./ModalCopyNewUsersPassword";
+import { definedErrorMap } from "../../utils/toErrorMap";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
-import { error } from "console";
+import ModalCopyNewUsersPassword from "./ModalCopyNewUsersPassword";
 
 interface ModalManagerUpdateCreateUserProps {
     onClose: () => void;
@@ -111,6 +112,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
     };
 
     useEffect(() => {
+        console.log("user arrived: ", user?.user?.name);
         if (!user) {
             setUserInfo((prevUser) => ({
                 ...prevUser,
@@ -122,17 +124,17 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                 picture: "",
             }));
         } else {
-            if (!userInfo.name) {
-                setUserInfo((prevUser) => ({
-                    ...prevUser,
-                    id: user?.user?.id,
-                    name: user?.user?.name,
-                    email: user?.user?.email,
-                    role_id: user?.user?.role?.id,
-                    active: user?.user?.active ? "active" : "",
-                    picture: user?.user?.picture,
-                }));
-            }
+            // if (!userInfo.name) {
+            setUserInfo((prevUser) => ({
+                ...prevUser,
+                id: user?.user?.id,
+                name: user?.user?.name,
+                email: user?.user?.email,
+                role_id: user?.user?.role?.id,
+                active: user?.user?.active ? "active" : "",
+                picture: user?.user?.picture,
+            }));
+            // }
         }
     }, [user, hasSubmit]);
 

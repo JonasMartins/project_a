@@ -1,5 +1,4 @@
-import { Box, Flex, useToast } from "@chakra-ui/react";
-import { useRouter } from "next/dist/client/router";
+import { Box, Flex } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import HomeNotifications from "../components/HomeNotifications";
 import SideBar from "../components/layout/SideBar";

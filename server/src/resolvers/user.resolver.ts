@@ -152,8 +152,6 @@ export class UserResolver {
     @Query(() => authUserResponse)
     @UseMiddleware(isAuth)
     logedInTest(@Ctx() { payload }: Context): authUserResponse {
-        console.log("called logedIn Test!, payload: ", payload);
-
         if (!payload?.userId) {
             return {
                 errors: genericError(
@@ -412,8 +410,6 @@ export class UserResolver {
             userRoleCode: user.role.code,
         };
 
-        console.log("token resolver", result.accessToken);
-
         return {
             result,
         };
@@ -551,7 +547,6 @@ export class UserResolver {
             if (result.path) {
                 user.picture = result.path;
             }
-            console.log("picture: ", user.picture);
         }
 
         try {

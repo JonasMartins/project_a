@@ -77,11 +77,14 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const { project } = router.query;
 
+    let url = project && typeof project === "string" ? project : project[0];
+
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
-            id: project && typeof project === "string" ? project : "-1",
+            // id: project && typeof project === "string" ? project : "-1",
+            id: url,
         },
-        pause: true,
+        pause: !project,
     });
 
     const [{ canDropPending }, dropRefPending] = useDrop({
