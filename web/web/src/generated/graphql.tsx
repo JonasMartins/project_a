@@ -961,6 +961,27 @@ export type GetProjectsQuery = { __typename?: "Query" } & {
     >;
 };
 
+export type GetSprintsQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
+}>;
+
+export type GetSprintsQuery = { __typename?: "Query" } & {
+    getSprints?: Maybe<
+        Array<
+            { __typename?: "Sprint" } & Pick<
+                Sprint,
+                "id" | "description" | "code" | "length" | "final" | "active"
+            > & {
+                    project: { __typename?: "Project" } & Pick<
+                        Project,
+                        "id" | "name"
+                    >;
+                }
+        >
+    >;
+};
+
 export type GetUserByIdQueryVariables = Exact<{
     id: Scalars["String"];
 }>;
@@ -1557,6 +1578,31 @@ export function useGetProjectsQuery(
 ) {
     return Urql.useQuery<GetProjectsQuery>({
         query: GetProjectsDocument,
+        ...options,
+    });
+}
+export const GetSprintsDocument = gql`
+    query getSprints($limit: Float, $active: Boolean!) {
+        getSprints(active: $active, limit: $limit) {
+            id
+            description
+            code
+            length
+            final
+            active
+            project {
+                id
+                name
+            }
+        }
+    }
+`;
+
+export function useGetSprintsQuery(
+    options: Omit<Urql.UseQueryArgs<GetSprintsQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetSprintsQuery>({
+        query: GetSprintsDocument,
         ...options,
     });
 }

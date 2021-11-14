@@ -8,7 +8,6 @@ import {
     IconButton,
     Tooltip,
 } from "@chakra-ui/react";
-import { SiCodesandbox } from "react-icons/si";
 import {
     AiOutlineApartment,
     AiOutlineOrderedList,
@@ -22,7 +21,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 
 interface SideBarProps {}
 
-const SideBar: React.FC<SideBarProps> = ({}) => {
+const SideBar: React.FC<SideBarProps> = () => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
@@ -40,9 +39,6 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                 overflowX="hidden"
                 transition="0.5s"
             >
-                <Flex mb={5} alignItems="center">
-                    <SiCodesandbox size="20px" />
-                </Flex>
                 <Tooltip
                     hasArrow
                     aria-label="Home"
@@ -68,7 +64,13 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                     placement="right"
                 >
                     <Flex mb={5} alignItems="center">
-                        <AiOutlineApartment size="20px" />
+                        <NextLink href="/sprints">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <AiOutlineApartment size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
                     </Flex>
                 </Tooltip>
                 <Tooltip
@@ -137,9 +139,6 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                 transition="0.5s"
             >
                 <Flex mb={5} alignItems="center">
-                    <SiCodesandbox size="35px" />
-                </Flex>
-                <Flex mb={5} alignItems="center">
                     <NextLink href="/">
                         <Link textStyle="bold">
                             <Flex alignItems="center">
@@ -150,8 +149,14 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                     </NextLink>
                 </Flex>
                 <Flex mb={5} alignItems="center">
-                    <AiOutlineApartment size="35px" />
-                    <Text ml={2}>Sprints</Text>
+                    <NextLink href="/sprints">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <AiOutlineApartment size="35px" />
+                                <Text ml={2}>Sprints</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
                 </Flex>
                 <Flex mb={5} alignItems="center">
                     <NextLink href="/backlog">
