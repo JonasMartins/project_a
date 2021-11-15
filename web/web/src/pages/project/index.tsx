@@ -22,11 +22,21 @@ import Footer from "./../../components/rootComponents/Footer";
 import { GlobalContext } from "./../../context/globalContext";
 import Navbar from "./../../components/rootComponents/Navbar";
 import React, { useEffect, useState, useContext } from "react";
-import { useGetProjectsQuery } from "./../../generated/graphql";
+import {
+    useGetProjectsQuery,
+    Project as Project_Type,
+} from "./../../generated/graphql";
 import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import { GrAdd } from "react-icons/gr";
 import ModalCreateUpdateProject from "./../../components/modal/ModalCreateUpdateProject";
 import { AiFillEdit } from "react-icons/ai";
+type projectType = {
+    project: { __typename?: "Project" } & Pick<
+        Project_Type,
+        "id" | "name" | "createdAt" | "description"
+    >;
+};
+
 interface projectsProps {}
 
 type manageContext = "update" | "create";
@@ -38,10 +48,17 @@ const Project: React.FC<projectsProps> = ({}) => {
         variables: {
             limit: 5,
         },
-        pause: true,
     });
 
     const [context, setContext] = useState<manageContext>("update");
+    const [countUpdate, setCountUpdate] = useState(0);
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
+
+    const [selectedProject, setSelectedProject] = useState<projectType | null>(
+        null
+    );
 
     const modalCreateUpdateProject = useDisclosure();
 
@@ -61,8 +78,8 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-        reexecuteQuery({ requestPolicy: "cache-first" });
-    }, [fetching, expanded, reexecuteQuery]);
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+    }, [fetching, expanded, reexecuteQuery, countUpdate]);
 
     if (error) return <p>Oh no... {error.message}</p>;
 
@@ -112,6 +129,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                                 onClick={() => {
                                     setContext("create");
                                     customOnOpenCreateUpdateProject();
+                                    setSelectedProject(null);
                                 }}
                             />
                         </Tooltip>
@@ -183,6 +201,9 @@ const Project: React.FC<projectsProps> = ({}) => {
                                                                 "update"
                                                             );
                                                             customOnOpenCreateUpdateProject();
+                                                            setSelectedProject({
+                                                                project,
+                                                            });
                                                         }}
                                                     />
                                                 </Tooltip>
@@ -203,7 +224,10 @@ const Project: React.FC<projectsProps> = ({}) => {
                 </Box>
                 <ModalCreateUpdateProject
                     context={context}
+                    project={selectedProject}
                     isOpen={modalCreateUpdateProject.isOpen}
+                    countUpdate={countUpdate}
+                    updateCallback={updatedCallback}
                     onClose={modalCreateUpdateProject.onClose}
                 />
             </Container>

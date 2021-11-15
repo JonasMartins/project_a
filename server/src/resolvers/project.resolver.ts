@@ -48,6 +48,61 @@ export class ProjectResolver {
 
         return { project };
     }
+    @Mutation(() => ProjectResponse)
+    async updateProject(
+        @Arg("id", () => String) id: string,
+        @Arg("name", () => String) name: string,
+        @Arg("description", () => String) description: string,
+        @Ctx() { em, req }: Context
+    ): Promise<ProjectResponse> {
+        console.log("req ", req);
+        if (description.length <= 2) {
+            return {
+                errors: [
+                    {
+                        field: "description",
+                        message:
+                            "A project description must have length greater than 2.",
+                        method: `Method: updateProject, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        const project = await em.findOne(Project, { id });
+
+        if (!project) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: `Could not found the project with id: ${id}`,
+                        method: `Method: updateProject, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        project.name = name;
+        project.description = description;
+
+        try {
+            await em.persistAndFlush(project);
+        } catch (e) {
+            return {
+                errors: [
+                    {
+                        field: "-",
+                        message: `${e.message}`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        return { project };
+    }
+
     @Query(() => [Project], { nullable: true })
     async getProjects(
         @Arg("limit", () => Number, { nullable: true }) limit: number,

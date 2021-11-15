@@ -174,6 +174,7 @@ export type Mutation = {
     createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
     createProject: ProjectResponse;
+    updateProject: ProjectResponse;
     createComment: CommentResponse;
 };
 
@@ -225,6 +226,12 @@ export type MutationCreateSprintArgs = {
 
 export type MutationCreateProjectArgs = {
     options: ProjectValidator;
+};
+
+export type MutationUpdateProjectArgs = {
+    description: Scalars["String"];
+    name: Scalars["String"];
+    id: Scalars["String"];
 };
 
 export type MutationCreateCommentArgs = {
@@ -536,6 +543,29 @@ export type CreateItemMutation = { __typename?: "Mutation" } & {
     };
 };
 
+export type CreateProjectMutationVariables = Exact<{
+    options: ProjectValidator;
+}>;
+
+export type CreateProjectMutation = { __typename?: "Mutation" } & {
+    createProject: { __typename?: "ProjectResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        project?: Maybe<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "description"
+            >
+        >;
+    };
+};
+
 export type CreateUserMutationVariables = Exact<{
     name: Scalars["String"];
     email: Scalars["String"];
@@ -591,6 +621,31 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
     Mutation,
     "logout"
 >;
+
+export type UpdateProjectMutationVariables = Exact<{
+    id: Scalars["String"];
+    name: Scalars["String"];
+    description: Scalars["String"];
+}>;
+
+export type UpdateProjectMutation = { __typename?: "Mutation" } & {
+    updateProject: { __typename?: "ProjectResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        project?: Maybe<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "description"
+            >
+        >;
+    };
+};
 
 export type UpdateSeetingsUserMutationVariables = Exact<{
     id: Scalars["String"];
@@ -1112,6 +1167,29 @@ export function useCreateItemMutation() {
         CreateItemDocument
     );
 }
+export const CreateProjectDocument = gql`
+    mutation createProject($options: ProjectValidator!) {
+        createProject(options: $options) {
+            errors {
+                method
+                message
+                field
+            }
+            project {
+                id
+                name
+                description
+            }
+        }
+    }
+`;
+
+export function useCreateProjectMutation() {
+    return Urql.useMutation<
+        CreateProjectMutation,
+        CreateProjectMutationVariables
+    >(CreateProjectDocument);
+}
 export const CreateUserDocument = gql`
     mutation CreateUser(
         $name: String!
@@ -1179,6 +1257,33 @@ export const Document = gql`
 
 export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
+}
+export const UpdateProjectDocument = gql`
+    mutation UpdateProject(
+        $id: String!
+        $name: String!
+        $description: String!
+    ) {
+        updateProject(id: $id, name: $name, description: $description) {
+            errors {
+                method
+                message
+                field
+            }
+            project {
+                id
+                name
+                description
+            }
+        }
+    }
+`;
+
+export function useUpdateProjectMutation() {
+    return Urql.useMutation<
+        UpdateProjectMutation,
+        UpdateProjectMutationVariables
+    >(UpdateProjectDocument);
 }
 export const UpdateSeetingsUserDocument = gql`
     mutation UpdateSeetingsUser(

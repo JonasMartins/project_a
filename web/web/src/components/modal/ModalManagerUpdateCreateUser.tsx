@@ -112,7 +112,6 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
     };
 
     useEffect(() => {
-        console.log("user arrived: ", user?.user?.name);
         if (!user) {
             setUserInfo((prevUser) => ({
                 ...prevUser,
@@ -198,8 +197,6 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                             ?.errors
                                     );
 
-                                    console.log("result ", result);
-
                                     setCustonErrors((prevErrors) => ({
                                         ...prevErrors,
                                         [result[0]["field"]]:
@@ -239,8 +236,6 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                                     let result = definedErrorMap(
                                         response.data?.createUser?.errors
                                     );
-
-                                    console.log("result ", result);
 
                                     setCustonErrors((prevErrors) => ({
                                         ...prevErrors,

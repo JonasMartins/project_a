@@ -1,0 +1,14 @@
+mutation createProject($options: ProjectValidator!) {
+    createProject(options: $options) {
+        errors {
+            method
+            message
+            field
+        }
+        project {
+            id
+            name
+            description
+        }
+    }
+}
