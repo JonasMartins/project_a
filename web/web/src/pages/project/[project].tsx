@@ -226,7 +226,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPageWidth("20em");
             setNavBarWidth("16em");
         } else {
-            setPageWidth("3.5em");
+            setPageWidth("3em");
             setNavBarWidth("50px");
         }
 
@@ -300,6 +300,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             <Flex
                 mt="1em"
                 mb="1em"
+                p={2}
                 ml={pageWidth}
                 overflowX="hidden"
                 transition="0.3s"
@@ -322,7 +323,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                         boxShadow="lg"
                         flexDir="column"
                         p={3}
-                        m="2em 2em 20em 0"
+                        m="2em 2em 20em 2em"
                         bg={bgColor[colorMode]}
                         color={color[colorMode]}
                         ref={dropRefPending}
@@ -384,7 +385,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                 <Flex alignSelf="center" mb={"150px"}>
                     <Text fontSize="2xl">
                         {`The "${data?.getProjectById?.project?.name}" project doesn't have an active sprint, please manege
-                        one at Backlog`}
+                        one at Sprtins`}
                     </Text>
                 </Flex>
             )}

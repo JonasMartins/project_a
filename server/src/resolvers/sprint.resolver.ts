@@ -29,7 +29,6 @@ class SprintResponse {
 
 @Resolver()
 export class SprintResolver {
- 
     @Mutation(() => SprintResponse)
     async createSprint(
         @Arg("options") options: SprintValidator,
@@ -124,6 +123,8 @@ export class SprintResolver {
             { active: active },
             { limit: max }
         );
+
+        await em.populate(sprints, ["project"]);
 
         return sprints;
     }

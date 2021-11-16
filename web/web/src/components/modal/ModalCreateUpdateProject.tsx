@@ -64,7 +64,6 @@ const ModalCreateUpdateProject: React.FC<ModalCreateUpdateProjectProps> = ({
     const { colorMode } = useColorMode();
     const color = { light: "black", dark: "white" };
     const toast = useToast();
-
     const [loading, setLoading] = useState(false);
     const [hasSubmit, setHasSubmit] = useState(0);
     const [{}, updateProject] = useUpdateProjectMutation();

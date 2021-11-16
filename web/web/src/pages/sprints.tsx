@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Footer from "./../components/rootComponents/Footer";
 import { Container } from "../components/Container";
 import Navbar from "../components/rootComponents/Navbar";
 import SideBar from "../components/layout/SideBar";
@@ -21,16 +22,18 @@ import { GlobalContext } from "../context/globalContext";
 import { useGetSprintsQuery } from "./../generated/graphql";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { GrAdd } from "react-icons/gr";
+import { AiFillEdit } from "react-icons/ai";
 
 interface SprintProps {}
+type manageContext = "update" | "create";
 
 const Sprint: React.FC<SprintProps> = () => {
     const { expanded } = useContext(GlobalContext);
     const [navBarWidth, setNavBarWidth] = useState("0px");
-
+    const [context, setContext] = useState<manageContext>("update");
     const [pageWidth, setPageWidth] = useState("3em");
 
-    const [sprints] = useGetSprintsQuery({
+    const [sprints, reexecuteQuery] = useGetSprintsQuery({
         variables: {
             active: true,
             limit: 5,
@@ -45,7 +48,9 @@ const Sprint: React.FC<SprintProps> = () => {
             setPageWidth("3em");
             setNavBarWidth("0px");
         }
-    }, [expanded]);
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+        console.log("Sprint ", sprints?.data?.getSprints);
+    }, [expanded, sprints.fetching]);
 
     const content = sprints.fetching ? (
         <FullPageSpinner />
@@ -123,6 +128,7 @@ const Sprint: React.FC<SprintProps> = () => {
                                 <Th>Length</Th>
                                 <Th>End</Th>
                                 <Th>Active?</Th>
+                                <Th>Edit</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -167,12 +173,30 @@ const Sprint: React.FC<SprintProps> = () => {
                                                 {sprint.active ? "Yes" : "No"}
                                             </Text>
                                         </Td>
+                                        <Tooltip
+                                            hasArrow
+                                            aria-label="Edit sprint"
+                                            label="Edit sprint"
+                                            colorScheme="withe"
+                                        >
+                                            <IconButton
+                                                isRound={true}
+                                                aria-label="Edit sprint"
+                                                variant="ghost"
+                                                mr={1}
+                                                icon={<AiFillEdit />}
+                                                onClick={() => {
+                                                    setContext("update");
+                                                }}
+                                            />
+                                        </Tooltip>
                                     </Tr>
                                 ))}
                         </Tbody>
                     </Table>
                 </Flex>
             </Flex>
+            <Footer />
         </Container>
     );
 
