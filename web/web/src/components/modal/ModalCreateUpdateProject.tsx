@@ -23,26 +23,14 @@ import { Field, Form, Formik } from "formik";
 import FlexSpinner from "../rootComponents/FlexSpinner";
 import { definedErrorMap } from "../../utils/toErrorMap";
 import {
-    Project,
     useCreateProjectMutation,
     useUpdateProjectMutation,
 } from "./../../generated/graphql";
-type projectType = {
-    project: { __typename?: "Project" } & Pick<
-        Project,
-        "id" | "name" | "createdAt" | "description"
-    >;
-};
-
-interface projectInfo {
-    id: string;
-    name: string;
-    description: string;
-}
-interface customErrors {
-    name: string | null;
-    description: string | null;
-}
+import {
+    projectType,
+    projectInfo,
+    customProjectErrors,
+} from "./../../utils/generalGroupTypes";
 
 interface ModalCreateUpdateProjectProps {
     onClose: () => void;
@@ -74,7 +62,7 @@ const ModalCreateUpdateProject: React.FC<ModalCreateUpdateProjectProps> = ({
         name: project?.project?.name,
         description: project?.project?.name,
     });
-    const [customErrors, setCustonErrors] = useState<customErrors>({
+    const [customErrors, setCustonErrors] = useState<customProjectErrors>({
         name: "",
         description: "",
     });

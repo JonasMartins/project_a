@@ -16,6 +16,8 @@ import {
     Tr,
     Tooltip,
     IconButton,
+    Box,
+    useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { GlobalContext } from "../context/globalContext";
@@ -23,6 +25,8 @@ import { useGetSprintsQuery } from "./../generated/graphql";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { GrAdd } from "react-icons/gr";
 import { AiFillEdit } from "react-icons/ai";
+import ModalCreateUpdateSprint from "./../components/modal/ModalCreateUpdateSprint";
+import { sprintType } from "./../utils/generalGroupTypes";
 
 interface SprintProps {}
 type manageContext = "update" | "create";
@@ -32,6 +36,14 @@ const Sprint: React.FC<SprintProps> = () => {
     const [navBarWidth, setNavBarWidth] = useState("0px");
     const [context, setContext] = useState<manageContext>("update");
     const [pageWidth, setPageWidth] = useState("3em");
+    const [countUpdate, setCountUpdate] = useState(0);
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
+
+    const [selectedSprint, setSelectedSprint] = useState<sprintType | null>(
+        null
+    );
 
     const [sprints, reexecuteQuery] = useGetSprintsQuery({
         variables: {
@@ -39,6 +51,12 @@ const Sprint: React.FC<SprintProps> = () => {
             limit: 5,
         },
     });
+
+    const _modalCreateUpdateSprint = useDisclosure();
+
+    const customOnOpenCreateUpdateSprint = (): void => {
+        _modalCreateUpdateSprint.onOpen();
+    };
 
     useEffect(() => {
         if (expanded) {
@@ -88,22 +106,6 @@ const Sprint: React.FC<SprintProps> = () => {
                     Sprints
                 </Text>
                 <Flex p={2} m={2} justifyContent="flex-end">
-                    {/* 
-                    <Tooltip
-                        hasArrow
-                        aria-label="list disabled/enabled users"
-                        label="List Enabled/Disabled users"
-                        colorScheme="withe"
-                    >
-                        <Button
-                            onClick={() => {
-                                setActiveUsers(!activeUsers);
-                            }}
-                            mr={2}
-                        >
-                            {activeUsers ? "Disabled?" : "Activated?"}
-                        </Button>
-                    </Tooltip> */}
                     <Tooltip
                         hasArrow
                         aria-label="Add new sprint"
@@ -116,6 +118,11 @@ const Sprint: React.FC<SprintProps> = () => {
                             variant="cyan-gradient"
                             mr={1}
                             icon={<GrAdd />}
+                            onClick={() => {
+                                setContext("create");
+                                customOnOpenCreateUpdateSprint();
+                                setSelectedSprint(null);
+                            }}
                         />
                     </Tooltip>
                 </Flex>
@@ -187,6 +194,10 @@ const Sprint: React.FC<SprintProps> = () => {
                                                 icon={<AiFillEdit />}
                                                 onClick={() => {
                                                     setContext("update");
+                                                    customOnOpenCreateUpdateSprint();
+                                                    setSelectedSprint(
+                                                        selectedSprint
+                                                    );
                                                 }}
                                             />
                                         </Tooltip>
@@ -196,7 +207,17 @@ const Sprint: React.FC<SprintProps> = () => {
                     </Table>
                 </Flex>
             </Flex>
-            <Footer />
+            <Box id="footer">
+                <Footer />
+            </Box>
+            <ModalCreateUpdateSprint
+                context={context}
+                sprint={selectedSprint}
+                isOpen={_modalCreateUpdateSprint.isOpen}
+                onClose={_modalCreateUpdateSprint.onClose}
+                countUpdate={countUpdate}
+                updateCallback={updatedCallback}
+            />
         </Container>
     );
 

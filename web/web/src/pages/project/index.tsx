@@ -22,20 +22,12 @@ import Footer from "./../../components/rootComponents/Footer";
 import { GlobalContext } from "./../../context/globalContext";
 import Navbar from "./../../components/rootComponents/Navbar";
 import React, { useEffect, useState, useContext } from "react";
-import {
-    useGetProjectsQuery,
-    Project as Project_Type,
-} from "./../../generated/graphql";
+import { useGetProjectsQuery } from "./../../generated/graphql";
 import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
 import { GrAdd } from "react-icons/gr";
 import ModalCreateUpdateProject from "./../../components/modal/ModalCreateUpdateProject";
 import { AiFillEdit } from "react-icons/ai";
-type projectType = {
-    project: { __typename?: "Project" } & Pick<
-        Project_Type,
-        "id" | "name" | "createdAt" | "description"
-    >;
-};
+import { projectType } from "./../../utils/generalGroupTypes";
 
 interface projectsProps {}
 
