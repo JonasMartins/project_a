@@ -173,6 +173,7 @@ export type Mutation = {
     createTeam: TeamResponse;
     createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
+    updateSprint: SprintResponse;
     createProject: ProjectResponse;
     updateProject: ProjectResponse;
     createComment: CommentResponse;
@@ -222,6 +223,12 @@ export type MutationCreateAppointmentArgs = {
 
 export type MutationCreateSprintArgs = {
     options: SprintValidator;
+};
+
+export type MutationUpdateSprintArgs = {
+    active?: Maybe<Scalars["Boolean"]>;
+    options: SprintValidator;
+    id: Scalars["String"];
 };
 
 export type MutationCreateProjectArgs = {
@@ -566,6 +573,34 @@ export type CreateProjectMutation = { __typename?: "Mutation" } & {
     };
 };
 
+export type CreateSprintMutationVariables = Exact<{
+    options: SprintValidator;
+}>;
+
+export type CreateSprintMutation = { __typename?: "Mutation" } & {
+    createSprint: { __typename?: "SprintResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        sprint?: Maybe<
+            { __typename?: "Sprint" } & Pick<
+                Sprint,
+                "id" | "code" | "description" | "length"
+            > & {
+                    project: { __typename?: "Project" } & Pick<
+                        Project,
+                        "id" | "name"
+                    >;
+                }
+        >;
+    };
+};
+
 export type CreateUserMutationVariables = Exact<{
     name: Scalars["String"];
     email: Scalars["String"];
@@ -670,6 +705,36 @@ export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
         user?: Maybe<
             { __typename?: "User" } & Pick<User, "id" | "name" | "email"> & {
                     role: { __typename?: "Role" } & Pick<Role, "id" | "name">;
+                }
+        >;
+    };
+};
+
+export type UpdateSprintMutationVariables = Exact<{
+    options: SprintValidator;
+    id: Scalars["String"];
+    active: Scalars["Boolean"];
+}>;
+
+export type UpdateSprintMutation = { __typename?: "Mutation" } & {
+    updateSprint: { __typename?: "SprintResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        sprint?: Maybe<
+            { __typename?: "Sprint" } & Pick<
+                Sprint,
+                "id" | "code" | "description" | "length"
+            > & {
+                    project: { __typename?: "Project" } & Pick<
+                        Project,
+                        "id" | "name"
+                    >;
                 }
         >;
     };
@@ -1190,6 +1255,34 @@ export function useCreateProjectMutation() {
         CreateProjectMutationVariables
     >(CreateProjectDocument);
 }
+export const CreateSprintDocument = gql`
+    mutation CreateSprint($options: SprintValidator!) {
+        createSprint(options: $options) {
+            errors {
+                message
+                method
+                field
+            }
+            sprint {
+                id
+                code
+                description
+                length
+                project {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useCreateSprintMutation() {
+    return Urql.useMutation<
+        CreateSprintMutation,
+        CreateSprintMutationVariables
+    >(CreateSprintDocument);
+}
 export const CreateUserDocument = gql`
     mutation CreateUser(
         $name: String!
@@ -1327,6 +1420,38 @@ export function useUpdateSeetingsUserMutation() {
         UpdateSeetingsUserMutation,
         UpdateSeetingsUserMutationVariables
     >(UpdateSeetingsUserDocument);
+}
+export const UpdateSprintDocument = gql`
+    mutation UpdateSprint(
+        $options: SprintValidator!
+        $id: String!
+        $active: Boolean!
+    ) {
+        updateSprint(options: $options, id: $id, active: $active) {
+            errors {
+                message
+                method
+                field
+            }
+            sprint {
+                id
+                code
+                description
+                length
+                project {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useUpdateSprintMutation() {
+    return Urql.useMutation<
+        UpdateSprintMutation,
+        UpdateSprintMutationVariables
+    >(UpdateSprintDocument);
 }
 export const CreateCommentDocument = gql`
     mutation CreateComment(

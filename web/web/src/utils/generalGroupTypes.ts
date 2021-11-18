@@ -13,9 +13,21 @@ export type sprintType = {
         Sprint,
         "id" | "description" | "code" | "length" | "final" | "active"
     > & {
-            project: projectSprintType;
+            project: {
+                __typename?: "Project";
+            } & Pick<Project, "id" | "name">;
         };
 };
+/*
+sprint: {
+    __typename?: "Sprint";
+} & Pick<Sprint, "id" | "description" | "code" | "length" | "final" | "active"> & {
+    project: {
+        __typename?: "Project";
+    } & Pick<Project, "id" | "name">;
+}
+
+*/
 
 export type projectType = {
     project: { __typename?: "Project" } & Pick<
@@ -37,4 +49,5 @@ export interface customProjectErrors {
 export interface customSprintErrors {
     code: string | null;
     project: string | null;
+    description: string | null;
 }

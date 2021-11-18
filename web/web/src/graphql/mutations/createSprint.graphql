@@ -1,0 +1,19 @@
+mutation CreateSprint($options: SprintValidator!) {
+    createSprint(options: $options) {
+        errors {
+            message
+            method
+            field
+        }
+        sprint {
+            id
+            code
+            description
+            length
+            project {
+                id
+                name
+            }
+        }
+    }
+}

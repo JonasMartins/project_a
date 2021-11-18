@@ -21,7 +21,11 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { GlobalContext } from "../context/globalContext";
-import { useGetSprintsQuery } from "./../generated/graphql";
+import {
+    useGetSprintsQuery,
+    useGetProjectsQuery,
+    GetProjectsQuery,
+} from "./../generated/graphql";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { GrAdd } from "react-icons/gr";
 import { AiFillEdit } from "react-icons/ai";
@@ -44,6 +48,8 @@ const Sprint: React.FC<SprintProps> = () => {
     const [selectedSprint, setSelectedSprint] = useState<sprintType | null>(
         null
     );
+    const [projects, setProjects] = useState<GetProjectsQuery | null>(null);
+    const [allProjects] = useGetProjectsQuery();
 
     const [sprints, reexecuteQuery] = useGetSprintsQuery({
         variables: {
@@ -59,6 +65,12 @@ const Sprint: React.FC<SprintProps> = () => {
     };
 
     useEffect(() => {
+        if (sprints.fetching || allProjects.fetching) return;
+
+        if (allProjects.data) {
+            setProjects(allProjects.data);
+        }
+
         if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
@@ -66,9 +78,10 @@ const Sprint: React.FC<SprintProps> = () => {
             setPageWidth("3em");
             setNavBarWidth("0px");
         }
+
         reexecuteQuery({ requestPolicy: "cache-and-network" });
         console.log("Sprint ", sprints?.data?.getSprints);
-    }, [expanded, sprints.fetching]);
+    }, [expanded, sprints.fetching, allProjects.fetching, countUpdate]);
 
     const content = sprints.fetching ? (
         <FullPageSpinner />
@@ -195,9 +208,9 @@ const Sprint: React.FC<SprintProps> = () => {
                                                 onClick={() => {
                                                     setContext("update");
                                                     customOnOpenCreateUpdateSprint();
-                                                    setSelectedSprint(
-                                                        selectedSprint
-                                                    );
+                                                    setSelectedSprint({
+                                                        sprint,
+                                                    });
                                                 }}
                                             />
                                         </Tooltip>
@@ -212,6 +225,7 @@ const Sprint: React.FC<SprintProps> = () => {
             </Box>
             <ModalCreateUpdateSprint
                 context={context}
+                projects={allProjects.data}
                 sprint={selectedSprint}
                 isOpen={_modalCreateUpdateSprint.isOpen}
                 onClose={_modalCreateUpdateSprint.onClose}
