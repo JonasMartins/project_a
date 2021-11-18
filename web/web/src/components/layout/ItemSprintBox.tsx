@@ -1,7 +1,17 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    IconButton,
+    Text,
+    Tooltip,
+    useDisclosure,
+} from "@chakra-ui/react";
 import React from "react";
 import { useDrag } from "react-dnd";
+import { AiOutlineEye } from "react-icons/ai";
 import { MdDragHandle } from "react-icons/md";
+import ModalShowItem from "../modal/ModalShowItem";
 import { Item } from "./../../generated/graphql";
 import { truncateString } from "./../../helpers/generalUtilitiesFunctions";
 import {
@@ -20,6 +30,7 @@ type itemQuery = {
 interface ItemSprintBoxProps {
     item: itemQuery;
     draggable?: boolean;
+    onClick?: () => void;
 }
 
 const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
@@ -31,6 +42,12 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
             opacity: 1,
         }),
     });
+
+    const modalShowItem = useDisclosure();
+
+    const customOnOpenShowItemModal = (): void => {
+        modalShowItem.onOpen();
+    };
 
     return (
         <Box
@@ -57,7 +74,30 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                         {returnPriorityIconHeaderModal(item.priority)}
                     </Flex>
                 </Flex>
+                <Flex justifyContent="flex-end">
+                    <Tooltip
+                        hasArrow
+                        aria-label="See item details"
+                        label="See item details"
+                        colorScheme="withe"
+                    >
+                        <IconButton
+                            isRound={true}
+                            aria-label="Item Details"
+                            mr={1}
+                            icon={<AiOutlineEye />}
+                            onClick={() => {
+                                customOnOpenShowItemModal();
+                            }}
+                        />
+                    </Tooltip>
+                </Flex>
             </Primary>
+            <ModalShowItem
+                item={item}
+                isOpen={modalShowItem.isOpen}
+                onClose={modalShowItem.onClose}
+            />
         </Box>
     );
 };

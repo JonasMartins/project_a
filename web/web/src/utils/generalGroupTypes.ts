@@ -48,6 +48,6 @@ export interface customProjectErrors {
 
 export interface customSprintErrors {
     code: string | null;
-    project: string | null;
+    project_id: string | null;
     description: string | null;
 }

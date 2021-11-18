@@ -18,6 +18,7 @@ import {
     IconButton,
     Box,
     useDisclosure,
+    Button,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { GlobalContext } from "../context/globalContext";
@@ -48,12 +49,13 @@ const Sprint: React.FC<SprintProps> = () => {
     const [selectedSprint, setSelectedSprint] = useState<sprintType | null>(
         null
     );
+    const [activeSprints, setActiveSprints] = useState(true);
     const [projects, setProjects] = useState<GetProjectsQuery | null>(null);
     const [allProjects] = useGetProjectsQuery();
 
     const [sprints, reexecuteQuery] = useGetSprintsQuery({
         variables: {
-            active: true,
+            active: activeSprints,
             limit: 5,
         },
     });
@@ -81,7 +83,13 @@ const Sprint: React.FC<SprintProps> = () => {
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
         console.log("Sprint ", sprints?.data?.getSprints);
-    }, [expanded, sprints.fetching, allProjects.fetching, countUpdate]);
+    }, [
+        expanded,
+        sprints.fetching,
+        allProjects.fetching,
+        activeSprints,
+        countUpdate,
+    ]);
 
     const content = sprints.fetching ? (
         <FullPageSpinner />
@@ -119,6 +127,21 @@ const Sprint: React.FC<SprintProps> = () => {
                     Sprints
                 </Text>
                 <Flex p={2} m={2} justifyContent="flex-end">
+                    <Tooltip
+                        hasArrow
+                        aria-label="list disabled/enabled sprints"
+                        label="List Enabled/Disabled sprints"
+                        colorScheme="withe"
+                    >
+                        <Button
+                            onClick={() => {
+                                setActiveSprints(!activeSprints);
+                            }}
+                            mr={2}
+                        >
+                            {activeSprints ? "Disabled?" : "Activated?"}
+                        </Button>
+                    </Tooltip>
                     <Tooltip
                         hasArrow
                         aria-label="Add new sprint"

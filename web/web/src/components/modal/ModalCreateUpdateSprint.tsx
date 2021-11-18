@@ -74,7 +74,6 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
     const color = { light: "black", dark: "white" };
     const toast = useToast();
     const [loading, setLoading] = useState(false);
-    const [hasSubmit, setHasSubmit] = useState(0);
 
     const [sprintInfo, setSprintInfo] = useState<sprintInfo>({
         id: sprint?.sprint?.id,
@@ -88,7 +87,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
 
     const [customErrors, setCustonErrors] = useState<customSprintErrors>({
         code: "",
-        project: "",
+        project_id: "",
         description: "",
     });
 
@@ -99,7 +98,8 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
         setCustonErrors((prevErrors) => ({
             ...prevErrors,
             code: "",
-            project: "",
+            project_id: "",
+            description: "",
         }));
 
         setSprintInfo((prevSprint) => ({
@@ -148,7 +148,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
             }));
             setCustonErrors({
                 code: "",
-                project: "",
+                project_id: "",
                 description: "",
             });
         };
@@ -158,7 +158,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
         <React.Fragment>
             <ModalCloseButton color={color[colorMode]} />
             <ModalBody>
-                <Flex p={2} m={2} justifyContent="center">
+                <Flex p={2} m={2} justifyContent="center" flexGrow={1}>
                     <Formik
                         initialValues={{
                             id: sprintInfo.id,
@@ -230,6 +230,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
                                     let result = definedErrorMap(
                                         response.data?.createSprint?.errors
                                     );
+
                                     setCustonErrors((prevErrors) => ({
                                         ...prevErrors,
                                         [result[0]["field"]]:
@@ -315,6 +316,9 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
                                                         sprintInfo.description
                                                     }
                                                 />
+                                                <FormErrorMessage>
+                                                    {customErrors.description}
+                                                </FormErrorMessage>
                                             </FormControl>
                                         )}
                                     </Field>
@@ -322,7 +326,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
                                         {({ field }) => (
                                             <FormControl
                                                 isInvalid={
-                                                    !!customErrors.project
+                                                    !!customErrors.project_id
                                                 }
                                             >
                                                 <FormLabel htmlFor="project">
@@ -346,7 +350,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
                                                         setCustonErrors(
                                                             (prevErrors) => ({
                                                                 ...prevErrors,
-                                                                project: "",
+                                                                project_id: "",
                                                             })
                                                         );
                                                         setSprintInfo(
@@ -379,7 +383,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
                                                 </Select>
 
                                                 <FormErrorMessage>
-                                                    {customErrors.project}
+                                                    {customErrors.project_id}
                                                 </FormErrorMessage>
                                             </FormControl>
                                         )}
@@ -509,7 +513,7 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
             isOpen={isOpen}
             onClose={onClose}
             scrollBehavior={"inside"}
-            size={"lg"}
+            size={"2xl"}
         >
             <ModalOverlay />
             <ModalContent>

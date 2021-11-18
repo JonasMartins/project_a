@@ -1,4 +1,11 @@
-import { Box, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
+import {
+    Box,
+    Flex,
+    Link,
+    Text,
+    useColorMode,
+    useDisclosure,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
@@ -9,23 +16,13 @@ import SideBar from "../../components/layout/SideBar";
 import Footer from "../../components/rootComponents/Footer";
 import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
 import Navbar from "../../components/rootComponents/Navbar";
-import {
-    Item,
-    ItemStatus,
-    useGetProjectByIdQuery,
-} from "../../generated/graphql";
+import { ItemStatus, useGetProjectByIdQuery } from "../../generated/graphql";
 import { GlobalContext } from "./../../context/globalContext";
+import { itemQuery } from "./../../helpers/items/ItemFunctinHelpers";
 
 interface projectsProps {
     id: string;
 }
-
-type itemQuery = {
-    __typename?: "Item";
-} & Pick<
-    Item,
-    "id" | "description" | "summary" | "status" | "priority" | "type"
->;
 
 const Project: React.FC<projectsProps> = ({}) => {
     const router = useRouter();

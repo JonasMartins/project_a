@@ -34,13 +34,13 @@ export class SprintResolver {
         @Arg("options") options: SprintValidator,
         @Ctx() { em }: Context
     ): Promise<SprintResponse> {
-        if (options.description.length <= 10) {
+        if (options.description.length <= 5) {
             return {
                 errors: genericError(
                     "description",
                     "createSprint",
-                    __filename,
-                    "A description must have length greater than 10 charachters."
+                    "sprtin.resolver.ts",
+                    "A description must have length greater than 5 charachters."
                 ),
             };
         }
@@ -208,7 +208,7 @@ export class SprintResolver {
         }
 
         _sprint.final = finalDate;
-        _sprint.active = new Date() <= finalDate;
+        //_sprint.active = new Date() <= finalDate;
 
         await em.persistAndFlush(_sprint);
 
