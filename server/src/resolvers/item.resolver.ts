@@ -17,6 +17,7 @@ import { User } from "./../entities/user.entity";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { EntityManager } from "@mikro-orm/postgresql"; // or any other driver package
 import { isAuth } from "../utils/isAuth";
+import { ItemStatus } from "../enums/itemStatus.enum";
 
 @ObjectType()
 class ItemResponse {
@@ -319,5 +320,28 @@ export class ItemResolver {
                 ),
             };
         }
+    }
+
+    @Mutation(() => Boolean)
+    async changeItemStatus(
+        @Arg("id") id: string,
+        @Arg("newStatus") newStatus: ItemStatus,
+        @Ctx() { em }: Context
+    ): Promise<Boolean> {
+        const item = await em.findOne(Item, { id });
+
+        if (!item) {
+            return new Promise((resolve, _) => {
+                resolve(false);
+            });
+        }
+
+        item.status = newStatus;
+
+        await em.persistAndFlush(item);
+
+        return new Promise((resolve, _) => {
+            resolve(true);
+        });
     }
 }
