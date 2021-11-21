@@ -1,0 +1,14 @@
+BUG:
+
+1: When access settings page, the page keeps loading, 
+some problem with cache, the spinner never changes his status, 
+when refresh page it works correctly.
+
+2: There is a bug when updating a user picure, it needs a aditional
+"/" right after the unique folder creation, so the file get a 404, becouse of that.
+
+
+3: Also related to bug number two, check if the image is successfully uploaded
+with correct path, if the navbar imediately updates the user's nwe photo.
+
+
