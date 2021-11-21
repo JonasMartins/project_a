@@ -80,6 +80,10 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
 
         drop: (item: itemQuery) => {
+            if (item.status !== ItemStatus.Open) {
+                handleChangeStatus(item, ItemStatus.Open);
+            }
+
             previousItemStatus = item.status;
 
             if (item.status === ItemStatus.InProgress) {
@@ -91,8 +95,6 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPendingItens((prevItens) => [...prevItens, item]);
 
             removeItemFromStatusArray(item);
-
-            handleChangeStatus(item, ItemStatus.Open);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -108,14 +110,16 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
 
         drop: (item: itemQuery) => {
+            if (item.status !== ItemStatus.InProgress) {
+                handleChangeStatus(item, ItemStatus.InProgress);
+            }
+
             previousItemStatus = item.status;
 
             item.status = ItemStatus.InProgress;
 
             setProgressItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
-
-            handleChangeStatus(item, ItemStatus.InProgress);
         },
 
         hover: (_, monitor) => {
@@ -140,13 +144,16 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
 
         drop: (item: itemQuery) => {
+            if (item.status !== ItemStatus.Resolved) {
+                handleChangeStatus(item, ItemStatus.Resolved);
+            }
+
             previousItemStatus = item.status;
 
             item.status = ItemStatus.Resolved;
 
             setDoneItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
-            handleChangeStatus(item, ItemStatus.Resolved);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),

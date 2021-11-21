@@ -53,5 +53,5 @@ export const manageUploadFile = async (
         };
     }
 
-    return { path: path + filename };
+    return { path: path + "/" + filename };
 };

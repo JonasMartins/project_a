@@ -54,7 +54,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
     const [loading, setLoading] = useState(true);
     const [pageWidth, setPageWidth] = useState("3em");
-    const [loadingCount, setLoadingCount] = useState(0);
     const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [changePassword, setChangePassword] = useState(false);
@@ -80,19 +79,12 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
     const [allRoles] = useGetAllRolesQuery();
 
-    const forceDataAndStateReady = (): void => {
-        if (loadingCount < 20 && loading) {
-            setLoadingCount(loadingCount + 1);
-        }
-
-        if (userInfo.name && userInfo.role_id && userInfo.email) {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        reexecuteQuery({ requestPolicy: "network-only" });
+    }, []);
 
     useEffect(() => {
         if (fetching && allRoles.fetching) return;
-
         if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
@@ -100,19 +92,16 @@ const Settings: React.FC<settingsProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-
-        if (
-            data?.getUserSettings?.user?.name &&
-            roles?.getAllRoles?.roles?.length
-        ) {
+        if (data?.getUserSettings?.user) {
             setUserInfo((prevUser) => ({
                 ...prevUser,
-                id: user.userId,
+                id: data?.getUserSettings?.user?.id,
                 name: data?.getUserSettings?.user?.name,
                 email: data?.getUserSettings?.user?.email,
                 passowrd: "",
                 role_id: data?.getUserSettings?.user?.role?.id,
             }));
+            setLoading(false);
         }
 
         setUserIsAdmin(
@@ -123,10 +112,21 @@ const Settings: React.FC<settingsProps> = ({}) => {
             setRoles(allRoles.data);
         }
 
-        forceDataAndStateReady();
-
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, allRoles.fetching, loadingCount, expanded, user]);
+    }, [fetching, allRoles.fetching, expanded, user, loading]);
+
+    useEffect(() => {
+        return () => {
+            setUserInfo((prevUser) => ({
+                ...prevUser,
+                id: "",
+                name: "",
+                email: "",
+                passowrd: "",
+                role_id: "",
+            }));
+        };
+    }, []);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
