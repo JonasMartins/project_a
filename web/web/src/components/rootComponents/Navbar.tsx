@@ -1,31 +1,39 @@
-import React, { useContext, useState, useEffect } from "react";
 import {
-    useColorMode,
-    Icon,
+    BellIcon,
+    DragHandleIcon,
+    MoonIcon,
+    SettingsIcon,
+    SunIcon,
+} from "@chakra-ui/icons";
+import {
     Box,
+    Flex,
+    Icon,
+    IconButton,
+    Image,
+    Link,
     Menu,
     MenuButton,
-    MenuItem,
-    MenuList,
-    IconButton,
     MenuDivider,
     MenuGroup,
-    Link,
+    MenuItem,
+    MenuList,
     Text,
-    Flex,
+    useColorMode,
     useDisclosure,
 } from "@chakra-ui/react";
-import { SettingsIcon, BellIcon, DragHandleIcon } from "@chakra-ui/icons";
-import NextLink from "next/link";
 import { useRouter } from "next/dist/client/router";
-import { GlobalContext } from "./../../context/globalContext";
+import NextLink from "next/link";
+import React, { useContext } from "react";
 import Avatar from "react-avatar";
-import { SunIcon, MoonIcon } from "@chakra-ui/icons";
-import { SiCodesandbox } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
-import { BsGear, BsBook } from "react-icons/bs";
-import ModalAboutProject from "./../modal/ModalAboutProject";
+import { BsBook, BsGear } from "react-icons/bs";
+import { SiCodesandbox } from "react-icons/si";
+import { GlobalContext } from "./../../context/globalContext";
 import { useUser } from "./../../helpers/hooks/useUser";
+import { getServerPathImage } from "./../../utils/handleServerImagePaths";
+import ModalAboutProject from "./../modal/ModalAboutProject";
+
 interface NavbarProps {
     pageWidth?: string;
 }
@@ -33,24 +41,22 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
     const router = useRouter();
 
-    const { setIsLoading, setCurrentUserId, setTheme } =
-        useContext(GlobalContext);
+    // reexecuteQuery({ requestPolicy: "network-only" });
+
+    const { setIsLoading, setCurrentUserId } = useContext(GlobalContext);
 
     const user = useUser();
 
-    const { toggleColorMode } = useColorMode();
-    const [darkMode, setDarkMode] = useState(false);
+    const { toggleColorMode, colorMode } = useColorMode();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleDarkMode = () => {
-        setDarkMode(!darkMode);
-        setTheme(darkMode ? "dark" : "light");
         toggleColorMode();
     };
 
     const logout = () => {
-        setIsLoading(true);
+        setIsLoading(false);
         localStorage.clear();
         setCurrentUserId("");
         router.push("/login");
@@ -60,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         <Flex
             overflow="hidden"
             top="0"
-            zIndex={1}
+            zIndex={0}
             flexGrow={1}
             m={0}
             p={[0, 2]}
@@ -90,20 +96,35 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
             <Flex justifyContent="flex-end">
                 <Menu>
                     <Box mr={2}>
-                        <Avatar
-                            name={user.name || "Foo Bar"}
-                            size="40px"
-                            round={true}
-                        />
+                        {user && user.picture ? (
+                            <Image
+                                borderRadius="full"
+                                boxSize="40px"
+                                src={getServerPathImage(user.picture)}
+                            />
+                        ) : (
+                            <Avatar
+                                name={(user && user.name) || "Foo Bar"}
+                                size="40px"
+                                round={true}
+                            />
+                        )}
                     </Box>
                     <Box mr={2}>
                         <IconButton
                             aria-label="Switch Theme"
                             isRound={true}
-                            isActive={darkMode}
                             onClick={handleDarkMode}
-                            colorScheme={darkMode ? "grey" : "yellow"}
-                            icon={darkMode ? <MoonIcon /> : <SunIcon />}
+                            colorScheme={
+                                colorMode === "dark" ? "grey" : "yellow"
+                            }
+                            icon={
+                                colorMode === "dark" ? (
+                                    <MoonIcon />
+                                ) : (
+                                    <SunIcon />
+                                )
+                            }
                         />
                     </Box>
 

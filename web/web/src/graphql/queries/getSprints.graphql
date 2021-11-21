@@ -1,0 +1,14 @@
+query getSprints($limit: Float, $active: Boolean!) {
+    getSprints(active: $active, limit: $limit) {
+        id
+        description
+        code
+        length
+        final
+        active
+        project {
+            id
+            name
+        }
+    }
+}

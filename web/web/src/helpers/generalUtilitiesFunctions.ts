@@ -15,6 +15,10 @@ export const getPastOrFutureDate = (
 };
 
 export const truncateString = (value: string, limit: number): string => {
+    if (!value) {
+        return "";
+    }
+
     if (value.length > limit) {
         return value.substr(0, limit) + "...";
     } else {
@@ -35,4 +39,8 @@ export const compareTwoStrings = (str1: string, str2: string): boolean => {
         str1.toLocaleLowerCase().replace(/ /g, "") ===
         str2.toLocaleLowerCase().replace(/ /g, "")
     );
+};
+
+export const getMainPageFromFullPath = (path: string): string => {
+    return path.split("/")[1];
 };

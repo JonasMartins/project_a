@@ -53,3 +53,14 @@ export const getPastOrFutureDate = (
 
     return futureOrPastDate;
 };
+
+export const getUniqueFolderName = (): string => {
+    const unit32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    return unit32.toString(16);
+};
+
+export const validateEmail = (email: string): boolean => {
+    const re =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+};

@@ -1,0 +1,36 @@
+query GetCommentsByItem($itemId: String!) {
+    getCommentsByItem(itemId: $itemId) {
+        errors {
+            message
+            method
+            field
+        }
+        comments {
+            id
+            body
+            order
+            createdAt
+            parent {
+                id
+                body
+            }
+            author {
+                name
+                picture
+            }
+            item {
+                id
+            }
+            replies {
+                id
+                body
+                createdAt
+                order
+                author {
+                    name
+                    picture
+                }
+            }
+        }
+    }
+}

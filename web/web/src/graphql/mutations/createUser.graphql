@@ -1,0 +1,29 @@
+mutation CreateUser(
+    $name: String!
+    $email: String!
+    $password: String!
+    $role_id: String!
+) {
+    createUser(
+        options: {
+            name: $name
+            password: $password
+            email: $email
+            role_id: $role_id
+        }
+    ) {
+        errors {
+            field
+            message
+            method
+        }
+        user {
+            id
+            name
+            role {
+                name
+                code
+            }
+        }
+    }
+}

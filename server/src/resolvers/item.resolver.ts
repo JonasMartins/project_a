@@ -6,6 +6,7 @@ import {
     Field,
     Ctx,
     Query,
+    UseMiddleware,
 } from "type-graphql";
 import { Item } from "../entities/item.entity";
 import { Sprint } from "../entities/sprint.entity";
@@ -15,6 +16,8 @@ import ItemValidator from "./../validators/item.validator";
 import { User } from "./../entities/user.entity";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { EntityManager } from "@mikro-orm/postgresql"; // or any other driver package
+import { isAuth } from "../utils/isAuth";
+import { ItemStatus } from "../enums/itemStatus.enum";
 
 @ObjectType()
 class ItemResponse {
@@ -77,7 +80,7 @@ export class ItemResolver {
                 errors: [
                     {
                         field: "sprint_id",
-                        message: `Could not found a valid sprint with id ${options.sprint_id}`,
+                        message: `Could not found a valid sprpint with id ${options.sprint_id}`,
                         method: `Method: createItem, at ${__filename}`,
                     },
                 ],
@@ -249,12 +252,14 @@ export class ItemResolver {
      * @returns
      */
     @Query(() => ItensResponse)
+    @UseMiddleware(isAuth)
     async getItensBacklog(
         @Arg("limit", () => Number, { nullable: true }) limit: number,
-        @Arg("cursor", () => Date, { nullable: true }) cursor: Date,
+        @Arg("offset", () => Number, { nullable: true }) offset: number,
         @Ctx() { em }: Context
     ): Promise<ItensResponse> {
         const max = Math.min(10, limit);
+        const maxOffset = Math.min(10, offset);
 
         const qb = (em as EntityManager).createQueryBuilder(Item, "i");
 
@@ -275,6 +280,7 @@ export class ItemResolver {
                 .orderBy({ updatedAt: "DESC" });
         } */
 
+        /*
         if (cursor) {
             qb.select(["i.*"])
                 .where({ updatedAt: { $lt: cursor } })
@@ -286,7 +292,13 @@ export class ItemResolver {
                 .where({ "1": "1" })
                 .limit(max)
                 .orderBy({ updatedAt: "DESC" });
-        }
+        } */
+
+        qb.select(["i.*"])
+            .where("1 = 1")
+            .orderBy({ updatedAt: "DESC" })
+            .limit(max)
+            .offset(maxOffset);
 
         try {
             const itens = await qb.getResult();
@@ -308,5 +320,28 @@ export class ItemResolver {
                 ),
             };
         }
+    }
+
+    @Mutation(() => Boolean)
+    async changeItemStatus(
+        @Arg("id") id: string,
+        @Arg("newStatus", () => ItemStatus) newStatus: ItemStatus,
+        @Ctx() { em }: Context
+    ): Promise<Boolean> {
+        const item = await em.findOne(Item, { id });
+
+        if (!item) {
+            return new Promise((resolve, _) => {
+                resolve(false);
+            });
+        }
+
+        item.status = newStatus;
+
+        await em.persistAndFlush(item);
+
+        return new Promise((resolve, _) => {
+            resolve(true);
+        });
     }
 }

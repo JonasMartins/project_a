@@ -1,24 +1,18 @@
 import { Box, Flex } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
-import { Container } from "./../components/Container";
-import Navbar from "./../components/rootComponents/Navbar";
-import Footer from "./../components/rootComponents/Footer";
 import HomeNotifications from "../components/HomeNotifications";
-import { GlobalContext } from "./../context/globalContext";
-import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
-import Login from "./../pages/login";
 import SideBar from "../components/layout/SideBar";
-import { useUser } from "./../helpers/hooks/useUser";
+import { Container } from "./../components/Container";
+import Footer from "./../components/rootComponents/Footer";
+import Navbar from "./../components/rootComponents/Navbar";
+import { GlobalContext } from "./../context/globalContext";
 
 interface indexProps {}
 
 const Index: React.FC<indexProps> = ({}) => {
-    const { loading, expanded } = useContext(GlobalContext);
-
+    const { expanded } = useContext(GlobalContext);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
-
-    const user = useUser();
 
     useEffect(() => {
         if (expanded) {
@@ -28,36 +22,31 @@ const Index: React.FC<indexProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [loading, expanded]);
+    }, [expanded]);
 
-    const content =
-        user && user.userId ? (
-            <>
-                <Container>
-                    <Navbar pageWidth={navBarWidth} />
-                    <SideBar />
-                    <Flex
-                        alignSelf="normal"
-                        flexDir="column"
-                        flexGrow={1}
-                        mb="150px"
-                        ml={pageWidth}
-                        transition="0.3s"
-                    >
-                        <HomeNotifications />
-                    </Flex>
-                    <Box id="footer">
-                        <Footer />
-                    </Box>
-                </Container>
-            </>
-        ) : (
-            <>
-                <Login />
-            </>
-        );
+    const content = (
+        <>
+            <Container>
+                <Navbar pageWidth={navBarWidth} />
+                <SideBar />
+                <Flex
+                    alignSelf="normal"
+                    flexDir="column"
+                    flexGrow={1}
+                    mb="150px"
+                    ml={pageWidth}
+                    transition="0.3s"
+                >
+                    <HomeNotifications />
+                </Flex>
+                <Box id="footer">
+                    <Footer />
+                </Box>
+            </Container>
+        </>
+    );
 
-    return loading ? <FullPageSpinner /> : content;
+    return content;
 };
 
 export default Index;

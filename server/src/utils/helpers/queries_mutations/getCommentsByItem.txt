@@ -1,0 +1,26 @@
+{
+    getCommentsByItem(itemId: "85495243-c981-4ee5-995e-0d29aafd4e22") {
+        errors {
+            message
+            method
+            field
+        }
+        comments {
+            id
+            order
+            body
+            parent {
+                id
+                body
+                author {
+                    name
+                    picture
+                }
+            }
+            item {
+                id
+            }
+        }
+    }
+}
+

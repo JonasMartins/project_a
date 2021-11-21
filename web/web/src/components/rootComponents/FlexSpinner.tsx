@@ -5,11 +5,9 @@ interface FlexSpinnerProps {}
 
 const FlexSpinner: React.FC<FlexSpinnerProps> = ({}) => {
     return (
-        <Container>
-            <Flex flexGrow={1} justifyContent="center" alignItems="center">
-                <Spinner size="xl" />
-            </Flex>
-        </Container>
+        <Flex flexGrow={1} justifyContent="center" alignItems="center">
+            <Spinner size="xl" />
+        </Flex>
     );
 };
 export default FlexSpinner;

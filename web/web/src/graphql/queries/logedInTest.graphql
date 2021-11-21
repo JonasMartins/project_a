@@ -1,0 +1,10 @@
+query LogedInTest {
+    logedInTest {
+        errors {
+            method
+            message
+            field
+        }
+        result
+    }
+}

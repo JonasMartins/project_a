@@ -1,0 +1,23 @@
+mutation UpdateSprint(
+    $options: SprintValidator!
+    $id: String!
+    $active: Boolean!
+) {
+    updateSprint(options: $options, id: $id, active: $active) {
+        errors {
+            message
+            method
+            field
+        }
+        sprint {
+            id
+            code
+            description
+            length
+            project {
+                id
+                name
+            }
+        }
+    }
+}

@@ -10,7 +10,7 @@ import { useUser } from "./../helpers/hooks/useUser";
 interface HomeNotificationsProps {}
 
 const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
-    const { userId, setCurrentUserName } = useContext(GlobalContext);
+    const { setCurrentUserName } = useContext(GlobalContext);
 
     const user = useUser();
 

@@ -17,13 +17,12 @@ import {
     useToast,
     Switch,
 } from "@chakra-ui/react";
-import Login from "./login";
 import Avatar from "react-avatar";
 import { Form, Formik, Field } from "formik";
 import {
-    useGetUserSettingsQuery,
-    useGetAllRolesQuery,
     GetAllRolesQuery,
+    useGetAllRolesQuery,
+    useGetUserSettingsQuery,
     useUpdateSeetingsUserMutation,
 } from "./../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -32,6 +31,7 @@ import { useRouter } from "next/dist/client/router";
 import { useUser } from "./../helpers/hooks/useUser";
 import { compareTwoStrings } from "./../helpers/generalUtilitiesFunctions";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
+import { getServerPathImage } from "./../utils/handleServerImagePaths";
 
 interface settingsProps {}
 
@@ -41,6 +41,7 @@ interface userInfo {
     email: string;
     passowrd: string;
     role_id: string;
+    file: File;
 }
 
 const Settings: React.FC<settingsProps> = ({}) => {
@@ -53,7 +54,6 @@ const Settings: React.FC<settingsProps> = ({}) => {
 
     const [loading, setLoading] = useState(true);
     const [pageWidth, setPageWidth] = useState("3em");
-    const [loadingCount, setLoadingCount] = useState(0);
     const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [changePassword, setChangePassword] = useState(false);
@@ -65,33 +65,26 @@ const Settings: React.FC<settingsProps> = ({}) => {
         email: "",
         passowrd: "",
         role_id: "",
+        file: null,
     });
 
-    const [{ data, fetching, error }, reexecuteQuery] = useGetUserSettingsQuery(
-        {
-            variables: {
-                id: user.userId ? user.userId : "-1",
-            },
-        }
-    );
+    const [{ data, fetching }, reexecuteQuery] = useGetUserSettingsQuery({
+        variables: {
+            id: user && user.userId ? user.userId : "-1",
+        },
+        pause: !user || !user.userId,
+    });
 
     const [{}, updateSeetingsUser] = useUpdateSeetingsUserMutation();
 
     const [allRoles] = useGetAllRolesQuery();
 
-    const forceDataAndStateReady = (): void => {
-        if (loadingCount < 20 && loading) {
-            setLoadingCount(loadingCount + 1);
-        }
-
-        if (userInfo.name && userInfo.role_id && userInfo.email) {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        reexecuteQuery({ requestPolicy: "network-only" });
+    }, []);
 
     useEffect(() => {
         if (fetching && allRoles.fetching) return;
-
         if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
@@ -99,19 +92,16 @@ const Settings: React.FC<settingsProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-
-        if (
-            data?.getUserSettings?.user?.name &&
-            roles?.getAllRoles?.roles?.length
-        ) {
+        if (data?.getUserSettings?.user) {
             setUserInfo((prevUser) => ({
                 ...prevUser,
-                id: user.userId,
+                id: data?.getUserSettings?.user?.id,
                 name: data?.getUserSettings?.user?.name,
                 email: data?.getUserSettings?.user?.email,
                 passowrd: "",
                 role_id: data?.getUserSettings?.user?.role?.id,
             }));
+            setLoading(false);
         }
 
         setUserIsAdmin(
@@ -122,10 +112,21 @@ const Settings: React.FC<settingsProps> = ({}) => {
             setRoles(allRoles.data);
         }
 
-        forceDataAndStateReady();
-
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, allRoles.fetching, loadingCount, expanded]);
+    }, [fetching, allRoles.fetching, expanded, user, loading]);
+
+    useEffect(() => {
+        return () => {
+            setUserInfo((prevUser) => ({
+                ...prevUser,
+                id: "",
+                name: "",
+                email: "",
+                passowrd: "",
+                role_id: "",
+            }));
+        };
+    }, []);
 
     const handlerUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
         setUserInfo((prevUser) => ({
@@ -134,7 +135,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         }));
     };
 
-    if (error) return <p>Oh no... {error.message}</p>;
+    // if (error) return <p>Oh no... {error.message}</p>;
 
     const content = loading ? (
         <FullPageSpinner />
@@ -150,18 +151,21 @@ const Settings: React.FC<settingsProps> = ({}) => {
                 ml={pageWidth}
                 transition="0.3s"
             >
-                {data && data?.getUserSettings?.user?.picure ? (
+                {data && data?.getUserSettings?.user?.picture ? (
                     <Flex
                         mt={5}
                         flexDir="column"
                         alignItems="center"
                         justifyContent="flex-start"
-                        flexGrow={1}
+                        flexGrow={0.3}
                     >
                         <Image
                             boxSize="150px"
                             borderRadius="full"
-                            src={data?.getUserSettings?.user?.picure}
+                            border="1px solid grey"
+                            src={getServerPathImage(
+                                data?.getUserSettings?.user?.picture
+                            )}
                         />
                         <Text>{data?.getUserSettings?.user?.role?.name}</Text>
                     </Flex>
@@ -201,11 +205,18 @@ const Settings: React.FC<settingsProps> = ({}) => {
                             email: userInfo.email,
                             password: userInfo.passowrd,
                             role_id: userInfo.role_id,
+                            file: userInfo.file,
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values, { setErrors }) => {
                             const response = await updateSeetingsUser({
-                                options: values,
+                                id: values.id,
+                                name: values.name,
+                                email: values.email,
+                                password: values.password,
+                                role_id: values.role_id,
+                                file: values.file,
+                                active: true,
                             });
 
                             if (response.data?.updateSeetingsUser?.errors) {
@@ -227,7 +238,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
                             }
                         }}
                     >
-                        {(props) => (
+                        {(props, isSubmitting) => (
                             <Form {...props}>
                                 <Stack spacing={3}>
                                     <Field name="name">
@@ -372,8 +383,44 @@ const Settings: React.FC<settingsProps> = ({}) => {
                                             </FormControl>
                                         )}
                                     </Field>
+
+                                    <Field name="picture">
+                                        {({ field, form }) => (
+                                            <FormControl
+                                                isInvalid={form.errors.picture}
+                                            >
+                                                <FormLabel htmlFor="picture">
+                                                    Profile
+                                                </FormLabel>
+                                                <Input
+                                                    {...field}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    id="picture"
+                                                    onChange={({
+                                                        target: {
+                                                            validity,
+                                                            files,
+                                                        },
+                                                    }) => {
+                                                        if (
+                                                            validity.valid &&
+                                                            files
+                                                        ) {
+                                                            props.setFieldValue(
+                                                                "file",
+                                                                files[0]
+                                                            );
+                                                        }
+                                                    }}
+                                                />
+                                            </FormControl>
+                                        )}
+                                    </Field>
+
                                     <Button
-                                        isLoading={props.isSubmitting}
+                                        disabled={isSubmitting}
+                                        isLoading={isSubmitting}
                                         type="submit"
                                         variant="cyan-gradient"
                                         borderRadius="2em"
@@ -393,7 +440,7 @@ const Settings: React.FC<settingsProps> = ({}) => {
         </Container>
     );
 
-    return user.userId ? content : <Login />;
+    return content;
 };
 
 export default Settings;

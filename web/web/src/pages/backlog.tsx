@@ -1,9 +1,4 @@
-import React, {
-    useContext,
-    useState,
-    useEffect,
-    CMouseEventHandler,
-} from "react";
+import React, { useContext, useState, useEffect, ChangeEvent } from "react";
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
@@ -16,7 +11,6 @@ import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
 import Navbar from "./../components/rootComponents/Navbar";
 import Footer from "./../components/rootComponents/Footer";
-import Login from "./../pages/login";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import {
     Box,
@@ -42,6 +36,7 @@ import {
 import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 import { useUser } from "./../helpers/hooks/useUser";
 import { GlobalContext } from "./../context/globalContext";
+import Comments from "./../components/Comments";
 
 interface backlogProps {}
 
@@ -74,18 +69,22 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const user = useUser();
 
     const { expanded } = useContext(GlobalContext);
+
+    const [offset, setOffset] = useState(0);
     const [page, setPage] = useState<number>(0);
     const [pageWidth, setPageWidth] = useState("3em");
+    const [searchInput, setSearchInput] = useState("");
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [itens, setItens] = useState<itensBacklog>(null);
-    const [cursor, setCursor] = useState<Date | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [itemDetailWidth, setItemDetailWidth] = useState(0);
+    const [showPagination, setShowPagination] = useState(true);
     const [itemDetailOpen, setItemDetailOpen] = useState(false);
     const [decrescentStatus, setDecrescentStatus] = useState(true);
     const [decrescentCreated, setDecrescentCreated] = useState(true);
     const [decrescentUpdated, setDecrescentUpdated] = useState(true);
     const [decrescentPriority, setDecrescentPriority] = useState(true);
+
     const [itemDetailed, setItemDetailed] = useState<itemBacklog | null>(null);
 
     const closeItemDetail = (): void => {
@@ -96,31 +95,17 @@ const Backlog: React.FC<backlogProps> = ({}) => {
     const [itensBacklog, reexecuteQuery] = useGetItensBacklogQuery({
         variables: {
             limit: itensPerPage,
-            cursor: cursor,
+            offset: offset,
         },
     });
 
-    const handlePagination = (e: CMouseEventHandler<HTMLButtonElement>) => {
-        let lastIten = 0;
-        let _cursor: Date | null = null;
-
-        if (e.target.name == "1") {
-            setCursor(null);
+    const handlePagination = (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+        if (e.target["name"] === "1") {
+            setOffset(0);
         } else {
-            lastIten =
-                itensPerPage <=
-                itensBacklog.data?.getItensBacklog?.itens?.length
-                    ? itensPerPage
-                    : itensBacklog.data?.getItensBacklog?.itens?.length;
-
-            if (lastIten) {
-                _cursor = new Date(
-                    itensBacklog.data?.getItensBacklog?.itens[
-                        lastIten - 1
-                    ].createdAt
-                );
-                setCursor(_cursor);
-            }
+            setOffset(Number(e.target["name"]) * itensPerPage);
         }
     };
 
@@ -130,8 +115,14 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         if (page) {
             _pages.push(
                 <IconButton
+                    disabled={currentPage === 0 ? true : false}
                     aria-label="Previous Itens page"
                     icon={<ArrowLeftIcon />}
+                    onClick={() => {
+                        closeItemDetail();
+                        setOffset((currentPage - 1) * itensPerPage);
+                        setCurrentPage(currentPage - 1);
+                    }}
                 />
             );
 
@@ -141,6 +132,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                         variant={currentPage === i ? "cyan-gradient" : "ghost"}
                         name={`${i + 1}`}
                         onClick={(e) => {
+                            closeItemDetail();
                             setCurrentPage(i);
                             handlePagination(e);
                         }}
@@ -152,8 +144,14 @@ const Backlog: React.FC<backlogProps> = ({}) => {
 
             _pages.push(
                 <IconButton
+                    disabled={currentPage === page - 1 ? true : false}
                     aria-label="Next Itens page"
                     icon={<ArrowRightIcon />}
+                    onClick={() => {
+                        closeItemDetail();
+                        setOffset((currentPage + 1) * itensPerPage);
+                        setCurrentPage(currentPage + 1);
+                    }}
                 />
             );
         }
@@ -172,14 +170,16 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         }
 
         if (itensBacklog.data?.getItensBacklog) {
-            setItens(itensBacklog.data?.getItensBacklog);
-            setPage(
-                Math.ceil(
-                    itensBacklog.data?.getItensBacklog?.total / itensPerPage
-                )
-            );
+            if (searchInput.length < 2) {
+                setItens(itensBacklog.data?.getItensBacklog);
+                setPage(
+                    Math.ceil(
+                        itensBacklog.data?.getItensBacklog?.total / itensPerPage
+                    )
+                );
+            }
         }
-        if (cursor) {
+        if (offset) {
             reexecuteQuery({ requestPolicy: "cache-and-network" });
         }
     }, [
@@ -188,7 +188,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         itens?.itens?.length,
         itemDetailed,
         itemDetailOpen,
-        cursor,
+        offset,
         currentPage,
     ]);
 
@@ -232,14 +232,35 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     />
                     <Input
                         onFocus={closeItemDetail}
-                        type="text"
                         maxW="300px"
-                        placeholder="Filter info"
+                        placeholder="Filter info (On this page)"
                         borderRadius="2em"
+                        value={searchInput}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            setSearchInput(e.target.value);
+                            if (e.target.value.length >= 2) {
+                                setShowPagination(false);
+
+                                let regexTerm =
+                                    "[ˆ,]*" + e.target.value + "[,$]*";
+                                let result = itens.itens.filter((item) =>
+                                    item.summary.match(regexTerm)
+                                );
+                                setItens({
+                                    itens: result,
+                                });
+                            } else {
+                                setItens(itensBacklog.data?.getItensBacklog);
+                                setPage(
+                                    Math.ceil(
+                                        itensBacklog.data?.getItensBacklog
+                                            ?.total / itensPerPage
+                                    )
+                                );
+                                setShowPagination(true);
+                            }
+                        }}
                     />
-                    <Button variant="cyan-gradient" borderRadius="2em" ml={3}>
-                        My Itens
-                    </Button>
                 </InputGroup>
                 <Flex
                     flexGrow={1}
@@ -401,8 +422,8 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                         key={item.id}
                                         justifyContent="space-between"
                                         alignItems="center"
-                                        p={1}
                                         boxShadow="md"
+                                        p={1}
                                         m={1}
                                         onClick={() => {
                                             setItemDetailOpen(true);
@@ -435,6 +456,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                             overflowX="hidden"
                             transition="0.3s"
                             boxShadow="md"
+                            mr={2}
                         >
                             {itemDetailed && itemDetailOpen ? (
                                 <Flex flexDir="column" flexGrow={1} p={2}>
@@ -515,6 +537,9 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                     <Flex p={2} mt={2}>
                                         <Text>{itemDetailed.description}</Text>
                                     </Flex>
+                                    <Flex>
+                                        <Comments itemId={itemDetailed.id} />
+                                    </Flex>
                                 </Flex>
                             ) : (
                                 <></>
@@ -523,9 +548,15 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                     </Flex>
                 )}
 
-                <Flex justifyContent="center">
-                    {returnPagination().map((page) => (
-                        <Box m={1}>{page}</Box>
+                <Flex
+                    justifyContent="center"
+                    display={showPagination ? "flex" : "none"}
+                    mt={3}
+                >
+                    {returnPagination().map((page, index) => (
+                        <Box m={1} key={index}>
+                            {page}
+                        </Box>
                     ))}
                 </Flex>
             </Flex>
@@ -535,7 +566,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
         </Container>
     );
 
-    return user.userId ? content : <Login />;
+    return content;
 };
 
 export default Backlog;

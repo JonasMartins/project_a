@@ -34,13 +34,13 @@ export class SprintResolver {
         @Arg("options") options: SprintValidator,
         @Ctx() { em }: Context
     ): Promise<SprintResponse> {
-        if (options.description.length <= 10) {
+        if (options.description.length <= 5) {
             return {
                 errors: genericError(
                     "description",
                     "createSprint",
-                    __filename,
-                    "A description must have length greater than 10 charachters."
+                    "sprtin.resolver.ts",
+                    "A description must have length greater than 5 charachters."
                 ),
             };
         }
@@ -107,6 +107,114 @@ export class SprintResolver {
         return { sprint };
     }
 
+    @Mutation(() => SprintResponse)
+    async updateSprint(
+        @Arg("id") id: string,
+        @Arg("options") options: SprintValidator,
+        @Arg("active", () => Boolean, { nullable: true }) active: boolean,
+        @Ctx() { em }: Context
+    ): Promise<SprintResponse> {
+        const _sprint = await em.findOne(Sprint, { id });
+
+        if (!_sprint) {
+            return {
+                errors: genericError(
+                    "id",
+                    "updateSprint",
+                    __filename,
+                    `Could not found sprint with id: ${id}`
+                ),
+            };
+        }
+
+        if (options.description.length <= 5) {
+            return {
+                errors: genericError(
+                    "description",
+                    "createSprint",
+                    __filename,
+                    "A description must have length greater than 5 charachters."
+                ),
+            };
+        }
+
+        const qb = (em as EntityManager).createQueryBuilder(Sprint);
+
+        qb.select("*")
+            .where({ active: true })
+            .andWhere({ id: { $ne: id } })
+            .andWhere({ project_id: options.project_id })
+            .limit(1);
+
+        console.log("consulta : ", qb.getQuery());
+
+        const activeSprints: Sprint = await qb.execute();
+
+        if (activeSprints.length) {
+            return {
+                errors: genericError(
+                    "project_id",
+                    "createSprint",
+                    __filename,
+                    `Already exists a active sprint for the project with id: ${options.project_id}`
+                ),
+            };
+        }
+
+        const project = await em.findOne(Project, { id: options.project_id });
+
+        if (!project) {
+            return {
+                errors: genericError(
+                    "project_id",
+                    "createSprint",
+                    __filename,
+                    `A projetc with id ${options.project_id} could not been found.`
+                ),
+            };
+        }
+        _sprint.length;
+        _sprint.active = active;
+        _sprint.project = project;
+        _sprint.code = options.code;
+        _sprint.description = options.description;
+
+        let finalDate = _sprint.createdAt;
+
+        switch (options.length) {
+            case SprintLength.ONE:
+                finalDate = getPastOrFutureDate(_sprint.createdAt, 7, "future");
+                break;
+            case SprintLength.TWO:
+                finalDate = getPastOrFutureDate(
+                    _sprint.createdAt,
+                    14,
+                    "future"
+                );
+                break;
+            case SprintLength.THREE:
+                finalDate = getPastOrFutureDate(
+                    _sprint.createdAt,
+                    21,
+                    "future"
+                );
+                break;
+            case SprintLength.FOUR:
+                finalDate = getPastOrFutureDate(
+                    _sprint.createdAt,
+                    28,
+                    "future"
+                );
+        }
+
+        _sprint.final = finalDate;
+        //_sprint.active = new Date() <= finalDate;
+
+        await em.persistAndFlush(_sprint);
+
+        return { sprint: _sprint };
+    }
+
     /**
      *      Retorna sprints com um certo limte
      */
@@ -123,6 +231,8 @@ export class SprintResolver {
             { active: active },
             { limit: max }
         );
+
+        await em.populate(sprints, ["project"]);
 
         return sprints;
     }

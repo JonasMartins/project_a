@@ -4,6 +4,8 @@ type GlobalContext = {
     userName: string;
     userRole: string;
     expanded: Boolean;
+    isLogged: Boolean;
+    _setIsLogged: (isLogged: Boolean) => void;
     _setExpanded: (isExpanded: Boolean) => void;
     colorMode: "dark" | "light";
     setIsLoading: (isLoading: boolean) => void;

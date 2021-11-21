@@ -16,10 +16,12 @@ import { TeamResolver } from "./resolvers/team.resolvers";
 import { AppointmentResolver } from "./resolvers/appointment.resolver";
 import { SprintResolver } from "./resolvers/sprint.resolver";
 import { ProjectResolver } from "./resolvers/project.resolver";
+import { CommentResolver } from "./resolvers/comment.resolver";
 import { Context } from "./types";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
+import { graphqlUploadExpress } from "graphql-upload";
 
 type failedRefresh = {
     ok: boolean;
@@ -43,7 +45,7 @@ export default class Application {
     public init = async (): Promise<void> => {
         this.app = express();
 
-        this.app.use(cookieParser());
+        // this.app.use(cookieParser());
 
         this.app.use(
             cors({
@@ -52,6 +54,7 @@ export default class Application {
             })
         );
 
+        /*
         this.app.post("/refresh_token", async (req, res) => {
             const token = req.cookies[COOKIE_NAME];
             const failedRefresh: failedRefresh = { ok: false, accessToken: "" };
@@ -64,7 +67,6 @@ export default class Application {
             } catch (e) {
                 return res.send(failedRefresh);
             }
-
             // token is valid
             const user = await this.orm.em.findOne(User, {
                 id: payload.userId,
@@ -82,7 +84,7 @@ export default class Application {
             sendRefreshToken(res, createRefreshToken(user));
 
             return res.send({ ok: true, accessToken: createAcessToken(user) });
-        });
+        }); */
 
         const apolloServer = new ApolloServer({
             schema: await buildSchema({
@@ -94,12 +96,25 @@ export default class Application {
                     SprintResolver,
                     ProjectResolver,
                     AppointmentResolver,
+                    CommentResolver,
                 ],
                 validate: false,
             }),
             // special object accesible for all resolvers
-            context: ({ req, res }): Context => ({ em: this.orm.em, req, res }),
+            context: ({ req, res }): Context => ({
+                em: this.orm.em,
+                req,
+                res,
+            }),
+            introspection: true,
+            uploads: false,
         });
+
+        this.app.use(
+            graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 2 })
+        );
+
+        this.app.use("/images", express.static("images"));
 
         apolloServer.applyMiddleware({
             app: this.app,

@@ -20,6 +20,8 @@ export type Scalars = {
     Float: number;
     /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
     DateTime: any;
+    /** The `Upload` scalar type represents a file upload. */
+    Upload: any;
 };
 
 export type Appointment = {
@@ -51,6 +53,32 @@ export type AppointmentsResponse = {
     appointments?: Maybe<Array<Appointment>>;
 };
 
+export type Comment = {
+    __typename?: "Comment";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    body: Scalars["String"];
+    item: Item;
+    author: User;
+    order: Scalars["Float"];
+    replies: Array<Comment>;
+    parent?: Maybe<Comment>;
+};
+
+export type CommentResponse = {
+    __typename?: "CommentResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    comment?: Maybe<Comment>;
+};
+
+export type CommentsResponse = {
+    __typename?: "CommentsResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    comments?: Maybe<Array<Comment>>;
+    total: Scalars["Float"];
+};
+
 export type ErrorFieldHandler = {
     __typename?: "ErrorFieldHandler";
     field: Scalars["String"];
@@ -76,6 +104,7 @@ export type Item = {
     approver_id: Scalars["String"];
     sprint: Sprint;
     appointments: Array<Appointment>;
+    comments?: Maybe<Array<Comment>>;
 };
 
 /** The basic directions */
@@ -135,6 +164,7 @@ export type LoginResponse = {
 export type Mutation = {
     __typename?: "Mutation";
     createItem: ItemResponse;
+    changeItemStatus: Scalars["Boolean"];
     revokeRefreshTokensForUser: RevokeResponse;
     createUser: UserResponse;
     logout?: Maybe<Scalars["Boolean"]>;
@@ -144,7 +174,10 @@ export type Mutation = {
     createTeam: TeamResponse;
     createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
+    updateSprint: SprintResponse;
     createProject: ProjectResponse;
+    updateProject: ProjectResponse;
+    createComment: CommentResponse;
 };
 
 export type MutationCreateItemArgs = {
@@ -152,6 +185,11 @@ export type MutationCreateItemArgs = {
     responsibleId: Scalars["String"];
     reporterId: Scalars["String"];
     options: ItemValidator;
+};
+
+export type MutationChangeItemStatusArgs = {
+    newStatus: ItemStatus;
+    id: Scalars["String"];
 };
 
 export type MutationRevokeRefreshTokensForUserArgs = {
@@ -168,7 +206,13 @@ export type MutationLoginArgs = {
 };
 
 export type MutationUpdateSeetingsUserArgs = {
-    options: UserSeetingsInput;
+    file?: Maybe<Scalars["Upload"]>;
+    active?: Maybe<Scalars["Boolean"]>;
+    role_id?: Maybe<Scalars["String"]>;
+    password?: Maybe<Scalars["String"]>;
+    email?: Maybe<Scalars["String"]>;
+    name?: Maybe<Scalars["String"]>;
+    id: Scalars["String"];
 };
 
 export type MutationCreateRoleArgs = {
@@ -187,8 +231,28 @@ export type MutationCreateSprintArgs = {
     options: SprintValidator;
 };
 
+export type MutationUpdateSprintArgs = {
+    active?: Maybe<Scalars["Boolean"]>;
+    options: SprintValidator;
+    id: Scalars["String"];
+};
+
 export type MutationCreateProjectArgs = {
     options: ProjectValidator;
+};
+
+export type MutationUpdateProjectArgs = {
+    description: Scalars["String"];
+    name: Scalars["String"];
+    id: Scalars["String"];
+};
+
+export type MutationCreateCommentArgs = {
+    order?: Maybe<Scalars["Float"]>;
+    parentId?: Maybe<Scalars["String"]>;
+    authorId: Scalars["String"];
+    itemId: Scalars["String"];
+    body: Scalars["String"];
 };
 
 export type Project = {
@@ -218,7 +282,7 @@ export type Query = {
     getItemById: ItemResponse;
     getItensBacklog: ItensResponse;
     hello: Scalars["String"];
-    logedInTest: Scalars["String"];
+    logedInTest: AuthUserResponse;
     getAllUsers: UsersResponse;
     getUserById: UserResponse;
     getUserSettings: UserResponse;
@@ -231,6 +295,8 @@ export type Query = {
     getSprintById: SprintResponse;
     getProjects?: Maybe<Array<Project>>;
     getProjectById: ProjectResponse;
+    getCommentById: CommentResponse;
+    getCommentsByItem: CommentsResponse;
 };
 
 export type QueryGetItensRelatedToUserByPeriodArgs = {
@@ -245,7 +311,7 @@ export type QueryGetItemByIdArgs = {
 };
 
 export type QueryGetItensBacklogArgs = {
-    cursor?: Maybe<Scalars["DateTime"]>;
+    offset?: Maybe<Scalars["Float"]>;
     limit?: Maybe<Scalars["Float"]>;
 };
 
@@ -295,6 +361,14 @@ export type QueryGetProjectsArgs = {
 
 export type QueryGetProjectByIdArgs = {
     id: Scalars["String"];
+};
+
+export type QueryGetCommentByIdArgs = {
+    id: Scalars["String"];
+};
+
+export type QueryGetCommentsByItemArgs = {
+    itemId: Scalars["String"];
 };
 
 export type RevokeResponse = {
@@ -407,7 +481,8 @@ export type User = {
     teams: Array<Team>;
     role: Role;
     appointments: Array<Appointment>;
-    picure?: Maybe<Scalars["String"]>;
+    comments?: Maybe<Array<Comment>>;
+    picture?: Maybe<Scalars["String"]>;
     active: Scalars["Boolean"];
 };
 
@@ -431,6 +506,12 @@ export type UsersResponse = {
     total: Scalars["Float"];
 };
 
+export type AuthUserResponse = {
+    __typename?: "authUserResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    result?: Maybe<Scalars["String"]>;
+};
+
 export type TokenAndId = {
     __typename?: "tokenAndId";
     accessToken?: Maybe<Scalars["String"]>;
@@ -439,13 +520,15 @@ export type TokenAndId = {
     userRoleCode?: Maybe<Scalars["String"]>;
 };
 
-export type UserSeetingsInput = {
+export type ChangeItemStatusMutationVariables = Exact<{
     id: Scalars["String"];
-    name?: Maybe<Scalars["String"]>;
-    email?: Maybe<Scalars["String"]>;
-    password?: Maybe<Scalars["String"]>;
-    role_id?: Maybe<Scalars["String"]>;
-};
+    newStatus: ItemStatus;
+}>;
+
+export type ChangeItemStatusMutation = { __typename?: "Mutation" } & Pick<
+    Mutation,
+    "changeItemStatus"
+>;
 
 export type CreateItemMutationVariables = Exact<{
     approverId: Scalars["String"];
@@ -483,6 +566,82 @@ export type CreateItemMutation = { __typename?: "Mutation" } & {
     };
 };
 
+export type CreateProjectMutationVariables = Exact<{
+    options: ProjectValidator;
+}>;
+
+export type CreateProjectMutation = { __typename?: "Mutation" } & {
+    createProject: { __typename?: "ProjectResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        project?: Maybe<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "description"
+            >
+        >;
+    };
+};
+
+export type CreateSprintMutationVariables = Exact<{
+    options: SprintValidator;
+}>;
+
+export type CreateSprintMutation = { __typename?: "Mutation" } & {
+    createSprint: { __typename?: "SprintResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        sprint?: Maybe<
+            { __typename?: "Sprint" } & Pick<
+                Sprint,
+                "id" | "code" | "description" | "length"
+            > & {
+                    project: { __typename?: "Project" } & Pick<
+                        Project,
+                        "id" | "name"
+                    >;
+                }
+        >;
+    };
+};
+
+export type CreateUserMutationVariables = Exact<{
+    name: Scalars["String"];
+    email: Scalars["String"];
+    password: Scalars["String"];
+    role_id: Scalars["String"];
+}>;
+
+export type CreateUserMutation = { __typename?: "Mutation" } & {
+    createUser: { __typename?: "UserResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "field" | "message" | "method"
+                >
+            >
+        >;
+        user?: Maybe<
+            { __typename?: "User" } & Pick<User, "id" | "name"> & {
+                    role: { __typename?: "Role" } & Pick<Role, "name" | "code">;
+                }
+        >;
+    };
+};
+
 export type LoginMutationVariables = Exact<{
     email: Scalars["String"];
     password: Scalars["String"];
@@ -514,8 +673,39 @@ export type Unnamed_1_Mutation = { __typename?: "Mutation" } & Pick<
     "logout"
 >;
 
+export type UpdateProjectMutationVariables = Exact<{
+    id: Scalars["String"];
+    name: Scalars["String"];
+    description: Scalars["String"];
+}>;
+
+export type UpdateProjectMutation = { __typename?: "Mutation" } & {
+    updateProject: { __typename?: "ProjectResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        project?: Maybe<
+            { __typename?: "Project" } & Pick<
+                Project,
+                "id" | "name" | "description"
+            >
+        >;
+    };
+};
+
 export type UpdateSeetingsUserMutationVariables = Exact<{
-    options: UserSeetingsInput;
+    id: Scalars["String"];
+    email: Scalars["String"];
+    name: Scalars["String"];
+    password: Scalars["String"];
+    role_id: Scalars["String"];
+    active: Scalars["Boolean"];
+    file?: Maybe<Scalars["Upload"]>;
 }>;
 
 export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
@@ -532,6 +722,60 @@ export type UpdateSeetingsUserMutation = { __typename?: "Mutation" } & {
             { __typename?: "User" } & Pick<User, "id" | "name" | "email"> & {
                     role: { __typename?: "Role" } & Pick<Role, "id" | "name">;
                 }
+        >;
+    };
+};
+
+export type UpdateSprintMutationVariables = Exact<{
+    options: SprintValidator;
+    id: Scalars["String"];
+    active: Scalars["Boolean"];
+}>;
+
+export type UpdateSprintMutation = { __typename?: "Mutation" } & {
+    updateSprint: { __typename?: "SprintResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        sprint?: Maybe<
+            { __typename?: "Sprint" } & Pick<
+                Sprint,
+                "id" | "code" | "description" | "length"
+            > & {
+                    project: { __typename?: "Project" } & Pick<
+                        Project,
+                        "id" | "name"
+                    >;
+                }
+        >;
+    };
+};
+
+export type CreateCommentMutationVariables = Exact<{
+    body: Scalars["String"];
+    itemId: Scalars["String"];
+    authorId: Scalars["String"];
+    parentId?: Maybe<Scalars["String"]>;
+    order?: Maybe<Scalars["Float"]>;
+}>;
+
+export type CreateCommentMutation = { __typename?: "Mutation" } & {
+    createComment: { __typename?: "CommentResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        comment?: Maybe<
+            { __typename?: "Comment" } & Pick<Comment, "id" | "body">
         >;
     };
 };
@@ -578,7 +822,7 @@ export type GetAllUsersQuery = { __typename?: "Query" } & {
             Array<
                 { __typename?: "User" } & Pick<
                     User,
-                    "id" | "name" | "email" | "active"
+                    "id" | "name" | "email" | "active" | "picture"
                 > & {
                         role: { __typename?: "Role" } & Pick<
                             Role,
@@ -621,6 +865,54 @@ export type GetAppointmentsByItemQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetCommentsByItemQueryVariables = Exact<{
+    itemId: Scalars["String"];
+}>;
+
+export type GetCommentsByItemQuery = { __typename?: "Query" } & {
+    getCommentsByItem: { __typename?: "CommentsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        comments?: Maybe<
+            Array<
+                { __typename?: "Comment" } & Pick<
+                    Comment,
+                    "id" | "body" | "order" | "createdAt"
+                > & {
+                        parent?: Maybe<
+                            { __typename?: "Comment" } & Pick<
+                                Comment,
+                                "id" | "body"
+                            >
+                        >;
+                        author: { __typename?: "User" } & Pick<
+                            User,
+                            "name" | "picture"
+                        >;
+                        item: { __typename?: "Item" } & Pick<Item, "id">;
+                        replies: Array<
+                            { __typename?: "Comment" } & Pick<
+                                Comment,
+                                "id" | "body" | "createdAt" | "order"
+                            > & {
+                                    author: { __typename?: "User" } & Pick<
+                                        User,
+                                        "name" | "picture"
+                                    >;
+                                }
+                        >;
+                    }
+            >
+        >;
+    };
+};
+
 export type GetItemByIdQueryVariables = Exact<{
     id: Scalars["String"];
 }>;
@@ -655,7 +947,7 @@ export type GetItemByIdQuery = { __typename?: "Query" } & {
 
 export type GetItensBacklogQueryVariables = Exact<{
     limit?: Maybe<Scalars["Float"]>;
-    cursor?: Maybe<Scalars["DateTime"]>;
+    offset?: Maybe<Scalars["Float"]>;
 }>;
 
 export type GetItensBacklogQuery = { __typename?: "Query" } & {
@@ -805,6 +1097,27 @@ export type GetProjectsQuery = { __typename?: "Query" } & {
     >;
 };
 
+export type GetSprintsQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
+}>;
+
+export type GetSprintsQuery = { __typename?: "Query" } & {
+    getSprints?: Maybe<
+        Array<
+            { __typename?: "Sprint" } & Pick<
+                Sprint,
+                "id" | "description" | "code" | "length" | "final" | "active"
+            > & {
+                    project: { __typename?: "Project" } & Pick<
+                        Project,
+                        "id" | "name"
+                    >;
+                }
+        >
+    >;
+};
+
 export type GetUserByIdQueryVariables = Exact<{
     id: Scalars["String"];
 }>;
@@ -861,7 +1174,7 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
         user?: Maybe<
             { __typename?: "User" } & Pick<
                 User,
-                "id" | "name" | "email" | "password" | "picure"
+                "id" | "name" | "email" | "password" | "picture"
             > & {
                     role: { __typename?: "Role" } & Pick<
                         Role,
@@ -872,6 +1185,36 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
     };
 };
 
+export type LogedInTestQueryVariables = Exact<{ [key: string]: never }>;
+
+export type LogedInTestQuery = { __typename?: "Query" } & {
+    logedInTest: { __typename?: "authUserResponse" } & Pick<
+        AuthUserResponse,
+        "result"
+    > & {
+            errors?: Maybe<
+                Array<
+                    { __typename?: "ErrorFieldHandler" } & Pick<
+                        ErrorFieldHandler,
+                        "method" | "message" | "field"
+                    >
+                >
+            >;
+        };
+};
+
+export const ChangeItemStatusDocument = gql`
+    mutation ChangeItemStatus($id: String!, $newStatus: ItemStatus!) {
+        changeItemStatus(id: $id, newStatus: $newStatus)
+    }
+`;
+
+export function useChangeItemStatusMutation() {
+    return Urql.useMutation<
+        ChangeItemStatusMutation,
+        ChangeItemStatusMutationVariables
+    >(ChangeItemStatusDocument);
+}
 export const CreateItemDocument = gql`
     mutation CreateItem(
         $approverId: String!
@@ -917,6 +1260,94 @@ export function useCreateItemMutation() {
         CreateItemDocument
     );
 }
+export const CreateProjectDocument = gql`
+    mutation createProject($options: ProjectValidator!) {
+        createProject(options: $options) {
+            errors {
+                method
+                message
+                field
+            }
+            project {
+                id
+                name
+                description
+            }
+        }
+    }
+`;
+
+export function useCreateProjectMutation() {
+    return Urql.useMutation<
+        CreateProjectMutation,
+        CreateProjectMutationVariables
+    >(CreateProjectDocument);
+}
+export const CreateSprintDocument = gql`
+    mutation CreateSprint($options: SprintValidator!) {
+        createSprint(options: $options) {
+            errors {
+                message
+                method
+                field
+            }
+            sprint {
+                id
+                code
+                description
+                length
+                project {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useCreateSprintMutation() {
+    return Urql.useMutation<
+        CreateSprintMutation,
+        CreateSprintMutationVariables
+    >(CreateSprintDocument);
+}
+export const CreateUserDocument = gql`
+    mutation CreateUser(
+        $name: String!
+        $email: String!
+        $password: String!
+        $role_id: String!
+    ) {
+        createUser(
+            options: {
+                name: $name
+                password: $password
+                email: $email
+                role_id: $role_id
+            }
+        ) {
+            errors {
+                field
+                message
+                method
+            }
+            user {
+                id
+                name
+                role {
+                    name
+                    code
+                }
+            }
+        }
+    }
+`;
+
+export function useCreateUserMutation() {
+    return Urql.useMutation<CreateUserMutation, CreateUserMutationVariables>(
+        CreateUserDocument
+    );
+}
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
         login(email: $email, password: $password) {
@@ -948,9 +1379,52 @@ export const Document = gql`
 export function useMutation() {
     return Urql.useMutation<Mutation, MutationVariables>(Document);
 }
+export const UpdateProjectDocument = gql`
+    mutation UpdateProject(
+        $id: String!
+        $name: String!
+        $description: String!
+    ) {
+        updateProject(id: $id, name: $name, description: $description) {
+            errors {
+                method
+                message
+                field
+            }
+            project {
+                id
+                name
+                description
+            }
+        }
+    }
+`;
+
+export function useUpdateProjectMutation() {
+    return Urql.useMutation<
+        UpdateProjectMutation,
+        UpdateProjectMutationVariables
+    >(UpdateProjectDocument);
+}
 export const UpdateSeetingsUserDocument = gql`
-    mutation UpdateSeetingsUser($options: userSeetingsInput!) {
-        updateSeetingsUser(options: $options) {
+    mutation UpdateSeetingsUser(
+        $id: String!
+        $email: String!
+        $name: String!
+        $password: String!
+        $role_id: String!
+        $active: Boolean!
+        $file: Upload
+    ) {
+        updateSeetingsUser(
+            id: $id
+            email: $email
+            name: $name
+            password: $password
+            role_id: $role_id
+            active: $active
+            file: $file
+        ) {
             errors {
                 field
                 message
@@ -974,6 +1448,72 @@ export function useUpdateSeetingsUserMutation() {
         UpdateSeetingsUserMutation,
         UpdateSeetingsUserMutationVariables
     >(UpdateSeetingsUserDocument);
+}
+export const UpdateSprintDocument = gql`
+    mutation UpdateSprint(
+        $options: SprintValidator!
+        $id: String!
+        $active: Boolean!
+    ) {
+        updateSprint(options: $options, id: $id, active: $active) {
+            errors {
+                message
+                method
+                field
+            }
+            sprint {
+                id
+                code
+                description
+                length
+                project {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
+export function useUpdateSprintMutation() {
+    return Urql.useMutation<
+        UpdateSprintMutation,
+        UpdateSprintMutationVariables
+    >(UpdateSprintDocument);
+}
+export const CreateCommentDocument = gql`
+    mutation CreateComment(
+        $body: String!
+        $itemId: String!
+        $authorId: String!
+        $parentId: String
+        $order: Float
+    ) {
+        createComment(
+            body: $body
+            itemId: $itemId
+            parentId: $parentId
+            authorId: $authorId
+            order: $order
+        ) {
+            errors {
+                method
+                message
+                field
+            }
+            comment {
+                id
+                body
+            }
+        }
+    }
+`;
+
+export function useCreateCommentMutation() {
+    return Urql.useMutation<
+        CreateCommentMutation,
+        CreateCommentMutationVariables
+    >(CreateCommentDocument);
 }
 export const GetAllRolesDocument = gql`
     query GetAllRoles {
@@ -1014,6 +1554,7 @@ export const GetAllUsersDocument = gql`
                 name
                 email
                 active
+                picture
                 role {
                     id
                     name
@@ -1063,6 +1604,56 @@ export function useGetAppointmentsByItemQuery(
         ...options,
     });
 }
+export const GetCommentsByItemDocument = gql`
+    query GetCommentsByItem($itemId: String!) {
+        getCommentsByItem(itemId: $itemId) {
+            errors {
+                message
+                method
+                field
+            }
+            comments {
+                id
+                body
+                order
+                createdAt
+                parent {
+                    id
+                    body
+                }
+                author {
+                    name
+                    picture
+                }
+                item {
+                    id
+                }
+                replies {
+                    id
+                    body
+                    createdAt
+                    order
+                    author {
+                        name
+                        picture
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export function useGetCommentsByItemQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetCommentsByItemQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetCommentsByItemQuery>({
+        query: GetCommentsByItemDocument,
+        ...options,
+    });
+}
 export const GetItemByIdDocument = gql`
     query GetItemById($id: String!) {
         getItemById(id: $id) {
@@ -1098,8 +1689,8 @@ export function useGetItemByIdQuery(
     });
 }
 export const GetItensBacklogDocument = gql`
-    query GetItensBacklog($limit: Float, $cursor: DateTime) {
-        getItensBacklog(limit: $limit, cursor: $cursor) {
+    query GetItensBacklog($limit: Float, $offset: Float) {
+        getItensBacklog(limit: $limit, offset: $offset) {
             errors {
                 method
                 message
@@ -1248,6 +1839,31 @@ export function useGetProjectsQuery(
         ...options,
     });
 }
+export const GetSprintsDocument = gql`
+    query getSprints($limit: Float, $active: Boolean!) {
+        getSprints(active: $active, limit: $limit) {
+            id
+            description
+            code
+            length
+            final
+            active
+            project {
+                id
+                name
+            }
+        }
+    }
+`;
+
+export function useGetSprintsQuery(
+    options: Omit<Urql.UseQueryArgs<GetSprintsQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetSprintsQuery>({
+        query: GetSprintsDocument,
+        ...options,
+    });
+}
 export const GetUserByIdDocument = gql`
     query GetUserById($id: String!) {
         getUserById(id: $id) {
@@ -1303,7 +1919,7 @@ export const GetUserSettingsDocument = gql`
                 name
                 email
                 password
-                picure
+                picture
                 role {
                     id
                     name
@@ -1322,6 +1938,27 @@ export function useGetUserSettingsQuery(
 ) {
     return Urql.useQuery<GetUserSettingsQuery>({
         query: GetUserSettingsDocument,
+        ...options,
+    });
+}
+export const LogedInTestDocument = gql`
+    query LogedInTest {
+        logedInTest {
+            errors {
+                method
+                message
+                field
+            }
+            result
+        }
+    }
+`;
+
+export function useLogedInTestQuery(
+    options: Omit<Urql.UseQueryArgs<LogedInTestQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<LogedInTestQuery>({
+        query: LogedInTestDocument,
         ...options,
     });
 }

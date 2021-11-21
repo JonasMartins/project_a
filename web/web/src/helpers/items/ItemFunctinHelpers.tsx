@@ -17,7 +17,15 @@ import {
     Sprint,
     Project,
     Item,
+    ItemType,
 } from "./../../generated/graphql";
+
+export type itemQuery = {
+    __typename?: "Item";
+} & Pick<
+    Item,
+    "id" | "description" | "summary" | "status" | "priority" | "type"
+>;
 
 export type itemBacklog = { __typename?: "Item" } & Pick<
     Item,
@@ -130,7 +138,7 @@ export const getItemTypeIcon = (type: string): JSX.Element => {
     return componentType;
 };
 
-export const returnHeaderGradient = (type: enumItemType): string => {
+export const returnHeaderGradient = (type: enumItemType | ItemType): string => {
     let stringGradientInfo = "";
 
     switch (type) {
@@ -147,7 +155,9 @@ export const returnHeaderGradient = (type: enumItemType): string => {
     return stringGradientInfo;
 };
 
-export const returnIconHeaderLabel = (type: enumItemType): JSX.Element => {
+export const returnIconHeaderLabel = (
+    type: enumItemType | ItemType
+): JSX.Element => {
     let componentType: JSX.Element | null = null;
     switch (type) {
         case "BUG":

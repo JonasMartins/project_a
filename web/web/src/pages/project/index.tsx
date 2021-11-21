@@ -10,6 +10,9 @@ import {
     Th,
     Thead,
     Tr,
+    IconButton,
+    Tooltip,
+    useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { FcWorkflow } from "react-icons/fc";
@@ -21,8 +24,14 @@ import Navbar from "./../../components/rootComponents/Navbar";
 import React, { useEffect, useState, useContext } from "react";
 import { useGetProjectsQuery } from "./../../generated/graphql";
 import FullPageSpinner from "./../../components/rootComponents/FullPageSpinner";
+import { GrAdd } from "react-icons/gr";
+import ModalCreateUpdateProject from "./../../components/modal/ModalCreateUpdateProject";
+import { AiFillEdit } from "react-icons/ai";
+import { projectType } from "./../../utils/generalGroupTypes";
 
 interface projectsProps {}
+
+type manageContext = "update" | "create";
 
 const Project: React.FC<projectsProps> = ({}) => {
     const { expanded } = useContext(GlobalContext);
@@ -31,8 +40,23 @@ const Project: React.FC<projectsProps> = ({}) => {
         variables: {
             limit: 5,
         },
-        pause: true,
     });
+
+    const [context, setContext] = useState<manageContext>("update");
+    const [countUpdate, setCountUpdate] = useState(0);
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
+
+    const [selectedProject, setSelectedProject] = useState<projectType | null>(
+        null
+    );
+
+    const modalCreateUpdateProject = useDisclosure();
+
+    const customOnOpenCreateUpdateProject = (): void => {
+        modalCreateUpdateProject.onOpen();
+    };
 
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
@@ -46,8 +70,8 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-        reexecuteQuery({ requestPolicy: "cache-first" });
-    }, [fetching, expanded, reexecuteQuery]);
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+    }, [fetching, expanded, reexecuteQuery, countUpdate]);
 
     if (error) return <p>Oh no... {error.message}</p>;
 
@@ -78,12 +102,37 @@ const Project: React.FC<projectsProps> = ({}) => {
                             {">"}
                         </Text>
                     </Flex>
-                    <Flex p={2} mb="150px">
-                        <Table size="lg" variant="striped">
+                    <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
+                        Projects
+                    </Text>
+                    <Flex p={2} m={2} justifyContent="flex-end">
+                        <Tooltip
+                            hasArrow
+                            aria-label="Add new project"
+                            label="Add a new project"
+                            colorScheme="withe"
+                        >
+                            <IconButton
+                                isRound={true}
+                                aria-label="Add new project"
+                                variant="cyan-gradient"
+                                mr={1}
+                                icon={<GrAdd />}
+                                onClick={() => {
+                                    setContext("create");
+                                    customOnOpenCreateUpdateProject();
+                                    setSelectedProject(null);
+                                }}
+                            />
+                        </Tooltip>
+                    </Flex>
+                    <Flex p={2} mb="250px">
+                        <Table size="sm" variant="striped">
                             <Thead>
                                 <Tr>
                                     <Th>Name</Th>
                                     <Th>Description</Th>
+                                    <Th>Edit</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -126,6 +175,31 @@ const Project: React.FC<projectsProps> = ({}) => {
                                                     </Text>
                                                 )}
                                             </Td>
+                                            <Td>
+                                                <Tooltip
+                                                    hasArrow
+                                                    aria-label="Edit project"
+                                                    label="Edit project"
+                                                    colorScheme="withe"
+                                                >
+                                                    <IconButton
+                                                        isRound={true}
+                                                        aria-label="Edit project"
+                                                        variant="ghost"
+                                                        mr={1}
+                                                        icon={<AiFillEdit />}
+                                                        onClick={() => {
+                                                            setContext(
+                                                                "update"
+                                                            );
+                                                            customOnOpenCreateUpdateProject();
+                                                            setSelectedProject({
+                                                                project,
+                                                            });
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            </Td>
                                         </Tr>
                                     ))}
                             </Tbody>
@@ -140,6 +214,14 @@ const Project: React.FC<projectsProps> = ({}) => {
                 <Box id="footer">
                     <Footer />
                 </Box>
+                <ModalCreateUpdateProject
+                    context={context}
+                    project={selectedProject}
+                    isOpen={modalCreateUpdateProject.isOpen}
+                    countUpdate={countUpdate}
+                    updateCallback={updatedCallback}
+                    onClose={modalCreateUpdateProject.onClose}
+                />
             </Container>
         </>
     );

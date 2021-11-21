@@ -15,11 +15,16 @@ import {
 import { COOKIE_NAME } from "../constants";
 import { User } from "../entities/user.entity";
 import { Context } from "../types";
-import { createAcessToken } from "../utils/auth";
+import { createAcessToken, authUserResponse } from "../utils/auth";
 import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { isAuth } from "../utils/isAuth";
 import { Role } from "./../entities/role.entity";
-import { genericError } from "./../utils/generalAuxiliaryMethods";
+import {
+    genericError,
+    validateEmail,
+} from "./../utils/generalAuxiliaryMethods";
+import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { manageUploadFile } from "./../utils/helpers/uploader.helper";
 
 @InputType()
 class UserBasicData {
@@ -52,6 +57,9 @@ class userSeetingsInput {
 
     @Field(() => Boolean, { nullable: true })
     active?: boolean;
+
+    @Field(() => GraphQLUpload, { nullable: true })
+    file?: FileUpload;
 }
 
 @ObjectType()
@@ -83,6 +91,7 @@ class UserResponse {
     errors?: ErrorFieldHandler[];
     @Field(() => User, { nullable: true })
     user?: User;
+    keys?: null;
 }
 
 @ObjectType()
@@ -140,10 +149,23 @@ export class UserResolver {
         return result;
     }
 
-    @Query(() => String)
+    @Query(() => authUserResponse)
     @UseMiddleware(isAuth)
-    logedInTest(@Ctx() { payload }: Context) {
-        return `Hi, yout id is : ${payload!.userId}`;
+    logedInTest(@Ctx() { payload }: Context): authUserResponse {
+        if (!payload?.userId) {
+            return {
+                errors: genericError(
+                    "-",
+                    "logedInTest",
+                    __filename,
+                    "Not Authenticated"
+                ),
+            };
+        }
+
+        let result = JSON.stringify(payload);
+
+        return { result };
     }
 
     @Query(() => UsersResponse)
@@ -227,13 +249,38 @@ export class UserResolver {
         @Arg("options") options: UserBasicData,
         @Ctx() { em }: Context
     ): Promise<UserResponse> {
+        if (!validateEmail(options.email)) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: `Email ${options.email} wrong email format.`,
+                        method: `Method: createUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        const userEmail = await em.findOne(User, { email: options.email });
+
+        if (userEmail) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: `Email ${options.email} already takken.`,
+                        method: `Method: createUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
         if (options.name.length <= 2) {
             return {
                 errors: [
                     {
-                        field: "username",
-                        message:
-                            "A username must have length greater than 2 charachters.",
+                        field: "name",
+                        message: "A user name must have length greater than 2.",
                         method: `Method: createUser, at ${__filename}`,
                     },
                 ],
@@ -245,7 +292,7 @@ export class UserResolver {
                     {
                         field: "password",
                         message:
-                            "A user password must have length greater than 3 charachters.",
+                            "A user password must have length greater than 3.",
                         method: `Method: createUser, at ${__filename}`,
                     },
                 ],
@@ -371,35 +418,79 @@ export class UserResolver {
     // userSeetingsInput
     @Mutation(() => UserResponse)
     async updateSeetingsUser(
-        @Arg("options") options: userSeetingsInput,
+        @Arg("id", () => String) id: string,
+        @Arg("name", () => String, { nullable: true }) name: string,
+        @Arg("email", () => String, { nullable: true }) email: string,
+        @Arg("password", () => String, { nullable: true }) password: string,
+        @Arg("role_id", () => String, { nullable: true }) role_id: string,
+        @Arg("active", () => Boolean, { nullable: true }) active: boolean,
+        @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload,
         @Ctx() { em }: Context
     ): Promise<UserResponse> {
-        const user = await em.findOne(User, { id: options.id });
-
-        if (!user) {
+        if (name.length <= 2) {
             return {
                 errors: [
                     {
-                        field: "id",
-                        message: `Could not found user with id: ${options.id}`,
+                        field: "name",
+                        message: "A user name must have length greater than 2.",
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+        if (password && password.length <= 3) {
+            return {
+                errors: [
+                    {
+                        field: "password",
+                        message:
+                            "A user password must have length greater than 3.",
                         method: `Method: updateSeetingsUser, at ${__filename}`,
                     },
                 ],
             };
         }
 
+        if (!validateEmail(email)) {
+            return {
+                errors: [
+                    {
+                        field: "email",
+                        message: `Email ${email} wrong email format.`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        const user = await em.findOne(User, { id });
+
+        if (!user) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: `Could not found user with id: ${id}`,
+                        method: `Method: updateSeetingsUser, at ${__filename}`,
+                    },
+                ],
+            };
+        }
+
+        user.active = active;
+
         if (
-            options.email.toLocaleLowerCase().replace(/ /g, "") !==
+            email.toLocaleLowerCase().replace(/ /g, "") !==
             user.email.toLocaleLowerCase().replace(/ /g, "")
         ) {
-            const userEmail = await em.findOne(User, { email: options.email });
+            const userEmail = await em.findOne(User, { email: email });
 
             if (userEmail) {
                 return {
                     errors: [
                         {
                             field: "email",
-                            message: `Email ${options.email} already takken.`,
+                            message: `Email ${email} already takken.`,
                             method: `Method: updateSeetingsUser, at ${__filename}`,
                         },
                     ],
@@ -407,22 +498,22 @@ export class UserResolver {
             }
         }
 
-        const role = await em.findOne(Role, { id: options.role_id });
+        const role = await em.findOne(Role, { id: role_id });
 
         if (!role) {
             return {
                 errors: [
                     {
                         field: "role_id",
-                        message: `Could not found role with id: ${options.role_id}`,
+                        message: `Could not found role with id: ${role_id}`,
                         method: `Method: updateSeetingsUser, at ${__filename}`,
                     },
                 ],
             };
         }
 
-        if (options.password) {
-            if (options.password.length <= 3) {
+        if (password) {
+            if (password.length <= 3) {
                 return {
                     errors: [
                         {
@@ -435,14 +526,28 @@ export class UserResolver {
                 };
             }
 
-            const hashedPassword = await argon2.hash(options.password);
-            options.password = hashedPassword;
-            user.password = options.password;
+            const hashedPassword = await argon2.hash(password);
+            password = hashedPassword;
+            user.password = password;
         }
 
-        user.name = options.name;
-        user.email = options.email;
+        user.name = name;
+        user.email = email;
         user.role = role;
+
+        if (file) {
+            let result = await manageUploadFile(
+                file,
+                "file",
+                "getUniqueFolderName",
+                __filename
+            );
+
+            // throw an error if the file could note been uploaded
+            if (result.path) {
+                user.picture = result.path;
+            }
+        }
 
         try {
             await em.persistAndFlush(user);

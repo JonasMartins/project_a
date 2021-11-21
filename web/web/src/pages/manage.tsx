@@ -10,6 +10,8 @@ import {
     Th,
     Thead,
     Tooltip,
+    Image,
+    Button,
     Tr,
     useDisclosure,
 } from "@chakra-ui/react";
@@ -19,7 +21,7 @@ import { AiFillEdit } from "react-icons/ai";
 import { IoPersonAddOutline } from "react-icons/io5";
 import SideBar from "../components/layout/SideBar";
 import { Container } from "./../components/Container";
-import ModalManagerUpdateUser from "./../components/modal/ModalManagerUpdateUser";
+import ModalManagerUpdateCreate from "../components/modal/ModalManagerUpdateCreateUser";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import Footer from "./../components/rootComponents/Footer";
 import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
@@ -32,8 +34,10 @@ import {
 } from "./../generated/graphql";
 import { useUser } from "./../helpers/hooks/useUser";
 import { userManageInfo } from "./../helpers/users/userFunctonHelpers";
+import { getServerPathImage } from "./../utils/handleServerImagePaths";
 
 interface manageProps {}
+type manageContext = "update" | "create";
 
 const Manage: React.FC<manageProps> = ({}) => {
     const user = useUser();
@@ -44,21 +48,29 @@ const Manage: React.FC<manageProps> = ({}) => {
     const [seletedUser, setSelectedUser] = useState<userManageInfo | null>(
         null
     );
+    const [activeUsers, setActiveUsers] = useState(true);
+    const [countUpdate, setCountUpdate] = useState(0);
+    const [context, setContext] = useState<manageContext>("update");
+
     const [roles, setRoles] = useState<GetAllRolesQuery | null>(null);
 
-    const [users] = useGetAllUsersQuery({
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
+
+    const [users, reexecuteQuery] = useGetAllUsersQuery({
         variables: {
             limit: 10,
-            active: true,
+            active: activeUsers,
         },
     });
 
     const [allRoles] = useGetAllRolesQuery();
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const modalUpdateUser = useDisclosure();
 
-    const customOnOpen = (): void => {
-        onOpen();
+    const customOnOpenUpdateUser = (): void => {
+        modalUpdateUser.onOpen();
     };
 
     useEffect(() => {
@@ -74,8 +86,9 @@ const Manage: React.FC<manageProps> = ({}) => {
         } else {
             setPageWidth("3em");
             setNavBarWidth("50px");
+            reexecuteQuery({ requestPolicy: "cache-and-network" });
         }
-    }, [users.fetching, allRoles.fetching, expanded]);
+    }, [users.fetching, allRoles.fetching, expanded, activeUsers, countUpdate]);
 
     const content = (
         <Container>
@@ -110,7 +123,22 @@ const Manage: React.FC<manageProps> = ({}) => {
                 <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
                     Management
                 </Text>
-                <Flex p={2} m={2} justifyContent="end">
+                <Flex p={2} m={2} justifyContent="flex-end">
+                    <Tooltip
+                        hasArrow
+                        aria-label="list disabled/enabled users"
+                        label="List Enabled/Disabled users"
+                        colorScheme="withe"
+                    >
+                        <Button
+                            onClick={() => {
+                                setActiveUsers(!activeUsers);
+                            }}
+                            mr={2}
+                        >
+                            {activeUsers ? "Disabled?" : "Activated?"}
+                        </Button>
+                    </Tooltip>
                     <Tooltip
                         hasArrow
                         aria-label="Add new user"
@@ -123,6 +151,11 @@ const Manage: React.FC<manageProps> = ({}) => {
                             variant="cyan-gradient"
                             mr={1}
                             icon={<IoPersonAddOutline />}
+                            onClick={() => {
+                                setContext("create");
+                                customOnOpenUpdateUser();
+                                setSelectedUser(null);
+                            }}
                         />
                     </Tooltip>
                 </Flex>
@@ -132,6 +165,7 @@ const Manage: React.FC<manageProps> = ({}) => {
                         <Table variant="striped" size="sm">
                             <Thead>
                                 <Tr>
+                                    <Th>Profile</Th>
                                     <Th>Name</Th>
                                     <Th>Email</Th>
                                     <Th>Role</Th>
@@ -142,6 +176,17 @@ const Manage: React.FC<manageProps> = ({}) => {
                             <Tbody>
                                 {users.data?.getAllUsers?.users?.map((user) => (
                                     <Tr key={user.id}>
+                                        <Td>
+                                            {
+                                                <Image
+                                                    boxSize="40px"
+                                                    borderRadius="full"
+                                                    src={getServerPathImage(
+                                                        user.picture
+                                                    )}
+                                                />
+                                            }
+                                        </Td>
                                         <Td>{user.name}</Td>
                                         <Td>{user.email}</Td>
                                         <Td>{user.role.name}</Td>
@@ -160,7 +205,8 @@ const Manage: React.FC<manageProps> = ({}) => {
                                                     mr={1}
                                                     icon={<AiFillEdit />}
                                                     onClick={() => {
-                                                        customOnOpen();
+                                                        setContext("update");
+                                                        customOnOpenUpdateUser();
                                                         setSelectedUser({
                                                             user,
                                                         });
@@ -180,11 +226,14 @@ const Manage: React.FC<manageProps> = ({}) => {
             <Box id="footer">
                 <Footer />
             </Box>
-            <ModalManagerUpdateUser
+            <ModalManagerUpdateCreate
+                context={context}
                 user={seletedUser}
-                isOpen={isOpen}
+                isOpen={modalUpdateUser.isOpen}
                 roles={roles}
-                onClose={onClose}
+                onClose={modalUpdateUser.onClose}
+                countUpdate={countUpdate}
+                updateCallback={updatedCallback}
             />
         </Container>
     );

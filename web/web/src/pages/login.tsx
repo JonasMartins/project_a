@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { Box, Stack } from "@chakra-ui/react";
 import { Form, Formik, Field } from "formik";
-
 import {
     FormControl,
     Button,
@@ -11,52 +10,32 @@ import {
     Image,
     Flex,
     Text,
+    useColorMode,
 } from "@chakra-ui/react";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/dist/client/router";
-import { Container } from "./../components/Container";
 import ButtonColorMode from "../components/ButtonColorMode";
 import { GlobalContext } from "./../context/globalContext";
 
 interface loginProps {}
 
-const roleCode = {
-    "001": "Developer Jr 1",
-    "002": "Developer Jr 2",
-    "003": "Tech Leader",
-    "999": "Admin",
-};
-
 const Login: React.FC<loginProps> = ({}) => {
     const router = useRouter();
+    const { colorMode } = useColorMode();
+    const bgColor = { light: "gray.50", dark: "gray.700" };
+    const color = { light: "black", dark: "white" };
     const [{}, login] = useLoginMutation();
 
-    const { setIsLoading } = useContext(GlobalContext);
-    type errors = {
-        email: string;
-        password: string;
-    };
+    const { setIsLoading, loading } = useContext(GlobalContext);
 
-    const validateEmail = (values: string): string => {
-        let error = "";
-
-        const regexEmail: RegExp = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
-
-        if (!values) {
-            error = `Field Email is required`;
-        }
-
-        if (values && !regexEmail.test(values)) {
-            error = "Invalid email";
-        }
-
-        return error;
-    };
     return (
-        <Container>
+        <Flex
+            direction="column"
+            bg={bgColor[colorMode]}
+            color={color[colorMode]}
+        >
             <ButtonColorMode size="md" position="fixed" right="1em" top="1em" />
-
             <Box
                 display="flex"
                 justifyContent="center"
@@ -78,40 +57,31 @@ const Login: React.FC<loginProps> = ({}) => {
                         initialValues={{ email: "", password: "" }}
                         onSubmit={async (values, { setErrors }) => {
                             const response = await login(values);
+                            setIsLoading(true);
 
                             if (response.data?.login.errors) {
                                 setErrors(
                                     toErrorMap(response.data.login.errors)
                                 );
+                                setIsLoading(false);
                             } else if (
                                 response.data?.login.result.accessToken
                             ) {
-                                setIsLoading(false);
-
                                 localStorage.setItem(
                                     "token",
                                     response.data?.login.result.accessToken
                                 );
-                                /*
-                                setToken(
-                                    response.data?.login?.result?.accessToken
-                                );*/
-                                // console.log("login");
-
                                 setTimeout(() => {
+                                    setIsLoading(false);
                                     router.push("/");
-                                }, 300)
-
+                                }, 500);
                             }
                         }}
                     >
                         {(props) => (
                             <Form>
                                 <Stack spacing={3}>
-                                    <Field
-                                        name="email"
-                                        validade={validateEmail}
-                                    >
+                                    <Field name="email">
                                         {({ field, form }) => (
                                             <FormControl
                                                 isInvalid={form.errors.email}
@@ -157,7 +127,7 @@ const Login: React.FC<loginProps> = ({}) => {
                                     </Field>
                                     <Button
                                         mt="2em"
-                                        isLoading={props.isSubmitting}
+                                        isLoading={Boolean(loading)}
                                         type="submit"
                                         variant="cyan-gradient"
                                         borderRadius="2em"
@@ -172,8 +142,7 @@ const Login: React.FC<loginProps> = ({}) => {
                     </Formik>
                 </Box>
             </Box>
-            {/* </Flex> */}
-        </Container>
+        </Flex>
     );
 };
 export default Login;

@@ -6,10 +6,8 @@ import {
     Flex,
     Link,
     IconButton,
-    ScaleFade,
     Tooltip,
 } from "@chakra-ui/react";
-import { SiCodesandbox } from "react-icons/si";
 import {
     AiOutlineApartment,
     AiOutlineOrderedList,
@@ -18,21 +16,18 @@ import {
 } from "react-icons/ai";
 import NextLink from "next/link";
 import { RiAdminLine } from "react-icons/ri";
-import { useUser } from "./../../helpers/hooks/useUser";
 import { GlobalContext } from "./../../context/globalContext";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 
 interface SideBarProps {}
 
-const SideBar: React.FC<SideBarProps> = ({}) => {
+const SideBar: React.FC<SideBarProps> = () => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
 
     const { expanded, _setExpanded } = useContext(GlobalContext);
     const [iconExpanded, setIconExpanded] = useState<Boolean>(expanded);
-
-    const user = useUser();
 
     const contractedContent = () => {
         return (
@@ -44,9 +39,6 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                 overflowX="hidden"
                 transition="0.5s"
             >
-                <Flex mb={5} alignItems="center">
-                    <SiCodesandbox size="20px" />
-                </Flex>
                 <Tooltip
                     hasArrow
                     aria-label="Home"
@@ -72,7 +64,13 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                     placement="right"
                 >
                     <Flex mb={5} alignItems="center">
-                        <AiOutlineApartment size="20px" />
+                        <NextLink href="/sprints">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <AiOutlineApartment size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
                     </Flex>
                 </Tooltip>
                 <Tooltip
@@ -109,28 +107,23 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                         </NextLink>
                     </Flex>
                 </Tooltip>
-
-                {user && user.role === "Admin" ? (
-                    <Tooltip
-                        hasArrow
-                        aria-label="Manage"
-                        label="Manage"
-                        colorScheme="withe"
-                        placement="right"
-                    >
-                        <Flex mb={5} alignItems="center">
-                            <NextLink href="/manage">
-                                <Link textStyle="bold">
-                                    <Flex alignItems="center">
-                                        <RiAdminLine size="20px" />
-                                    </Flex>
-                                </Link>
-                            </NextLink>
-                        </Flex>
-                    </Tooltip>
-                ) : (
-                    <></>
-                )}
+                <Tooltip
+                    hasArrow
+                    aria-label="Manage"
+                    label="Manage"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/manage">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <RiAdminLine size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Tooltip>
             </Flex>
         );
     };
@@ -146,9 +139,6 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                 transition="0.5s"
             >
                 <Flex mb={5} alignItems="center">
-                    <SiCodesandbox size="35px" />
-                </Flex>
-                <Flex mb={5} alignItems="center">
                     <NextLink href="/">
                         <Link textStyle="bold">
                             <Flex alignItems="center">
@@ -159,8 +149,14 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                     </NextLink>
                 </Flex>
                 <Flex mb={5} alignItems="center">
-                    <AiOutlineApartment size="35px" />
-                    <Text ml={2}>Sprints</Text>
+                    <NextLink href="/sprints">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <AiOutlineApartment size="35px" />
+                                <Text ml={2}>Sprints</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
                 </Flex>
                 <Flex mb={5} alignItems="center">
                     <NextLink href="/backlog">
@@ -183,25 +179,21 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
                     </NextLink>
                 </Flex>
 
-                {user && user.role === "Admin" ? (
-                    <Flex mb={5} alignItems="center">
-                        <NextLink href="/manage">
-                            <Link textStyle="bold">
-                                <Flex alignItems="center">
-                                    <RiAdminLine size="35px" />
+                <Flex mb={5} alignItems="center">
+                    <NextLink href="/manage">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <RiAdminLine size="35px" />
 
-                                    <Text ml={2}>Manage</Text>
-                                </Flex>
-                            </Link>
-                        </NextLink>
-                    </Flex>
-                ) : (
-                    <></>
-                )}
+                                <Text ml={2}>Manage</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
+                </Flex>
             </Flex>
         );
     };
-    return (
+    const content = (
         <Box
             h="100%"
             overflowY="hidden"
@@ -239,6 +231,8 @@ const SideBar: React.FC<SideBarProps> = ({}) => {
             </Flex>
         </Box>
     );
+
+    return content;
 };
 
 export default SideBar;

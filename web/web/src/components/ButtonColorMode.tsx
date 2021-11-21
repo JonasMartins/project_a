@@ -1,8 +1,7 @@
-import React, { useState, useContext } from "react";
+import React from "react";
 import { useColorMode, IconButton, Tooltip } from "@chakra-ui/react";
 import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-import { GlobalContext } from "./../context/globalContext";
 interface ButtonColorModeProps {
     position?: any;
     top?: string;
@@ -16,14 +15,9 @@ const ButtonColorMode: React.FC<ButtonColorModeProps> = ({
     right,
     size,
 }) => {
-    const { toggleColorMode } = useColorMode();
-    const [darkMode, setDarkMode] = useState(true);
-
-    const { setTheme } = useContext(GlobalContext);
+    const { toggleColorMode, colorMode } = useColorMode();
 
     const handleDarkMode = () => {
-        setDarkMode(!darkMode);
-        setTheme(darkMode ? "dark" : "light");
         toggleColorMode();
     };
 
@@ -43,7 +37,6 @@ const ButtonColorMode: React.FC<ButtonColorModeProps> = ({
                 onClick={handleDarkMode}
                 size={size}
                 isRound={true}
-                isActive={darkMode}
                 colorScheme={"yellow"}
                 icon={<SunIcon />}
             />
@@ -66,13 +59,12 @@ const ButtonColorMode: React.FC<ButtonColorModeProps> = ({
                 onClick={handleDarkMode}
                 size={size}
                 isRound={true}
-                isActive={darkMode}
                 colorScheme={"grey"}
                 icon={<MoonIcon />}
             />
         </Tooltip>
     );
 
-    return darkMode ? DarkTheme : LightTheme;
+    return colorMode === "dark" ? DarkTheme : LightTheme;
 };
 export default ButtonColorMode;

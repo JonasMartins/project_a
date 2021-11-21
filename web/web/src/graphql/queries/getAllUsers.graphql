@@ -10,6 +10,7 @@ query getAllUsers($limit: Float, $active: Boolean!) {
             name
             email
             active
+            picture
             role {
                 id
                 name

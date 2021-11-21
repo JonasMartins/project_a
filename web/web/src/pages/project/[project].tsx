@@ -1,39 +1,25 @@
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import {
-    Box,
-    Flex,
-    IconButton,
-    Link,
-    Text,
-    useColorMode,
-} from "@chakra-ui/react";
+import { Box, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useDrop } from "react-dnd";
 import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import { useDrop } from "react-dnd";
 import { Container } from "../../components/Container";
-import SideBar from "../../components/layout/SideBar";
-import Navbar from "../../components/rootComponents/Navbar";
-import Footer from "../../components/rootComponents/Footer";
-import React, { useEffect, useState, useContext } from "react";
-import { GlobalContext } from "./../../context/globalContext";
 import ItemSprintBox from "../../components/layout/ItemSprintBox";
+import SideBar from "../../components/layout/SideBar";
+import Footer from "../../components/rootComponents/Footer";
 import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
+import Navbar from "../../components/rootComponents/Navbar";
 import {
-    Item,
     ItemStatus,
     useGetProjectByIdQuery,
+    useChangeItemStatusMutation,
 } from "../../generated/graphql";
+import { GlobalContext } from "./../../context/globalContext";
+import { itemQuery } from "./../../helpers/items/ItemFunctinHelpers";
 
 interface projectsProps {
     id: string;
 }
-
-type itemQuery = {
-    __typename?: "Item";
-} & Pick<
-    Item,
-    "id" | "description" | "summary" | "status" | "priority" | "type"
->;
 
 const Project: React.FC<projectsProps> = ({}) => {
     const router = useRouter();
@@ -42,12 +28,12 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const { colorMode } = useColorMode();
     const { expanded } = useContext(GlobalContext);
+    const [loading, setLoading] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(1);
     const [fillItens, setFillItens] = useState(false);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [doneItens, setDoneItens] = useState<Array<itemQuery>>([]);
-    const [dragedItem, setDragedItem] = useState<itemQuery | null>(null);
     const [pendingItens, setPendingItens] = useState<Array<itemQuery>>([]);
     const [progressItens, setProgressItens] = useState<Array<itemQuery>>([]);
 
@@ -56,12 +42,36 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const { project } = router.query;
 
+    let url = "";
+
+    if (project && project !== undefined) {
+        url = typeof project === "string" ? project : project[0];
+    }
+
     const [{ data, fetching, error }, reexecuteQuery] = useGetProjectByIdQuery({
         variables: {
-            id: project && typeof project === "string" ? project : "-1",
+            // id: project && typeof project === "string" ? project : "-1",
+            id: url,
         },
-        pause: true,
+        pause: !project,
     });
+
+    const handleChangeStatus = async (item: itemQuery, status: ItemStatus) => {
+        // setLoading(true);
+        // setFillItens(false);
+        await changeItemStatus({
+            id: item.id,
+            newStatus: status,
+        });
+
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+
+        // setTimeout(() => {
+        //     setLoading(false);
+        // }, 500);
+    };
+
+    const [{}, changeItemStatus] = useChangeItemStatusMutation();
 
     const [{ canDropPending }, dropRefPending] = useDrop({
         accept: "item",
@@ -70,6 +80,10 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
 
         drop: (item: itemQuery) => {
+            if (item.status !== ItemStatus.Open) {
+                handleChangeStatus(item, ItemStatus.Open);
+            }
+
             previousItemStatus = item.status;
 
             if (item.status === ItemStatus.InProgress) {
@@ -81,8 +95,6 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPendingItens((prevItens) => [...prevItens, item]);
 
             removeItemFromStatusArray(item);
-
-            setDragedItem(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -98,13 +110,16 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
 
         drop: (item: itemQuery) => {
+            if (item.status !== ItemStatus.InProgress) {
+                handleChangeStatus(item, ItemStatus.InProgress);
+            }
+
             previousItemStatus = item.status;
 
             item.status = ItemStatus.InProgress;
 
             setProgressItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
-            setDragedItem(item);
         },
 
         hover: (_, monitor) => {
@@ -129,13 +144,16 @@ const Project: React.FC<projectsProps> = ({}) => {
         },
 
         drop: (item: itemQuery) => {
+            if (item.status !== ItemStatus.Resolved) {
+                handleChangeStatus(item, ItemStatus.Resolved);
+            }
+
             previousItemStatus = item.status;
 
             item.status = ItemStatus.Resolved;
 
             setDoneItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
-            setDragedItem(item);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -227,15 +245,17 @@ const Project: React.FC<projectsProps> = ({}) => {
             setPageWidth("20em");
             setNavBarWidth("16em");
         } else {
-            setPageWidth("3.5em");
+            setPageWidth("3em");
             setNavBarWidth("50px");
         }
 
         if (!fillItens) {
             loadItensByTypes();
         }
+
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-    }, [fetching, reexecuteQuery, dataLoaded, expanded]);
+        // [fetching, reexecuteQuery, dataLoaded, expanded]
+    }, [project, fetching, dataLoaded, expanded, reexecuteQuery, loading]);
 
     useEffect(() => {
         return () => {
@@ -249,8 +269,6 @@ const Project: React.FC<projectsProps> = ({}) => {
     if (error) {
         return <p>Oh no... {error.message}</p>;
     }
-
-    const loading = <FullPageSpinner />;
 
     const content = (
         <Container>
@@ -299,6 +317,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             <Flex
                 mt="1em"
                 mb="1em"
+                p={2}
                 ml={pageWidth}
                 overflowX="hidden"
                 transition="0.3s"
@@ -321,7 +340,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                         boxShadow="lg"
                         flexDir="column"
                         p={3}
-                        m="2em 2em 20em 0"
+                        m="2em 2em 20em 2em"
                         bg={bgColor[colorMode]}
                         color={color[colorMode]}
                         ref={dropRefPending}
@@ -383,7 +402,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                 <Flex alignSelf="center" mb={"150px"}>
                     <Text fontSize="2xl">
                         {`The "${data?.getProjectById?.project?.name}" project doesn't have an active sprint, please manege
-                        one at Backlog`}
+                        one at Sprtins`}
                     </Text>
                 </Flex>
             )}
@@ -392,7 +411,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             </Box>
         </Container>
     );
-    return fetching ? loading : content;
+    return fetching || !project || loading ? <FullPageSpinner /> : content;
 };
 
 export default Project;
