@@ -1,11 +1,4 @@
-import {
-    Box,
-    Flex,
-    Link,
-    Text,
-    useColorMode,
-    useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
@@ -16,7 +9,11 @@ import SideBar from "../../components/layout/SideBar";
 import Footer from "../../components/rootComponents/Footer";
 import FullPageSpinner from "../../components/rootComponents/FullPageSpinner";
 import Navbar from "../../components/rootComponents/Navbar";
-import { ItemStatus, useGetProjectByIdQuery } from "../../generated/graphql";
+import {
+    ItemStatus,
+    useGetProjectByIdQuery,
+    useChangeItemStatusMutation,
+} from "../../generated/graphql";
 import { GlobalContext } from "./../../context/globalContext";
 import { itemQuery } from "./../../helpers/items/ItemFunctinHelpers";
 
@@ -31,12 +28,12 @@ const Project: React.FC<projectsProps> = ({}) => {
 
     const { colorMode } = useColorMode();
     const { expanded } = useContext(GlobalContext);
+    const [loading, setLoading] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(1);
     const [fillItens, setFillItens] = useState(false);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
     const [doneItens, setDoneItens] = useState<Array<itemQuery>>([]);
-    const [dragedItem, setDragedItem] = useState<itemQuery | null>(null);
     const [pendingItens, setPendingItens] = useState<Array<itemQuery>>([]);
     const [progressItens, setProgressItens] = useState<Array<itemQuery>>([]);
 
@@ -59,6 +56,23 @@ const Project: React.FC<projectsProps> = ({}) => {
         pause: !project,
     });
 
+    const handleChangeStatus = async (item: itemQuery, status: ItemStatus) => {
+        // setLoading(true);
+        // setFillItens(false);
+        await changeItemStatus({
+            id: item.id,
+            newStatus: status,
+        });
+
+        reexecuteQuery({ requestPolicy: "cache-and-network" });
+
+        // setTimeout(() => {
+        //     setLoading(false);
+        // }, 500);
+    };
+
+    const [{}, changeItemStatus] = useChangeItemStatusMutation();
+
     const [{ canDropPending }, dropRefPending] = useDrop({
         accept: "item",
         canDrop: (item: itemQuery) => {
@@ -78,7 +92,7 @@ const Project: React.FC<projectsProps> = ({}) => {
 
             removeItemFromStatusArray(item);
 
-            setDragedItem(item);
+            handleChangeStatus(item, ItemStatus.Open);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -100,7 +114,8 @@ const Project: React.FC<projectsProps> = ({}) => {
 
             setProgressItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
-            setDragedItem(item);
+
+            handleChangeStatus(item, ItemStatus.InProgress);
         },
 
         hover: (_, monitor) => {
@@ -131,7 +146,7 @@ const Project: React.FC<projectsProps> = ({}) => {
 
             setDoneItens((prevItens) => [...prevItens, item]);
             removeItemFromStatusArray(item);
-            setDragedItem(item);
+            handleChangeStatus(item, ItemStatus.Resolved);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -233,7 +248,7 @@ const Project: React.FC<projectsProps> = ({}) => {
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
         // [fetching, reexecuteQuery, dataLoaded, expanded]
-    }, [project, fetching, dataLoaded, expanded, reexecuteQuery]);
+    }, [project, fetching, dataLoaded, expanded, reexecuteQuery, loading]);
 
     useEffect(() => {
         return () => {
@@ -247,8 +262,6 @@ const Project: React.FC<projectsProps> = ({}) => {
     if (error) {
         return <p>Oh no... {error.message}</p>;
     }
-
-    const loading = <FullPageSpinner />;
 
     const content = (
         <Container>
@@ -391,7 +404,7 @@ const Project: React.FC<projectsProps> = ({}) => {
             </Box>
         </Container>
     );
-    return fetching || !project ? loading : content;
+    return fetching || !project || loading ? <FullPageSpinner /> : content;
 };
 
 export default Project;

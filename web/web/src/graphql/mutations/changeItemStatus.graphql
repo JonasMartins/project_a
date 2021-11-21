@@ -1,0 +1,3 @@
+mutation ChangeItemStatus($id: String!, $newStatus: ItemStatus!) {
+    changeItemStatus(id: $id, newStatus: $newStatus)
+}

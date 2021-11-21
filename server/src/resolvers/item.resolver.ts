@@ -325,7 +325,7 @@ export class ItemResolver {
     @Mutation(() => Boolean)
     async changeItemStatus(
         @Arg("id") id: string,
-        @Arg("newStatus") newStatus: ItemStatus,
+        @Arg("newStatus", () => ItemStatus) newStatus: ItemStatus,
         @Ctx() { em }: Context
     ): Promise<Boolean> {
         const item = await em.findOne(Item, { id });

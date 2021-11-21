@@ -164,6 +164,7 @@ export type LoginResponse = {
 export type Mutation = {
     __typename?: "Mutation";
     createItem: ItemResponse;
+    changeItemStatus: Scalars["Boolean"];
     revokeRefreshTokensForUser: RevokeResponse;
     createUser: UserResponse;
     logout?: Maybe<Scalars["Boolean"]>;
@@ -184,6 +185,11 @@ export type MutationCreateItemArgs = {
     responsibleId: Scalars["String"];
     reporterId: Scalars["String"];
     options: ItemValidator;
+};
+
+export type MutationChangeItemStatusArgs = {
+    newStatus: ItemStatus;
+    id: Scalars["String"];
 };
 
 export type MutationRevokeRefreshTokensForUserArgs = {
@@ -513,6 +519,16 @@ export type TokenAndId = {
     name?: Maybe<Scalars["String"]>;
     userRoleCode?: Maybe<Scalars["String"]>;
 };
+
+export type ChangeItemStatusMutationVariables = Exact<{
+    id: Scalars["String"];
+    newStatus: ItemStatus;
+}>;
+
+export type ChangeItemStatusMutation = { __typename?: "Mutation" } & Pick<
+    Mutation,
+    "changeItemStatus"
+>;
 
 export type CreateItemMutationVariables = Exact<{
     approverId: Scalars["String"];
@@ -1187,6 +1203,18 @@ export type LogedInTestQuery = { __typename?: "Query" } & {
         };
 };
 
+export const ChangeItemStatusDocument = gql`
+    mutation ChangeItemStatus($id: String!, $newStatus: ItemStatus!) {
+        changeItemStatus(id: $id, newStatus: $newStatus)
+    }
+`;
+
+export function useChangeItemStatusMutation() {
+    return Urql.useMutation<
+        ChangeItemStatusMutation,
+        ChangeItemStatusMutationVariables
+    >(ChangeItemStatusDocument);
+}
 export const CreateItemDocument = gql`
     mutation CreateItem(
         $approverId: String!
