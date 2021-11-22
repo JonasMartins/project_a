@@ -1,0 +1,29 @@
+query getTeams {
+    getTeams {
+        errors {
+            method
+            message
+            field
+        }
+        teams {
+            id
+            name
+            description
+            leader {
+                id
+                name
+                picture
+                role {
+                    name
+                }
+            }
+            members {
+                name
+                picture
+                role {
+                    name
+                }
+            }
+        }
+    }
+}

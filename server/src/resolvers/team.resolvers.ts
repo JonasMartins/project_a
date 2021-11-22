@@ -13,6 +13,7 @@ import { ErrorFieldHandler } from "../utils/errorFieldHandler";
 import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { User } from "../entities/user.entity";
+import { EntityManager } from "@mikro-orm/knex";
 
 @ObjectType()
 class TeamResponse {
@@ -22,8 +23,42 @@ class TeamResponse {
     team?: Team;
 }
 
+@ObjectType()
+class TeamsResponse {
+    @Field(() => [ErrorFieldHandler], { nullable: true })
+    errors?: ErrorFieldHandler[];
+    @Field(() => [Team], { nullable: true })
+    teams?: Team[];
+}
+
 @Resolver()
 export class TeamResolver {
+    @Query(() => TeamsResponse)
+    async getTeams(@Ctx() { em }: Context): Promise<TeamsResponse> {
+        const qb = (em as EntityManager).createQueryBuilder(Team, "t");
+
+        try {
+            qb.select(["t.*"]).orderBy({ updatedAt: "DESC" });
+
+            const teams: Team[] = await qb.getResult();
+
+            await em.populate(teams, ["leader"]);
+
+            return { teams };
+        } catch (e) {
+            console.log("error ", e);
+
+            return {
+                errors: genericError(
+                    "_",
+                    "getTeams",
+                    __filename,
+                    `Message: ${e.messaege}`
+                ),
+            };
+        }
+    }
+
     @Query(() => TeamResponse)
     async getTeamById(
         @Arg("id") id: string,
@@ -85,11 +120,10 @@ export class TeamResolver {
         }
 
         // let team: Team | null = null;
-        const team: Team = await em.create(Team, {
-            leader: user,
+        const team = em.create(Team, {
             name: options.name,
-            leader_id: options.leader_id,
             description: options.description,
+            leader_id: options.leader_id,
         });
 
         await em.persistAndFlush(team);

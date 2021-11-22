@@ -48,6 +48,10 @@ export class User extends Base<User> {
     public itenApprover: Collection<Item> = new Collection<Item>(this);
 
     @Field(() => [Team])
+    @OneToMany(() => Team, (team: Team) => team.leader, { lazy: true })
+    public teamLeader: Collection<Team> = new Collection<Team>(this);
+
+    @Field(() => [Team])
     @ManyToMany(() => Team, (team: Team) => team.members, {
         mappedBy: "members",
     })

@@ -1,4 +1,4 @@
-import { Sprint, Project } from "./../generated/graphql";
+import { Sprint, Project, Team, Role, User } from "./../generated/graphql";
 
 export type projectSprintType = {
     project: {
@@ -18,16 +18,22 @@ export type sprintType = {
             } & Pick<Project, "id" | "name">;
         };
 };
-/*
-sprint: {
-    __typename?: "Sprint";
-} & Pick<Sprint, "id" | "description" | "code" | "length" | "final" | "active"> & {
-    project: {
-        __typename?: "Project";
-    } & Pick<Project, "id" | "name">;
-}
-
-*/
+export type teamGetTeamsType = { __typename?: "Team" } & Pick<
+    Team,
+    "id" | "name" | "description"
+> & {
+        leader: { __typename?: "User" } & Pick<
+            User,
+            "id" | "name" | "picture"
+        > & {
+                role: { __typename?: "Role" } & Pick<Role, "name">;
+            };
+        members: Array<
+            { __typename?: "User" } & Pick<User, "name" | "picture"> & {
+                    role: { __typename?: "Role" } & Pick<Role, "name">;
+                }
+        >;
+    };
 
 export type projectType = {
     project: { __typename?: "Project" } & Pick<

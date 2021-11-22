@@ -288,6 +288,7 @@ export type Query = {
     getUserSettings: UserResponse;
     getRoleById: RoleRespnse;
     getAllRoles: RolesRespnse;
+    getTeams: TeamsResponse;
     getTeamById: TeamResponse;
     getAppointmentsByItem: AppointmentsResponse;
     getAppointmentsByUser: AppointmentsResponse;
@@ -467,6 +468,12 @@ export type TeamValidator = {
     leader_id: Scalars["String"];
 };
 
+export type TeamsResponse = {
+    __typename?: "TeamsResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    teams?: Maybe<Array<Team>>;
+};
+
 export type User = {
     __typename?: "User";
     id: Scalars["ID"];
@@ -478,6 +485,7 @@ export type User = {
     itenReporter: Array<Item>;
     itenResponsible: Array<Item>;
     itenApprover: Array<Item>;
+    teamLeader: Array<Team>;
     teams: Array<Team>;
     role: Role;
     appointments: Array<Appointment>;
@@ -1116,6 +1124,50 @@ export type GetSprintsQuery = { __typename?: "Query" } & {
                 }
         >
     >;
+};
+
+export type GetTeamsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetTeamsQuery = { __typename?: "Query" } & {
+    getTeams: { __typename?: "TeamsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        teams?: Maybe<
+            Array<
+                { __typename?: "Team" } & Pick<
+                    Team,
+                    "id" | "name" | "description"
+                > & {
+                        leader: { __typename?: "User" } & Pick<
+                            User,
+                            "id" | "name" | "picture"
+                        > & {
+                                role: { __typename?: "Role" } & Pick<
+                                    Role,
+                                    "name"
+                                >;
+                            };
+                        members: Array<
+                            { __typename?: "User" } & Pick<
+                                User,
+                                "name" | "picture"
+                            > & {
+                                    role: { __typename?: "Role" } & Pick<
+                                        Role,
+                                        "name"
+                                    >;
+                                }
+                        >;
+                    }
+            >
+        >;
+    };
 };
 
 export type GetUserByIdQueryVariables = Exact<{
@@ -1861,6 +1913,46 @@ export function useGetSprintsQuery(
 ) {
     return Urql.useQuery<GetSprintsQuery>({
         query: GetSprintsDocument,
+        ...options,
+    });
+}
+export const GetTeamsDocument = gql`
+    query getTeams {
+        getTeams {
+            errors {
+                method
+                message
+                field
+            }
+            teams {
+                id
+                name
+                description
+                leader {
+                    id
+                    name
+                    picture
+                    role {
+                        name
+                    }
+                }
+                members {
+                    name
+                    picture
+                    role {
+                        name
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export function useGetTeamsQuery(
+    options: Omit<Urql.UseQueryArgs<GetTeamsQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetTeamsQuery>({
+        query: GetTeamsDocument,
         ...options,
     });
 }

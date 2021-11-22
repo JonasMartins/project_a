@@ -1,40 +1,57 @@
-import React, { useState } from "react";
-import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "@chakra-ui/icons";
-import SideBar from "./../components/layout/SideBar";
-import { Container } from "./../components/Container";
-import Navbar from "./../components/rootComponents/Navbar";
-import Footer from "./../components/rootComponents/Footer";
 import {
     Box,
     Flex,
-    Text,
-    IconButton,
     Link,
-    Input,
-    InputGroup,
-    InputLeftElement,
-    Button,
+    Text,
+    Table,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr,
+    Image,
+    Tooltip,
+    IconButton,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import React, { useContext, useEffect, useState } from "react";
+import { GlobalContext } from "../context/globalContext";
+import { Container } from "./../components/Container";
+import SideBar from "./../components/layout/SideBar";
+import Footer from "./../components/rootComponents/Footer";
+import Navbar from "./../components/rootComponents/Navbar";
+import { useGetTeamsQuery } from "./../generated/graphql";
+import { teamGetTeamsType } from "./../utils/generalGroupTypes";
+import FlexSpinner from "./../components/rootComponents/FlexSpinner";
+import { getServerPathImage } from "../utils/handleServerImagePaths";
+import { AiOutlineEye, AiFillEdit } from "react-icons/ai";
 
 interface TeamProps {}
 
-const Team: React.FC<TeamProps> = ({ children }) => {
-    const [expand, setExpand] = useState(true);
+const Team: React.FC<TeamProps> = () => {
+    const { expanded } = useContext(GlobalContext);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
 
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
+    const [teams, setTeams] = useState<Array<teamGetTeamsType>>([]);
 
-        if (expand) {
+    const [teamsQuery] = useGetTeamsQuery();
+
+    useEffect(() => {
+        if (teamsQuery.fetching) return;
+
+        if (teamsQuery.data?.getTeams?.teams) {
+            setTeams(teamsQuery.data?.getTeams?.teams);
+        }
+
+        if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
         } else {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    };
+    }, [expanded, teamsQuery.fetching]);
 
     const content = (
         <Container>
@@ -49,17 +66,6 @@ const Team: React.FC<TeamProps> = ({ children }) => {
                 transition="0.3s"
             >
                 <Flex flexDir="row" alignItems="center" p={2}>
-                    <Flex mt={2}>
-                        <IconButton
-                            isRound={true}
-                            aria-label="Show Side Bar"
-                            mr={1}
-                            icon={
-                                expand ? <ArrowLeftIcon /> : <ArrowRightIcon />
-                            }
-                            onClick={handleExpandSideBar}
-                        />
-                    </Flex>
                     <NextLink href={"/"}>
                         <Link>
                             <Text>Home</Text>
@@ -68,33 +74,94 @@ const Team: React.FC<TeamProps> = ({ children }) => {
                     <Text color="gray.500" ml={2} mr={2}>
                         {">"}
                     </Text>
-                    <NextLink href={"/backlog"}>
+                    <NextLink href={"/team"}>
                         <Link>
-                            <Text>Backlog</Text>
+                            <Text>Teams</Text>
                         </Link>
                     </NextLink>
                     <Text color="gray.500" ml={2} mr={2}>
                         {">"}
                     </Text>
                 </Flex>
-                <Text p={2} fontSize="lg" fontWeight="semibold">
-                    Backlog
+                <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
+                    Teams
                 </Text>
-                <InputGroup>
-                    <InputLeftElement
-                        pointerEvents="none"
-                        children={<SearchIcon color="gray.300" />}
-                    />
-                    <Input
-                        type="text"
-                        maxW="300px"
-                        placeholder="Filter info"
-                        borderRadius="2em"
-                    />
-                    <Button variant="cyan-gradient" borderRadius="2em" ml={3}>
-                        My Itens
-                    </Button>
-                </InputGroup>
+                {teams.length ? (
+                    <Flex p={2} m={2}>
+                        <Table variant="striped" size="sm">
+                            <Thead>
+                                <Tr>
+                                    <Th>Name</Th>
+                                    <Th>Description</Th>
+                                    <Th>Leader</Th>
+                                    <Th>Details</Th>
+                                    <Th>Edit</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {teams.map((team) => (
+                                    <Tr key={team.id}>
+                                        <Td>{team.name}</Td>
+                                        <Td>{team.description}</Td>
+                                        <Td>
+                                            {
+                                                <Tooltip
+                                                    hasArrow
+                                                    aria-label={
+                                                        team.leader.name
+                                                    }
+                                                    label={team.leader.name}
+                                                    colorScheme="withe"
+                                                >
+                                                    <Image
+                                                        boxSize="40px"
+                                                        borderRadius="full"
+                                                        src={getServerPathImage(
+                                                            team.leader.picture
+                                                        )}
+                                                    />
+                                                </Tooltip>
+                                            }
+                                        </Td>
+                                        <Td>
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label="See Team details"
+                                                label="See Team details"
+                                                colorScheme="withe"
+                                            >
+                                                <IconButton
+                                                    isRound={true}
+                                                    aria-label="Team Details"
+                                                    mr={1}
+                                                    icon={<AiOutlineEye />}
+                                                />
+                                            </Tooltip>
+                                        </Td>
+                                        <Td>
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label="Edit team"
+                                                label="Edit team"
+                                                colorScheme="withe"
+                                            >
+                                                <IconButton
+                                                    isRound={true}
+                                                    aria-label="Edit Team"
+                                                    variant="ghost"
+                                                    mr={1}
+                                                    icon={<AiFillEdit />}
+                                                />
+                                            </Tooltip>
+                                        </Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                        </Table>
+                    </Flex>
+                ) : (
+                    <FlexSpinner />
+                )}
             </Flex>
             <Box id="footer">
                 <Footer />

@@ -1,4 +1,10 @@
-import { Entity, Property, ManyToMany, Collection } from "@mikro-orm/core";
+import {
+    Entity,
+    Property,
+    ManyToMany,
+    Collection,
+    ManyToOne,
+} from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { Base } from "./../utils/entities/base.entity";
 import { User } from "./user.entity";
@@ -16,6 +22,7 @@ export class Team extends Base<Team> {
     description: string;
 
     @Field(() => User)
+    @ManyToOne(() => User)
     public leader!: User;
 
     @Field()

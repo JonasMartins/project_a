@@ -1,40 +1,28 @@
-import React, { useContext, useState } from "react";
-import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "@chakra-ui/icons";
-import SideBar from "./SideBar";
-import { Container } from "./../Container";
-import Navbar from "./../rootComponents/Navbar";
-import Footer from "./../rootComponents/Footer";
-import {
-    Box,
-    Flex,
-    Text,
-    IconButton,
-    Link,
-    Input,
-    InputGroup,
-    InputLeftElement,
-    Button,
-} from "@chakra-ui/react";
+import { Box, Flex, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
+import React, { useContext, useEffect, useState } from "react";
+import { GlobalContext } from "../../context/globalContext";
+import { Container } from "./../../components/Container";
+import SideBar from "./../../components/layout/SideBar";
+import Footer from "./../../components/rootComponents/Footer";
+import Navbar from "./../../components/rootComponents/Navbar";
 
-interface DefaultLayoutProps {}
+interface TeamProps {}
 
-const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
-    const [expand, setExpand] = useState(true);
+const Team: React.FC<TeamProps> = () => {
+    const { expanded } = useContext(GlobalContext);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
 
-    const handleExpandSideBar = (): void => {
-        setExpand(!expand);
-
-        if (expand) {
+    useEffect(() => {
+        if (expanded) {
             setPageWidth("20em");
             setNavBarWidth("16em");
         } else {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    };
+    }, [expanded]);
 
     const content = (
         <Container>
@@ -49,17 +37,6 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
                 transition="0.3s"
             >
                 <Flex flexDir="row" alignItems="center" p={2}>
-                    <Flex mt={2}>
-                        <IconButton
-                            isRound={true}
-                            aria-label="Show Side Bar"
-                            mr={1}
-                            icon={
-                                expand ? <ArrowLeftIcon /> : <ArrowRightIcon />
-                            }
-                            onClick={handleExpandSideBar}
-                        />
-                    </Flex>
                     <NextLink href={"/"}>
                         <Link>
                             <Text>Home</Text>
@@ -68,33 +45,18 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
                     <Text color="gray.500" ml={2} mr={2}>
                         {">"}
                     </Text>
-                    <NextLink href={"/backlog"}>
+                    <NextLink href={"/team"}>
                         <Link>
-                            <Text>Backlog</Text>
+                            <Text>Teams</Text>
                         </Link>
                     </NextLink>
                     <Text color="gray.500" ml={2} mr={2}>
                         {">"}
                     </Text>
                 </Flex>
-                <Text p={2} fontSize="lg" fontWeight="semibold">
-                    Backlog
+                <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
+                    Teams
                 </Text>
-                <InputGroup>
-                    <InputLeftElement
-                        pointerEvents="none"
-                        children={<SearchIcon color="gray.300" />}
-                    />
-                    <Input
-                        type="text"
-                        maxW="300px"
-                        placeholder="Filter info"
-                        borderRadius="2em"
-                    />
-                    <Button variant="cyan-gradient" borderRadius="2em" ml={3}>
-                        My Itens
-                    </Button>
-                </InputGroup>
             </Flex>
             <Box id="footer">
                 <Footer />
@@ -105,4 +67,4 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     return content;
 };
 
-export default DefaultLayout;
+export default Team;
