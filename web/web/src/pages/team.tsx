@@ -1,9 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "@chakra-ui/icons";
-import SideBar from "./SideBar";
-import { Container } from "./../Container";
-import Navbar from "./../rootComponents/Navbar";
-import Footer from "./../rootComponents/Footer";
+import SideBar from "./../components/layout/SideBar";
+import { Container } from "./../components/Container";
+import Navbar from "./../components/rootComponents/Navbar";
+import Footer from "./../components/rootComponents/Footer";
 import {
     Box,
     Flex,
@@ -17,9 +17,9 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 
-interface DefaultLayoutProps {}
+interface TeamProps {}
 
-const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
+const Team: React.FC<TeamProps> = ({ children }) => {
     const [expand, setExpand] = useState(true);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
@@ -105,4 +105,4 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     return content;
 };
 
-export default DefaultLayout;
+export default Team;

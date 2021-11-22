@@ -1,13 +1,10 @@
 import { Connection, IDatabaseDriver, MikroORM } from "@mikro-orm/core";
 import { ApolloServer } from "apollo-server-express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import "express-async-errors";
 import { Server } from "http";
-import { verify } from "jsonwebtoken";
 import { buildSchema } from "type-graphql";
-import { User } from "./entities/user.entity";
 import microConfig from "./mikro-orm.config";
 import { ItemResolver } from "./resolvers/item.resolver";
 import { UserResolver } from "./resolvers/user.resolver";
@@ -17,16 +14,21 @@ import { AppointmentResolver } from "./resolvers/appointment.resolver";
 import { SprintResolver } from "./resolvers/sprint.resolver";
 import { ProjectResolver } from "./resolvers/project.resolver";
 import { CommentResolver } from "./resolvers/comment.resolver";
+import { graphqlUploadExpress } from "graphql-upload";
 import { Context } from "./types";
+/*
+import { verify } from "jsonwebtoken";
+import { User } from "./entities/user.entity";
+import cookieParser from "cookie-parser";
 import { createAcessToken, createRefreshToken } from "./utils/auth";
 import { COOKIE_NAME } from "./utils/cons";
 import { sendRefreshToken } from "./utils/sendRefreshToken";
-import { graphqlUploadExpress } from "graphql-upload";
 
 type failedRefresh = {
     ok: boolean;
     accessToken: string;
 };
+*/
 
 export default class Application {
     public orm: MikroORM<IDatabaseDriver<Connection>>;

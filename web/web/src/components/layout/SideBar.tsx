@@ -13,11 +13,12 @@ import {
     AiOutlineOrderedList,
     AiOutlineProject,
     AiOutlineHome,
+    AiOutlineExpandAlt,
 } from "react-icons/ai";
 import NextLink from "next/link";
-import { RiAdminLine } from "react-icons/ri";
+import { RiAdminLine, RiTeamLine } from "react-icons/ri";
 import { GlobalContext } from "./../../context/globalContext";
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import { CgMinimizeAlt } from "react-icons/cg";
 
 interface SideBarProps {}
 
@@ -109,6 +110,23 @@ const SideBar: React.FC<SideBarProps> = () => {
                 </Tooltip>
                 <Tooltip
                     hasArrow
+                    aria-label="Teams"
+                    label="Teams"
+                    colorScheme="withe"
+                    placement="right"
+                >
+                    <Flex mb={5} alignItems="center">
+                        <NextLink href="/team">
+                            <Link textStyle="bold">
+                                <Flex alignItems="center">
+                                    <RiTeamLine size="20px" />
+                                </Flex>
+                            </Link>
+                        </NextLink>
+                    </Flex>
+                </Tooltip>
+                <Tooltip
+                    hasArrow
                     aria-label="Manage"
                     label="Manage"
                     colorScheme="withe"
@@ -180,6 +198,18 @@ const SideBar: React.FC<SideBarProps> = () => {
                 </Flex>
 
                 <Flex mb={5} alignItems="center">
+                    <NextLink href="/team">
+                        <Link textStyle="bold">
+                            <Flex alignItems="center">
+                                <RiTeamLine size="35px" />
+
+                                <Text ml={2}>Teams</Text>
+                            </Flex>
+                        </Link>
+                    </NextLink>
+                </Flex>
+
+                <Flex mb={5} alignItems="center">
                     <NextLink href="/manage">
                         <Link textStyle="bold">
                             <Flex alignItems="center">
@@ -210,22 +240,30 @@ const SideBar: React.FC<SideBarProps> = () => {
         >
             <Flex p={0} mt={2} flexDirection="column" alignItems="center">
                 <Flex mb={5} alignItems="center">
-                    <IconButton
-                        isRound={true}
-                        aria-label="Show Side Bar"
-                        mr={1}
-                        icon={
-                            iconExpanded ? (
-                                <ArrowLeftIcon />
-                            ) : (
-                                <ArrowRightIcon />
-                            )
-                        }
-                        onClick={() => {
-                            setIconExpanded(!iconExpanded);
-                            _setExpanded(!expanded);
-                        }}
-                    />
+                    <Tooltip
+                        hasArrow
+                        aria-label="Expand/Minimize side bar"
+                        label="Expand/Minimize side bar"
+                        colorScheme="withe"
+                        placement="right"
+                    >
+                        <IconButton
+                            isRound={true}
+                            aria-label="Show Side Bar"
+                            size="sm"
+                            icon={
+                                iconExpanded ? (
+                                    <CgMinimizeAlt />
+                                ) : (
+                                    <AiOutlineExpandAlt />
+                                )
+                            }
+                            onClick={() => {
+                                setIconExpanded(!iconExpanded);
+                                _setExpanded(!expanded);
+                            }}
+                        />
+                    </Tooltip>
                 </Flex>
                 {expanded ? expandedContent() : contractedContent()}
             </Flex>
