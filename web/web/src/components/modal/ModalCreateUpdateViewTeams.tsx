@@ -14,6 +14,7 @@ import {
 import React, { useState } from "react";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
 import { teamGetTeamsType } from "./../../utils/generalGroupTypes";
+import { useGetAllUsersQuery } from "./../../generated/graphql";
 
 interface ModalCreateUpdateViewTeamsProps {
     onClose: () => void;
@@ -32,6 +33,13 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     const color = { light: "black", dark: "white" };
     const toast = useToast();
     const [loading, setLoading] = useState(false);
+
+    const [usersQuery] = useGetAllUsersQuery({
+        variables: {
+            limit: 10,
+            active: true,
+        },
+    });
 
     const handleTitle = (): string => {
         let title = "";

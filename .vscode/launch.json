@@ -10,7 +10,8 @@
             "reAttach": true,
             "name": "Launch localhost FireFox",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            "outFiles": ["${workspaceFolder}/**/*.ts", "!**/node_modules/**"]
         }
 
         // {

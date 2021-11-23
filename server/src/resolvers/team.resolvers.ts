@@ -14,6 +14,7 @@ import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { User } from "../entities/user.entity";
 import { EntityManager } from "@mikro-orm/knex";
+import { Collection } from "@mikro-orm/core";
 
 @ObjectType()
 class TeamResponse {
@@ -84,6 +85,65 @@ export class TeamResolver {
         });
 
         team.leader = leader;
+
+        return { team };
+    }
+
+    @Mutation(() => TeamResponse)
+    async updateTeam(
+        @Arg("id") id: string,
+        @Arg("options") options: TeamValidator,
+        @Arg("members", () => [String], { nullable: true }) members: string[],
+        @Ctx() { em }: Context
+    ): Promise<TeamResponse> {
+        const team = await em.findOne(Team, { id });
+
+        if (!team) {
+            return {
+                errors: genericError(
+                    "id",
+                    "updateTeam",
+                    __filename,
+                    `Could not found team with id ${id}`
+                ),
+            };
+        }
+
+        if (options.description.length <= 3) {
+            return {
+                errors: genericError(
+                    "description",
+                    "updateTeam",
+                    __filename,
+                    "A team description must have length greater than 3 charachters."
+                ),
+            };
+        }
+
+        const leader: User | null = await em.findOne(User, {
+            id: options.leader_id,
+        });
+
+        if (!leader) {
+            return {
+                errors: genericError(
+                    "leader_id",
+                    "updateTeam",
+                    __filename,
+                    "The team leader could not been found."
+                ),
+            };
+        }
+
+        const _members = await em.find(User, { id: members });
+
+        await team.members.init();
+        _members.map((member) => team.members.add(member));
+        team.leader_id = options.leader_id;
+        team.description = options.description;
+        team.name = options.name;
+
+        await em.persistAndFlush(team);
 
         return { team };
     }
