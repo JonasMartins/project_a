@@ -151,6 +151,7 @@ export class TeamResolver {
     @Mutation(() => TeamResponse)
     async createTeam(
         @Arg("options") options: TeamValidator,
+        @Arg("members", () => [String], { nullable: true }) members: string[],
         @Ctx() { em }: Context
     ): Promise<TeamResponse> {
         if (options.description.length <= 3) {
@@ -185,6 +186,12 @@ export class TeamResolver {
             description: options.description,
             leader_id: options.leader_id,
         });
+
+        if (members) {
+            const _members = await em.find(User, { id: members });
+            await team.members.init();
+            _members.map((member) => team.members.add(member));
+        }
 
         await em.persistAndFlush(team);
 

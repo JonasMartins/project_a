@@ -171,6 +171,7 @@ export type Mutation = {
     login: LoginResponse;
     updateSeetingsUser: UserResponse;
     createRole: RoleRespnse;
+    updateTeam: TeamResponse;
     createTeam: TeamResponse;
     createAppointment: AppointmentResponse;
     createSprint: SprintResponse;
@@ -219,7 +220,14 @@ export type MutationCreateRoleArgs = {
     options: RoleValidator;
 };
 
+export type MutationUpdateTeamArgs = {
+    members?: Maybe<Array<Scalars["String"]>>;
+    options: TeamValidator;
+    id: Scalars["String"];
+};
+
 export type MutationCreateTeamArgs = {
+    members?: Maybe<Array<Scalars["String"]>>;
     options: TeamValidator;
 };
 
@@ -1156,7 +1164,7 @@ export type GetTeamsQuery = { __typename?: "Query" } & {
                         members: Array<
                             { __typename?: "User" } & Pick<
                                 User,
-                                "name" | "picture"
+                                "id" | "name" | "picture"
                             > & {
                                     role: { __typename?: "Role" } & Pick<
                                         Role,
@@ -1937,6 +1945,7 @@ export const GetTeamsDocument = gql`
                     }
                 }
                 members {
+                    id
                     name
                     picture
                     role {

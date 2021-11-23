@@ -18,6 +18,7 @@ query getTeams {
                 }
             }
             members {
+                id
                 name
                 picture
                 role {

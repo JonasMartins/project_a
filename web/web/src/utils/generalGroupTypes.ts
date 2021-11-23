@@ -21,6 +21,13 @@ export type sprintType = {
             } & Pick<Project, "id" | "name">;
         };
 };
+
+export type membersGetTeamsType = Array<
+    { __typename?: "User" } & Pick<User, "id" | "name" | "picture"> & {
+            role: { __typename?: "Role" } & Pick<Role, "name">;
+        }
+>;
+
 export type teamGetTeamsType = { __typename?: "Team" } & Pick<
     Team,
     "id" | "name" | "description"
@@ -32,7 +39,7 @@ export type teamGetTeamsType = { __typename?: "Team" } & Pick<
                 role: { __typename?: "Role" } & Pick<Role, "name">;
             };
         members: Array<
-            { __typename?: "User" } & Pick<User, "name" | "picture"> & {
+            { __typename?: "User" } & Pick<User, "id" | "name" | "picture"> & {
                     role: { __typename?: "Role" } & Pick<Role, "name">;
                 }
         >;
