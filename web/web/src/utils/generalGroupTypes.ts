@@ -1,5 +1,8 @@
 import { Sprint, Project, Team, Role, User } from "./../generated/graphql";
 
+export type generalContext = "create" | "update" | "view";
+export type simpleContext = "create" | "update";
+
 export type projectSprintType = {
     project: {
         __typename?: "Project";

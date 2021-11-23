@@ -12,6 +12,7 @@ import {
     Image,
     Tooltip,
     IconButton,
+    useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { useContext, useEffect, useState } from "react";
@@ -21,10 +22,12 @@ import SideBar from "./../components/layout/SideBar";
 import Footer from "./../components/rootComponents/Footer";
 import Navbar from "./../components/rootComponents/Navbar";
 import { useGetTeamsQuery } from "./../generated/graphql";
-import { teamGetTeamsType } from "./../utils/generalGroupTypes";
+import { teamGetTeamsType, generalContext } from "./../utils/generalGroupTypes";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import { getServerPathImage } from "../utils/handleServerImagePaths";
 import { AiOutlineEye, AiFillEdit } from "react-icons/ai";
+import { GrAdd } from "react-icons/gr";
+import ModalCreateUpdateViewTeams from "./../components/modal/ModalCreateUpdateViewTeams";
 
 interface TeamProps {}
 
@@ -32,8 +35,16 @@ const Team: React.FC<TeamProps> = () => {
     const { expanded } = useContext(GlobalContext);
     const [pageWidth, setPageWidth] = useState("3em");
     const [navBarWidth, setNavBarWidth] = useState("50px");
-
+    const [context, setContext] = useState<generalContext>("view");
     const [teams, setTeams] = useState<Array<teamGetTeamsType>>([]);
+    const [selectedTeam, setSelectedTeam] = useState<teamGetTeamsType | null>(
+        null
+    );
+
+    const _modalCreateUpdateViewTeam = useDisclosure();
+    const customOpenModal = (): void => {
+        _modalCreateUpdateViewTeam.onOpen();
+    };
 
     const [teamsQuery] = useGetTeamsQuery();
 
@@ -86,6 +97,27 @@ const Team: React.FC<TeamProps> = () => {
                 <Text p={2} fontSize="lg" fontWeight="semibold" ml={2}>
                     Teams
                 </Text>
+                <Flex p={2} m={2} justifyContent="flex-end">
+                    <Tooltip
+                        hasArrow
+                        aria-label="Add new Team"
+                        label="Add a new Team"
+                        colorScheme="withe"
+                    >
+                        <IconButton
+                            isRound={true}
+                            aria-label="Add new Team"
+                            variant="cyan-gradient"
+                            mr={1}
+                            icon={<GrAdd />}
+                            onClick={() => {
+                                setContext("create");
+                                customOpenModal();
+                                setSelectedTeam(null);
+                            }}
+                        />
+                    </Tooltip>
+                </Flex>
                 {teams.length ? (
                     <Flex p={2} m={2}>
                         <Table variant="striped" size="sm">
@@ -135,6 +167,11 @@ const Team: React.FC<TeamProps> = () => {
                                                     aria-label="Team Details"
                                                     mr={1}
                                                     icon={<AiOutlineEye />}
+                                                    onClick={() => {
+                                                        setContext("view");
+                                                        customOpenModal();
+                                                        setSelectedTeam(team);
+                                                    }}
                                                 />
                                             </Tooltip>
                                         </Td>
@@ -151,6 +188,11 @@ const Team: React.FC<TeamProps> = () => {
                                                     variant="ghost"
                                                     mr={1}
                                                     icon={<AiFillEdit />}
+                                                    onClick={() => {
+                                                        setContext("update");
+                                                        customOpenModal();
+                                                        setSelectedTeam(team);
+                                                    }}
                                                 />
                                             </Tooltip>
                                         </Td>
@@ -166,6 +208,12 @@ const Team: React.FC<TeamProps> = () => {
             <Box id="footer">
                 <Footer />
             </Box>
+            <ModalCreateUpdateViewTeams
+                context={context}
+                isOpen={_modalCreateUpdateViewTeam.isOpen}
+                onClose={_modalCreateUpdateViewTeam.onClose}
+                team={selectedTeam}
+            />
         </Container>
     );
 

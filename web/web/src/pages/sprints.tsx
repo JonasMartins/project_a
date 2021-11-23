@@ -31,15 +31,14 @@ import FullPageSpinner from "./../components/rootComponents/FullPageSpinner";
 import { GrAdd } from "react-icons/gr";
 import { AiFillEdit } from "react-icons/ai";
 import ModalCreateUpdateSprint from "./../components/modal/ModalCreateUpdateSprint";
-import { sprintType } from "./../utils/generalGroupTypes";
+import { sprintType, simpleContext } from "./../utils/generalGroupTypes";
 
 interface SprintProps {}
-type manageContext = "update" | "create";
 
 const Sprint: React.FC<SprintProps> = () => {
     const { expanded } = useContext(GlobalContext);
     const [navBarWidth, setNavBarWidth] = useState("0px");
-    const [context, setContext] = useState<manageContext>("update");
+    const [context, setContext] = useState<simpleContext>("update");
     const [pageWidth, setPageWidth] = useState("3em");
     const [countUpdate, setCountUpdate] = useState(0);
     const updatedCallback = (value: number): void => {
