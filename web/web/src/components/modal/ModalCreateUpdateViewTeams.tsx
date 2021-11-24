@@ -16,6 +16,7 @@ import {
     Input,
     Button,
     Textarea,
+    Checkbox,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
@@ -77,6 +78,14 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         return title;
     };
 
+    const orderUsers = (): void => {
+        if (usersQuery.data?.getAllUsers?.users) {
+            usersQuery.data?.getAllUsers?.users.sort((a, b) =>
+                a.role.name > b.role.name ? 1 : -1
+            );
+        }
+    };
+
     const handleChangeTeam = (e: ChangeEvent<HTMLInputElement>) => {
         setTeamInfo((prevTeam) => ({
             ...prevTeam,
@@ -106,7 +115,8 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 members: team.members,
             }));
         }
-    }, [team]);
+        orderUsers();
+    }, [team, usersQuery.fetching]);
 
     useEffect(() => {
         return () => {
@@ -191,18 +201,65 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                             </FormControl>
                                         )}
                                     </Field>
-                                    <Button
-                                        isLoading={props.isSubmitting}
-                                        type="submit"
-                                        variant="cyan-gradient"
-                                        borderRadius="2em"
-                                        isDisabled={context === "view"}
-                                        size="md"
-                                        flexFlow="row"
-                                        mt={4}
-                                    >
-                                        Save
-                                    </Button>
+                                    <Field name="members">
+                                        {({ field, form }) => (
+                                            <FormControl>
+                                                <FormLabel htmlFor="active">
+                                                    <Text
+                                                        color={color[colorMode]}
+                                                    >
+                                                        Members
+                                                    </Text>
+                                                </FormLabel>
+
+                                                {usersQuery.data?.getAllUsers?.users.map(
+                                                    (user) => (
+                                                        <Flex flexDirection="column">
+                                                            <Flex>
+                                                                <Checkbox
+                                                                    {...field}
+                                                                    id={user.id}
+                                                                    key={
+                                                                        user.id
+                                                                    }
+                                                                    size="lg"
+                                                                    isDisabled={
+                                                                        context ===
+                                                                        "view"
+                                                                    }
+                                                                />
+                                                                <Text
+                                                                    pl={2}
+                                                                    color={
+                                                                        color[
+                                                                            colorMode
+                                                                        ]
+                                                                    }
+                                                                >
+                                                                    {`${user.name} - ${user.role.name}`}
+                                                                </Text>
+                                                            </Flex>
+                                                        </Flex>
+                                                    )
+                                                )}
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    {context !== "view" ? (
+                                        <Button
+                                            isLoading={props.isSubmitting}
+                                            type="submit"
+                                            variant="cyan-gradient"
+                                            borderRadius="2em"
+                                            size="md"
+                                            flexFlow="row"
+                                            mt={4}
+                                        >
+                                            Save
+                                        </Button>
+                                    ) : (
+                                        <></>
+                                    )}
                                 </Stack>
                             </Form>
                         )}

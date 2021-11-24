@@ -119,7 +119,7 @@ const ModalCreateUpdateProject: React.FC<ModalCreateUpdateProjectProps> = ({
         <React.Fragment>
             <ModalCloseButton color={color[colorMode]} />
             <ModalBody>
-                <Flex p={2} m={2} justifyContent="center">
+                <Flex p={2} m={2} justifyContent="flex-start" flexFlow="column">
                     <Formik
                         initialValues={{
                             id: projectInfo.id,
@@ -296,7 +296,7 @@ const ModalCreateUpdateProject: React.FC<ModalCreateUpdateProjectProps> = ({
             isOpen={isOpen}
             onClose={onClose}
             scrollBehavior={"inside"}
-            size={"lg"}
+            size={"2xl"}
         >
             <ModalOverlay />
             <ModalContent>

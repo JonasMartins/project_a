@@ -168,7 +168,7 @@ const ModalManagerUpdateCreate: React.FC<ModalManagerUpdateCreateUserProps> = ({
                         src={getServerPathImage(user?.user.picture)}
                     />
                 </Flex>
-                <Flex p={2} m={2} justifyContent="center">
+                <Flex p={2} m={2} justifyContent="flex-start" flexFlow="column">
                     <Formik
                         initialValues={{
                             id: userInfo.id,

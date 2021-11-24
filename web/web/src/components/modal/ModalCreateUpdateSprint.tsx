@@ -158,7 +158,13 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
         <React.Fragment>
             <ModalCloseButton color={color[colorMode]} />
             <ModalBody>
-                <Flex p={2} m={2} justifyContent="center" flexGrow={1}>
+                <Flex
+                    p={2}
+                    m={2}
+                    justifyContent="flex-start"
+                    flexGrow={1}
+                    flexFlow="column"
+                >
                     <Formik
                         initialValues={{
                             id: sprintInfo.id,
