@@ -28,6 +28,21 @@ export type membersGetTeamsType = Array<
         }
 >;
 
+export type singleMemberGetTeamsType = { __typename?: "User" } & Pick<
+    User,
+    "id" | "name" | "picture"
+> & {
+        role: { __typename?: "Role" } & Pick<Role, "name">;
+    };
+
+export type singleUserGetAllUsers = {
+    __typename?: "User";
+} & Pick<User, "id" | "name" | "picture" | "active" | "email"> & {
+        role: {
+            __typename?: "Role";
+        } & Pick<Role, "id" | "name">;
+    };
+
 export type teamGetTeamsType = { __typename?: "Team" } & Pick<
     Team,
     "id" | "name" | "description"

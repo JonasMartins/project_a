@@ -16,7 +16,10 @@ import {
     Input,
     Button,
     Textarea,
-    Checkbox,
+    Image,
+    useDisclosure,
+    Collapse,
+    Tooltip,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
@@ -24,14 +27,22 @@ import {
     teamGetTeamsType,
     membersGetTeamsType,
 } from "./../../utils/generalGroupTypes";
-import { useGetAllUsersQuery, User } from "./../../generated/graphql";
+import { useGetAllUsersQuery } from "./../../generated/graphql";
 import { Field, Form, Formik } from "formik";
+import { getServerPathImage } from "../../utils/handleServerImagePaths";
 
 interface ModalCreateUpdateViewTeamsProps {
     onClose: () => void;
     isOpen: boolean;
     context: "update" | "create" | "view";
     team: teamGetTeamsType | null;
+}
+
+interface teamMember {
+    id: string;
+    name: string;
+    role: string;
+    member: string;
 }
 
 interface teamInfoType {
@@ -48,10 +59,11 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     context,
     team,
 }) => {
-    const { colorMode } = useColorMode();
-    const color = { light: "black", dark: "white" };
     const toast = useToast();
+    const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
+    const color = { light: "black", dark: "white" };
+    const handleShowMembers = useDisclosure();
 
     const [teamInfo, setTeamInfo] = useState<teamInfoType>(null);
 
@@ -77,15 +89,6 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         }
         return title;
     };
-
-    const orderUsers = (): void => {
-        if (usersQuery.data?.getAllUsers?.users) {
-            usersQuery.data?.getAllUsers?.users.sort((a, b) =>
-                a.role.name > b.role.name ? 1 : -1
-            );
-        }
-    };
-
     const handleChangeTeam = (e: ChangeEvent<HTMLInputElement>) => {
         setTeamInfo((prevTeam) => ({
             ...prevTeam,
@@ -115,21 +118,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 members: team.members,
             }));
         }
-        orderUsers();
     }, [team, usersQuery.fetching]);
-
-    useEffect(() => {
-        return () => {
-            setTeamInfo((prevInfo) => ({
-                ...prevInfo,
-                id: "",
-                name: "",
-                description: "",
-                leader_id: "",
-                members: [],
-            }));
-        };
-    }, []);
 
     const content = (
         <React.Fragment>
@@ -201,50 +190,19 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                             </FormControl>
                                         )}
                                     </Field>
-                                    <Field name="members">
-                                        {({ field, form }) => (
-                                            <FormControl>
-                                                <FormLabel htmlFor="active">
-                                                    <Text
-                                                        color={color[colorMode]}
-                                                    >
-                                                        Members
-                                                    </Text>
-                                                </FormLabel>
+                                    <Flex justifyContent="flex-end">
+                                        <Button
+                                            isDisabled={context === "create"}
+                                            size="xs"
+                                            onClick={handleShowMembers.onToggle}
+                                        >
+                                            {" "}
+                                            <Text color={color[colorMode]}>
+                                                Show Members
+                                            </Text>
+                                        </Button>{" "}
+                                    </Flex>
 
-                                                {usersQuery.data?.getAllUsers?.users.map(
-                                                    (user) => (
-                                                        <Flex flexDirection="column">
-                                                            <Flex>
-                                                                <Checkbox
-                                                                    {...field}
-                                                                    id={user.id}
-                                                                    key={
-                                                                        user.id
-                                                                    }
-                                                                    size="lg"
-                                                                    isDisabled={
-                                                                        context ===
-                                                                        "view"
-                                                                    }
-                                                                />
-                                                                <Text
-                                                                    pl={2}
-                                                                    color={
-                                                                        color[
-                                                                            colorMode
-                                                                        ]
-                                                                    }
-                                                                >
-                                                                    {`${user.name} - ${user.role.name}`}
-                                                                </Text>
-                                                            </Flex>
-                                                        </Flex>
-                                                    )
-                                                )}
-                                            </FormControl>
-                                        )}
-                                    </Field>
                                     {context !== "view" ? (
                                         <Button
                                             isLoading={props.isSubmitting}
@@ -272,7 +230,10 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     return (
         <Modal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={() => {
+                onClose();
+                handleShowMembers.onClose();
+            }}
             scrollBehavior={"inside"}
             size={"2xl"}
         >
@@ -285,7 +246,37 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 </ModalHeader>
                 {loading ? <FlexSpinner /> : content}
                 <ModalFooter>
-                    <ModalBody></ModalBody>
+                    <ModalBody>
+                        <Flex mb={2}>
+                            <Collapse in={handleShowMembers.isOpen}>
+                                {context !== "create" ? (
+                                    <Flex>
+                                        {teamInfo &&
+                                            teamInfo.members.map((member) => (
+                                                <Tooltip
+                                                    hasArrow
+                                                    aria-label={member.name}
+                                                    label={member.name}
+                                                    colorScheme="withe"
+                                                    key={member.id}
+                                                >
+                                                    <Image
+                                                        m={1}
+                                                        boxSize="40px"
+                                                        borderRadius="full"
+                                                        src={getServerPathImage(
+                                                            member.picture
+                                                        )}
+                                                    />
+                                                </Tooltip>
+                                            ))}
+                                    </Flex>
+                                ) : (
+                                    <></>
+                                )}
+                            </Collapse>
+                        </Flex>
+                    </ModalBody>
                 </ModalFooter>
             </ModalContent>
         </Modal>

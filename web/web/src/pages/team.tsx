@@ -28,6 +28,7 @@ import { getServerPathImage } from "../utils/handleServerImagePaths";
 import { AiOutlineEye, AiFillEdit } from "react-icons/ai";
 import { GrAdd } from "react-icons/gr";
 import ModalCreateUpdateViewTeams from "./../components/modal/ModalCreateUpdateViewTeams";
+import { HiUserGroup } from "react-icons/hi";
 
 interface TeamProps {}
 
@@ -63,6 +64,12 @@ const Team: React.FC<TeamProps> = () => {
             setNavBarWidth("50px");
         }
     }, [expanded, teamsQuery.fetching]);
+
+    useEffect(() => {
+        return () => {
+            setSelectedTeam(null);
+        };
+    }, []);
 
     const content = (
         <Container>
@@ -128,6 +135,7 @@ const Team: React.FC<TeamProps> = () => {
                                     <Th>Leader</Th>
                                     <Th>Details</Th>
                                     <Th>Edit</Th>
+                                    <Th>Members</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -193,6 +201,22 @@ const Team: React.FC<TeamProps> = () => {
                                                         customOpenModal();
                                                         setSelectedTeam(team);
                                                     }}
+                                                />
+                                            </Tooltip>
+                                        </Td>
+                                        <Td>
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label="manage members"
+                                                label="Manage Members"
+                                                colorScheme="white"
+                                            >
+                                                <IconButton
+                                                    aria-label="Manage Members"
+                                                    icon={<HiUserGroup />}
+                                                    isRound={true}
+                                                    variant="ghost"
+                                                    mr={1}
                                                 />
                                             </Tooltip>
                                         </Td>

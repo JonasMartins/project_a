@@ -44,6 +44,7 @@ export class TeamResolver {
             const teams: Team[] = await qb.getResult();
 
             await em.populate(teams, ["leader"]);
+            await em.populate(teams, ["members"]);
 
             return { teams };
         } catch (e) {
