@@ -294,6 +294,7 @@ export type Query = {
     getAllUsers: UsersResponse;
     getUserById: UserResponse;
     getUserSettings: UserResponse;
+    getUsersSelect: Array<UserSelect>;
     getRoleById: RoleRespnse;
     getAllRoles: RolesRespnse;
     getTeams: TeamsResponse;
@@ -335,6 +336,11 @@ export type QueryGetUserByIdArgs = {
 
 export type QueryGetUserSettingsArgs = {
     id: Scalars["String"];
+};
+
+export type QueryGetUsersSelectArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
 };
 
 export type QueryGetRoleByIdArgs = {
@@ -515,6 +521,12 @@ export type UserResponse = {
     user?: Maybe<User>;
 };
 
+export type UserSelect = {
+    __typename?: "UserSelect";
+    label: Scalars["String"];
+    value: Scalars["String"];
+};
+
 export type UsersResponse = {
     __typename?: "UsersResponse";
     errors?: Maybe<Array<ErrorFieldHandler>>;
@@ -630,6 +642,25 @@ export type CreateSprintMutation = { __typename?: "Mutation" } & {
                     >;
                 }
         >;
+    };
+};
+
+export type CreateTeamMutationVariables = Exact<{
+    options: TeamValidator;
+    members?: Maybe<Array<Scalars["String"]> | Scalars["String"]>;
+}>;
+
+export type CreateTeamMutation = { __typename?: "Mutation" } & {
+    createTeam: { __typename?: "TeamResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        team?: Maybe<{ __typename?: "Team" } & Pick<Team, "id" | "name">>;
     };
 };
 
@@ -769,6 +800,26 @@ export type UpdateSprintMutation = { __typename?: "Mutation" } & {
                     >;
                 }
         >;
+    };
+};
+
+export type UpdateTeamMutationVariables = Exact<{
+    id: Scalars["String"];
+    options: TeamValidator;
+    members?: Maybe<Array<Scalars["String"]> | Scalars["String"]>;
+}>;
+
+export type UpdateTeamMutation = { __typename?: "Mutation" } & {
+    updateTeam: { __typename?: "TeamResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "message" | "method" | "field"
+                >
+            >
+        >;
+        team?: Maybe<{ __typename?: "Team" } & Pick<Team, "id" | "name">>;
     };
 };
 
@@ -1245,6 +1296,17 @@ export type GetUserSettingsQuery = { __typename?: "Query" } & {
     };
 };
 
+export type GetUsersSelectQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    active: Scalars["Boolean"];
+}>;
+
+export type GetUsersSelectQuery = { __typename?: "Query" } & {
+    getUsersSelect: Array<
+        { __typename?: "UserSelect" } & Pick<UserSelect, "value" | "label">
+    >;
+};
+
 export type LogedInTestQueryVariables = Exact<{ [key: string]: never }>;
 
 export type LogedInTestQuery = { __typename?: "Query" } & {
@@ -1370,6 +1432,27 @@ export function useCreateSprintMutation() {
         CreateSprintMutation,
         CreateSprintMutationVariables
     >(CreateSprintDocument);
+}
+export const CreateTeamDocument = gql`
+    mutation CreateTeam($options: TeamValidator!, $members: [String!]) {
+        createTeam(options: $options, members: $members) {
+            errors {
+                message
+                method
+                field
+            }
+            team {
+                id
+                name
+            }
+        }
+    }
+`;
+
+export function useCreateTeamMutation() {
+    return Urql.useMutation<CreateTeamMutation, CreateTeamMutationVariables>(
+        CreateTeamDocument
+    );
 }
 export const CreateUserDocument = gql`
     mutation CreateUser(
@@ -1540,6 +1623,31 @@ export function useUpdateSprintMutation() {
         UpdateSprintMutation,
         UpdateSprintMutationVariables
     >(UpdateSprintDocument);
+}
+export const UpdateTeamDocument = gql`
+    mutation UpdateTeam(
+        $id: String!
+        $options: TeamValidator!
+        $members: [String!]
+    ) {
+        updateTeam(id: $id, options: $options, members: $members) {
+            errors {
+                message
+                method
+                field
+            }
+            team {
+                id
+                name
+            }
+        }
+    }
+`;
+
+export function useUpdateTeamMutation() {
+    return Urql.useMutation<UpdateTeamMutation, UpdateTeamMutationVariables>(
+        UpdateTeamDocument
+    );
 }
 export const CreateCommentDocument = gql`
     mutation CreateComment(
@@ -2039,6 +2147,23 @@ export function useGetUserSettingsQuery(
 ) {
     return Urql.useQuery<GetUserSettingsQuery>({
         query: GetUserSettingsDocument,
+        ...options,
+    });
+}
+export const GetUsersSelectDocument = gql`
+    query GetUsersSelect($limit: Float, $active: Boolean!) {
+        getUsersSelect(active: $active, limit: $limit) {
+            value
+            label
+        }
+    }
+`;
+
+export function useGetUsersSelectQuery(
+    options: Omit<Urql.UseQueryArgs<GetUsersSelectQueryVariables>, "query"> = {}
+) {
+    return Urql.useQuery<GetUsersSelectQuery>({
+        query: GetUsersSelectDocument,
         ...options,
     });
 }

@@ -38,28 +38,13 @@ class UserBasicData {
     role_id: string;
 }
 
-@InputType()
-class userSeetingsInput {
-    @Field()
-    id: string;
+@ObjectType()
+class UserSelect {
+    @Field(() => String)
+    label: string;
 
-    @Field(() => String, { nullable: true })
-    name: string;
-
-    @Field(() => String, { nullable: true })
-    email: string;
-
-    @Field(() => String, { nullable: true })
-    password?: string;
-
-    @Field(() => String, { nullable: true })
-    role_id: string;
-
-    @Field(() => Boolean, { nullable: true })
-    active?: boolean;
-
-    @Field(() => GraphQLUpload, { nullable: true })
-    file?: FileUpload;
+    @Field(() => String)
+    value: string;
 }
 
 @ObjectType()
@@ -413,6 +398,36 @@ export class UserResolver {
         return {
             result,
         };
+    }
+
+    @Query(() => [UserSelect])
+    async getUsersSelect(
+        @Arg("active") active: boolean,
+        @Arg("limit", () => Number, { nullable: true }) limit: number,
+        @Ctx() { em }: Context
+    ): Promise<UserSelect[]> {
+        const max = Math.min(50, limit);
+        const qb = (em as EntityManager).createQueryBuilder(User, "u");
+        qb.select(["u.*"])
+            .where({ active: active })
+            .limit(max)
+            .orderBy({ name: "ASC" });
+
+        let result: UserSelect[] = [];
+
+        try {
+            const users: User[] = await qb.getResult();
+
+            users.forEach((user) => {
+                result.push({
+                    label: user.name,
+                    value: user.id,
+                });
+            });
+            return result;
+        } catch (e) {
+            throw new Error(e.messaege);
+        }
     }
 
     // userSeetingsInput

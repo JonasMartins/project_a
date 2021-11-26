@@ -1,0 +1,13 @@
+mutation CreateTeam($options: TeamValidator!, $members: [String!]) {
+    createTeam(options: $options, members: $members) {
+        errors {
+            message
+            method
+            field
+        }
+        team {
+            id
+            name
+        }
+    }
+}

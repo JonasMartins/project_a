@@ -22,7 +22,11 @@ import SideBar from "./../components/layout/SideBar";
 import Footer from "./../components/rootComponents/Footer";
 import Navbar from "./../components/rootComponents/Navbar";
 import { useGetTeamsQuery } from "./../generated/graphql";
-import { teamGetTeamsType, generalContext } from "./../utils/generalGroupTypes";
+import {
+    teamGetTeamsType,
+    generalContext,
+    defaultSelectPattern,
+} from "./../utils/generalGroupTypes";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import { getServerPathImage } from "../utils/handleServerImagePaths";
 import { AiOutlineEye, AiFillEdit } from "react-icons/ai";

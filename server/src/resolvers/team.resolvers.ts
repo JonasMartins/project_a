@@ -136,10 +136,12 @@ export class TeamResolver {
             };
         }
 
-        const _members = await em.find(User, { id: members });
+        if (members) {
+            const _members = await em.find(User, { id: members });
+            await team.members.init();
+            _members.map((member) => team.members.add(member));
+        }
 
-        await team.members.init();
-        _members.map((member) => team.members.add(member));
         team.leader_id = options.leader_id;
         team.description = options.description;
         team.name = options.name;

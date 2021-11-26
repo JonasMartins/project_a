@@ -1,3 +1,4 @@
+import { string } from "prop-types";
 import { Sprint, Project, Team, Role, User } from "./../generated/graphql";
 
 export type generalContext = "create" | "update" | "view";
@@ -81,4 +82,16 @@ export interface customSprintErrors {
     code: string | null;
     project_id: string | null;
     description: string | null;
+}
+
+export interface customTeamErrors {
+    id: string | null;
+    name: string | null;
+    description: string | null;
+    leader_id: string | null;
+}
+
+export interface defaultSelectPattern {
+    value: string;
+    label: string;
 }

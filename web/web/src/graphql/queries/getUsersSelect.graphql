@@ -1,0 +1,6 @@
+query GetUsersSelect($limit: Float, $active: Boolean!) {
+    getUsersSelect(active: $active, limit: $limit) {
+        value
+        label
+    }
+}

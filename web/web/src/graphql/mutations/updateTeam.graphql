@@ -1,0 +1,17 @@
+mutation UpdateTeam(
+    $id: String!
+    $options: TeamValidator!
+    $members: [String!]
+) {
+    updateTeam(id: $id, options: $options, members: $members) {
+        errors {
+            message
+            method
+            field
+        }
+        team {
+            id
+            name
+        }
+    }
+}

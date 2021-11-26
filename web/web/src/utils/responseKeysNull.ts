@@ -18,4 +18,5 @@ export const _keys = {
     authUserResponse: () => null,
     ErrorFieldHandler: () => null,
     TeamsResponse: () => null,
+    UserSelect: () => null,
 };

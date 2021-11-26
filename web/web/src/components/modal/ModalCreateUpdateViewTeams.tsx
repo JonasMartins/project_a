@@ -20,29 +20,32 @@ import {
     useDisclosure,
     Collapse,
     Tooltip,
+    FormErrorMessage,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
 import {
     teamGetTeamsType,
     membersGetTeamsType,
+    customTeamErrors,
+    defaultSelectPattern,
 } from "./../../utils/generalGroupTypes";
-import { useGetAllUsersQuery } from "./../../generated/graphql";
+import {
+    useCreateTeamMutation,
+    useUpdateTeamMutation,
+    useGetUsersSelectQuery,
+} from "./../../generated/graphql";
 import { Field, Form, Formik } from "formik";
 import { getServerPathImage } from "../../utils/handleServerImagePaths";
+import { truncateString } from "../../helpers/generalUtilitiesFunctions";
+import { definedErrorMap } from "../../utils/toErrorMap";
+import Select from "react-select";
 
 interface ModalCreateUpdateViewTeamsProps {
     onClose: () => void;
     isOpen: boolean;
     context: "update" | "create" | "view";
     team: teamGetTeamsType | null;
-}
-
-interface teamMember {
-    id: string;
-    name: string;
-    role: string;
-    member: string;
 }
 
 interface teamInfoType {
@@ -65,9 +68,25 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     const color = { light: "black", dark: "white" };
     const handleShowMembers = useDisclosure();
 
-    const [teamInfo, setTeamInfo] = useState<teamInfoType>(null);
+    const [teamInfo, setTeamInfo] = useState<teamInfoType>({
+        id: team?.id,
+        name: team?.name,
+        description: team?.description,
+        leader_id: team?.leader.id,
+        members: team?.members,
+    });
 
-    const [usersQuery] = useGetAllUsersQuery({
+    const [customErrors, setCustomErrors] = useState<customTeamErrors>({
+        id: "",
+        leader_id: "",
+        name: "",
+        description: "",
+    });
+
+    const [{}, createTeam] = useCreateTeamMutation();
+    const [{}, updateTeam] = useUpdateTeamMutation();
+
+    const [optionsUser] = useGetUsersSelectQuery({
         variables: {
             limit: 10,
             active: true,
@@ -96,9 +115,18 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         }));
     };
 
-    useEffect(() => {
-        if (usersQuery.fetching) return;
+    const getIndexOfCurrentLeader = (): number => {
+        let index = 0;
+        let leader = optionsUser.data?.getUsersSelect?.filter((user) => {
+            return user.value === teamInfo.leader_id;
+        });
+        if (leader) {
+            index = optionsUser.data?.getUsersSelect?.indexOf(leader[0]);
+        }
+        return index;
+    };
 
+    const handleSetInfo = () => {
         if (!team) {
             setTeamInfo((prevInfo) => ({
                 ...prevInfo,
@@ -118,7 +146,12 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 members: team.members,
             }));
         }
-    }, [team, usersQuery.fetching]);
+    };
+
+    useEffect(() => {
+        if (optionsUser.fetching) return;
+        handleSetInfo();
+    }, [team, optionsUser.fetching]);
 
     const content = (
         <React.Fragment>
@@ -132,9 +165,32 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                     flexFlow="column"
                 >
                     <Formik
-                        initialValues={{}}
+                        initialValues={{
+                            id: teamInfo.id,
+                            leader_id: teamInfo.leader_id,
+                            name: teamInfo.description,
+                            description: teamInfo.description,
+                        }}
                         enableReinitialize={true}
-                        onSubmit={() => {}}
+                        onSubmit={async (values) => {
+                            setLoading(true);
+                            if (context === "update") {
+                                const response = await updateTeam({
+                                    id: values.id,
+                                    options: {
+                                        name: values.name,
+                                        description: values.description,
+                                        leader_id: values.leader_id,
+                                    },
+                                });
+                                if (response.data?.updateTeam?.errors) {
+                                    let result = definedErrorMap(
+                                        response.data?.updateTeam?.errors
+                                    );
+                                }
+                            } else {
+                            }
+                        }}
                     >
                         {(props) => (
                             <Form {...props}>
@@ -185,8 +241,40 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                     }
                                                     color={color[colorMode]}
                                                     onChange={handleChangeTeam}
-                                                    value={teamInfo.description}
+                                                    value={truncateString(
+                                                        teamInfo.description,
+                                                        50
+                                                    )}
                                                 />
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Field name="leader_id">
+                                        {({ field }) => (
+                                            <FormControl>
+                                                <FormLabel htmlFor="leader_id">
+                                                    <Text
+                                                        color={color[colorMode]}
+                                                    >
+                                                        Leader
+                                                    </Text>
+                                                </FormLabel>
+                                                <Select
+                                                    isDisabled={
+                                                        context === "view"
+                                                    }
+                                                    defaultValue={
+                                                        optionsUser?.data
+                                                            ?.getUsersSelect[
+                                                            getIndexOfCurrentLeader()
+                                                        ]
+                                                    }
+                                                    options={
+                                                        optionsUser?.data
+                                                            ?.getUsersSelect
+                                                    }
+                                                />
+                                                <FormErrorMessage></FormErrorMessage>
                                             </FormControl>
                                         )}
                                     </Field>
@@ -233,6 +321,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
             onClose={() => {
                 onClose();
                 handleShowMembers.onClose();
+                handleSetInfo();
             }}
             scrollBehavior={"inside"}
             size={"2xl"}
@@ -251,8 +340,9 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                             <Collapse in={handleShowMembers.isOpen}>
                                 {context !== "create" ? (
                                     <Flex>
-                                        {teamInfo &&
-                                            teamInfo.members.map((member) => (
+                                        {team &&
+                                            team.members &&
+                                            team.members.map((member) => (
                                                 <Tooltip
                                                     hasArrow
                                                     aria-label={member.name}
