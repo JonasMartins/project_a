@@ -1,5 +1,11 @@
-import { string } from "prop-types";
-import { Sprint, Project, Team, Role, User } from "./../generated/graphql";
+import {
+    Sprint,
+    Project,
+    Team,
+    Role,
+    User,
+    UserSelect,
+} from "./../generated/graphql";
 
 export type generalContext = "create" | "update" | "view";
 export type simpleContext = "create" | "update";
@@ -67,6 +73,11 @@ export type projectType = {
         "id" | "name" | "createdAt" | "description"
     >;
 };
+
+export type userSelectOption = { __typename?: "UserSelect" } & Pick<
+    UserSelect,
+    "value" | "label"
+>;
 
 export interface projectInfo {
     id: string;

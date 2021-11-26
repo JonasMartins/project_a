@@ -28,6 +28,7 @@ import {
     teamGetTeamsType,
     membersGetTeamsType,
     customTeamErrors,
+    userSelectOption,
 } from "./../../utils/generalGroupTypes";
 import {
     useCreateTeamMutation,
@@ -69,7 +70,10 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
     const color = { light: "black", dark: "white" };
+    const [teamMembers, setTeamMembers] = useState<Array<userSelectOption>>([]);
+
     const handleShowOptions = useDisclosure();
+    const handleShowMembers = useDisclosure();
 
     const [teamInfo, setTeamInfo] = useState<teamInfoType>({
         id: team?.id,
@@ -136,6 +140,24 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         return index;
     };
 
+    const getCurrentTeamMemebers = (): void => {
+        optionsUser.data?.getUsersSelect?.forEach((user) => {
+            let alreadyMember = team?.members?.find((member) => {
+                return member.id === user.value;
+            });
+
+            if (alreadyMember) {
+                setTeamMembers((prevMembers) => [
+                    ...prevMembers,
+                    {
+                        value: alreadyMember.id,
+                        label: alreadyMember.name,
+                    },
+                ]);
+            }
+        });
+    };
+
     const handleSetInfo = () => {
         if (!team) {
             setTeamInfo((prevInfo) => ({
@@ -159,8 +181,11 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     };
 
     useEffect(() => {
+        setLoading(true);
         if (optionsUser.fetching) return;
         handleSetInfo();
+        getCurrentTeamMemebers();
+        setLoading(false);
     }, [team, optionsUser.fetching]);
 
     const content = (
@@ -383,7 +408,43 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                     >
                                         <Flex minHeight="10em" mt={2} />
                                     </Collapse>
-
+                                    <Field name="members">
+                                        {({}) => (
+                                            <FormControl>
+                                                <FormLabel htmlFor="members">
+                                                    <Text
+                                                        color={color[colorMode]}
+                                                    >
+                                                        Members
+                                                    </Text>
+                                                </FormLabel>
+                                                <Select
+                                                    aria-label="select members"
+                                                    isDisabled={
+                                                        context === "view"
+                                                    }
+                                                    onMenuOpen={
+                                                        handleShowMembers.onOpen
+                                                    }
+                                                    onMenuClose={
+                                                        handleShowMembers.onClose
+                                                    }
+                                                    isMulti
+                                                    options={
+                                                        optionsUser?.data
+                                                            ?.getUsersSelect
+                                                    }
+                                                    defaultValue={teamMembers}
+                                                />
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Collapse
+                                        in={handleShowMembers.isOpen}
+                                        animateOpacity
+                                    >
+                                        <Flex minHeight="10em" mt={2} />
+                                    </Collapse>
                                     {context !== "view" ? (
                                         <Button
                                             isLoading={props.isSubmitting}
@@ -413,6 +474,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
             onClose={() => {
                 onClose();
                 handleSetInfo();
+                setTeamMembers([]);
             }}
             scrollBehavior={"inside"}
             size={"2xl"}
