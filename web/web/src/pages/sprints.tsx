@@ -81,7 +81,6 @@ const Sprint: React.FC<SprintProps> = () => {
         }
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
-        console.log("Sprint ", sprints?.data?.getSprints);
     }, [
         expanded,
         sprints.fetching,

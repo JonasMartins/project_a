@@ -28,7 +28,6 @@ import {
     teamGetTeamsType,
     membersGetTeamsType,
     customTeamErrors,
-    defaultSelectPattern,
 } from "./../../utils/generalGroupTypes";
 import {
     useCreateTeamMutation,
@@ -46,6 +45,8 @@ interface ModalCreateUpdateViewTeamsProps {
     isOpen: boolean;
     context: "update" | "create" | "view";
     team: teamGetTeamsType | null;
+    countUpdate: number;
+    updateCallback: (number) => void;
 }
 
 interface teamInfoType {
@@ -61,12 +62,14 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     onClose,
     context,
     team,
+    updateCallback,
+    countUpdate,
 }) => {
     const toast = useToast();
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
     const color = { light: "black", dark: "white" };
-    const handleShowMembers = useDisclosure();
+    const handleShowOptions = useDisclosure();
 
     const [teamInfo, setTeamInfo] = useState<teamInfoType>({
         id: team?.id,
@@ -76,7 +79,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         members: team?.members,
     });
 
-    const [customErrors, setCustomErrors] = useState<customTeamErrors>({
+    const [customErrors, setCustonErrors] = useState<customTeamErrors>({
         id: "",
         leader_id: "",
         name: "",
@@ -109,6 +112,13 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         return title;
     };
     const handleChangeTeam = (e: ChangeEvent<HTMLInputElement>) => {
+        setCustonErrors((prevErrors) => ({
+            ...prevErrors,
+            id: "",
+            leader_id: "",
+            name: "",
+            description: "",
+        }));
         setTeamInfo((prevTeam) => ({
             ...prevTeam,
             [e.target.name]: e.target.value,
@@ -168,7 +178,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                         initialValues={{
                             id: teamInfo.id,
                             leader_id: teamInfo.leader_id,
-                            name: teamInfo.description,
+                            name: teamInfo.name,
                             description: teamInfo.description,
                         }}
                         enableReinitialize={true}
@@ -187,8 +197,71 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                     let result = definedErrorMap(
                                         response.data?.updateTeam?.errors
                                     );
+                                    setCustonErrors((prevErrors) => ({
+                                        ...prevErrors,
+                                        [result[0]["field"]]:
+                                            result[0]["message"],
+                                    }));
+                                    setTimeout(() => {
+                                        setLoading(false);
+                                    }, 300);
+                                } else {
+                                    setTimeout(() => {
+                                        setTimeout(() => {
+                                            updateCallback(countUpdate + 1);
+                                            toast({
+                                                title: "Team Updated",
+                                                description:
+                                                    "Team successfully updated",
+                                                status: "success",
+                                                duration: 8000,
+                                                isClosable: true,
+                                                position: "bottom-right",
+                                            });
+                                            setLoading(false);
+                                            onClose();
+                                        }, 500);
+                                    });
                                 }
                             } else {
+                                const response = await createTeam({
+                                    options: {
+                                        name: values.name,
+                                        description: values.description,
+                                        leader_id: values.leader_id,
+                                    },
+                                });
+
+                                if (response.data?.createTeam?.errors) {
+                                    let result = definedErrorMap(
+                                        response.data?.createTeam?.errors
+                                    );
+                                    setCustonErrors((prevErrors) => ({
+                                        ...prevErrors,
+                                        [result[0]["field"]]:
+                                            result[0]["message"],
+                                    }));
+                                    setTimeout(() => {
+                                        setLoading(false);
+                                    }, 300);
+                                } else {
+                                    setTimeout(() => {
+                                        setTimeout(() => {
+                                            updateCallback(countUpdate + 1);
+                                            toast({
+                                                title: "Team Created",
+                                                description:
+                                                    "Team successfully created",
+                                                status: "success",
+                                                duration: 8000,
+                                                isClosable: true,
+                                                position: "bottom-right",
+                                            });
+                                            setLoading(false);
+                                            onClose();
+                                        }, 500);
+                                    });
+                                }
                             }
                         }}
                     >
@@ -197,7 +270,9 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                 <Stack spacing={3}>
                                     <Field name="name">
                                         {({ field }) => (
-                                            <FormControl isInvalid={false}>
+                                            <FormControl
+                                                isInvalid={!!customErrors.name}
+                                            >
                                                 <FormLabel htmlFor="name">
                                                     <Text
                                                         color={color[colorMode]}
@@ -223,7 +298,11 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                     </Field>
                                     <Field name="description">
                                         {({ field }) => (
-                                            <FormControl isInvalid={false}>
+                                            <FormControl
+                                                isInvalid={
+                                                    !!customErrors.description
+                                                }
+                                            >
                                                 <FormLabel htmlFor="description">
                                                     <Text
                                                         color={color[colorMode]}
@@ -246,11 +325,14 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                         50
                                                     )}
                                                 />
+                                                <FormErrorMessage>
+                                                    {customErrors.description}
+                                                </FormErrorMessage>
                                             </FormControl>
                                         )}
                                     </Field>
                                     <Field name="leader_id">
-                                        {({ field }) => (
+                                        {({}) => (
                                             <FormControl>
                                                 <FormLabel htmlFor="leader_id">
                                                     <Text
@@ -260,8 +342,16 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                     </Text>
                                                 </FormLabel>
                                                 <Select
+                                                    aria-label="select leader"
+                                                    placeholder="Search user"
                                                     isDisabled={
                                                         context === "view"
+                                                    }
+                                                    onMenuOpen={
+                                                        handleShowOptions.onOpen
+                                                    }
+                                                    onMenuClose={
+                                                        handleShowOptions.onClose
                                                     }
                                                     defaultValue={
                                                         optionsUser?.data
@@ -273,23 +363,26 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                         optionsUser?.data
                                                             ?.getUsersSelect
                                                     }
+                                                    onChange={(e) => {
+                                                        setTeamInfo(
+                                                            (prevTeam) => ({
+                                                                ...prevTeam,
+                                                                leader_id:
+                                                                    e.value,
+                                                            })
+                                                        );
+                                                    }}
                                                 />
                                                 <FormErrorMessage></FormErrorMessage>
                                             </FormControl>
                                         )}
                                     </Field>
-                                    <Flex justifyContent="flex-end">
-                                        <Button
-                                            isDisabled={context === "create"}
-                                            size="xs"
-                                            onClick={handleShowMembers.onToggle}
-                                        >
-                                            {" "}
-                                            <Text color={color[colorMode]}>
-                                                Show Members
-                                            </Text>
-                                        </Button>{" "}
-                                    </Flex>
+                                    <Collapse
+                                        in={handleShowOptions.isOpen}
+                                        animateOpacity
+                                    >
+                                        <Flex minHeight="10em" mt={2} />
+                                    </Collapse>
 
                                     {context !== "view" ? (
                                         <Button
@@ -299,7 +392,6 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                             borderRadius="2em"
                                             size="md"
                                             flexFlow="row"
-                                            mt={4}
                                         >
                                             Save
                                         </Button>
@@ -320,7 +412,6 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
             isOpen={isOpen}
             onClose={() => {
                 onClose();
-                handleShowMembers.onClose();
                 handleSetInfo();
             }}
             scrollBehavior={"inside"}
@@ -336,35 +427,42 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 {loading ? <FlexSpinner /> : content}
                 <ModalFooter>
                     <ModalBody>
+                        <Flex justifyContent="center">
+                            <Text
+                                fontWeight="semibold"
+                                color={color[colorMode]}
+                                mb={3}
+                            >
+                                Current Members:
+                            </Text>{" "}
+                        </Flex>
                         <Flex mb={2}>
-                            <Collapse in={handleShowMembers.isOpen}>
-                                {context !== "create" ? (
-                                    <Flex>
-                                        {team &&
-                                            team.members &&
-                                            team.members.map((member) => (
-                                                <Tooltip
-                                                    hasArrow
-                                                    aria-label={member.name}
-                                                    label={member.name}
-                                                    colorScheme="withe"
-                                                    key={member.id}
-                                                >
-                                                    <Image
-                                                        m={1}
-                                                        boxSize="40px"
-                                                        borderRadius="full"
-                                                        src={getServerPathImage(
-                                                            member.picture
-                                                        )}
-                                                    />
-                                                </Tooltip>
-                                            ))}
-                                    </Flex>
-                                ) : (
-                                    <></>
-                                )}
-                            </Collapse>
+                            {context !== "create" ? (
+                                <Flex>
+                                    {team &&
+                                        team.members &&
+                                        team.members.map((member) => (
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label={member.name}
+                                                label={member.name}
+                                                colorScheme="withe"
+                                                key={member.id}
+                                            >
+                                                <Image
+                                                    m={1}
+                                                    boxSize="40px"
+                                                    borderRadius="full"
+                                                    src={getServerPathImage(
+                                                        member.picture
+                                                    )}
+                                                />
+                                            </Tooltip>
+                                        ))}
+                                </Flex>
+                            ) : (
+                                <></>
+                            )}
                         </Flex>
                     </ModalBody>
                 </ModalFooter>

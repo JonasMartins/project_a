@@ -168,11 +168,11 @@ export class TeamResolver {
             };
         }
 
-        const user: User | null = await em.findOne(User, {
+        const leader: User | null = await em.findOne(User, {
             id: options.leader_id,
         });
 
-        if (!user) {
+        if (!leader) {
             return {
                 errors: genericError(
                     "leader_id",
@@ -190,13 +190,15 @@ export class TeamResolver {
             leader_id: options.leader_id,
         });
 
+        await em.persistAndFlush(team);
+
         if (members) {
             const _members = await em.find(User, { id: members });
             await team.members.init();
             _members.map((member) => team.members.add(member));
+            team.members.add(leader);
+            await em.persistAndFlush(team);
         }
-
-        await em.persistAndFlush(team);
 
         return { team };
     }

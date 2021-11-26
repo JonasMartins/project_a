@@ -22,11 +22,7 @@ import SideBar from "./../components/layout/SideBar";
 import Footer from "./../components/rootComponents/Footer";
 import Navbar from "./../components/rootComponents/Navbar";
 import { useGetTeamsQuery } from "./../generated/graphql";
-import {
-    teamGetTeamsType,
-    generalContext,
-    defaultSelectPattern,
-} from "./../utils/generalGroupTypes";
+import { teamGetTeamsType, generalContext } from "./../utils/generalGroupTypes";
 import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import { getServerPathImage } from "../utils/handleServerImagePaths";
 import { AiOutlineEye, AiFillEdit } from "react-icons/ai";
@@ -45,16 +41,24 @@ const Team: React.FC<TeamProps> = () => {
     const [selectedTeam, setSelectedTeam] = useState<teamGetTeamsType | null>(
         null
     );
+    const [countUpdate, setCountUpdate] = useState(0);
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
 
     const _modalCreateUpdateViewTeam = useDisclosure();
     const customOpenModal = (): void => {
         _modalCreateUpdateViewTeam.onOpen();
     };
 
-    const [teamsQuery] = useGetTeamsQuery();
+    const [teamsQuery, reexecuteQuery] = useGetTeamsQuery();
 
     useEffect(() => {
         if (teamsQuery.fetching) return;
+
+        reexecuteQuery({
+            requestPolicy: "cache-and-network",
+        });
 
         if (teamsQuery.data?.getTeams?.teams) {
             setTeams(teamsQuery.data?.getTeams?.teams);
@@ -67,7 +71,7 @@ const Team: React.FC<TeamProps> = () => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [expanded, teamsQuery.fetching]);
+    }, [expanded, teamsQuery.fetching, countUpdate]);
 
     useEffect(() => {
         return () => {
@@ -131,7 +135,7 @@ const Team: React.FC<TeamProps> = () => {
                 </Flex>
                 {teams.length ? (
                     <Flex p={2} m={2}>
-                        <Table variant="striped" size="sm">
+                        <Table size="sm">
                             <Thead>
                                 <Tr>
                                     <Th>Name</Th>
@@ -241,6 +245,8 @@ const Team: React.FC<TeamProps> = () => {
                 isOpen={_modalCreateUpdateViewTeam.isOpen}
                 onClose={_modalCreateUpdateViewTeam.onClose}
                 team={selectedTeam}
+                countUpdate={countUpdate}
+                updateCallback={updatedCallback}
             />
         </Container>
     );
