@@ -69,7 +69,17 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     const toast = useToast();
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
-    const [teamMembersIds, setTeamMembersIds] = useState<string[]>([]);
+    const [teamMembersIds, setTeamMembersIds] = useState<string[]>(
+        (): string[] => {
+            let _membersIds: string[] = [];
+            if (team && team.members) {
+                team.members.forEach((member) => {
+                    _membersIds.push(member.id);
+                });
+            }
+            return _membersIds;
+        }
+    );
     const color = { light: "black", dark: "white" };
 
     let teamMembers: Array<userSelectOption> = [];
@@ -179,11 +189,14 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 leader_id: team.leader.id,
                 members: team.members,
             }));
-            if (team.members) {
-                team.members.map((member) =>
-                    setTeamMembersIds((prevIds) => [...prevIds, member.id])
-                );
+
+            let _membersIds: string[] = [];
+            if (team && team.members) {
+                team.members.forEach((member) => {
+                    _membersIds.push(member.id);
+                });
             }
+            setTeamMembersIds(_membersIds);
         }
     };
 
@@ -191,6 +204,8 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         if (optionsUser.fetching) return;
         handleSetInfo();
     }, [team, optionsUser.fetching]);
+
+    useEffect(() => {}, [teamMembersIds, isOpen]);
 
     const content = (
         <React.Fragment>
@@ -213,6 +228,8 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values) => {
+                            console.log(values);
+
                             setLoading(true);
                             if (context === "update") {
                                 const response = await updateTeam({
@@ -430,9 +447,9 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                     isDisabled={
                                                         context === "view"
                                                     }
-                                                    onMenuOpen={
-                                                        handleShowMembers.onOpen
-                                                    }
+                                                    onMenuOpen={() => {
+                                                        handleShowMembers.onOpen();
+                                                    }}
                                                     onMenuClose={
                                                         handleShowMembers.onClose
                                                     }

@@ -55,7 +55,7 @@ const Team: React.FC<TeamProps> = () => {
 
     useEffect(() => {
         if (teamsQuery.fetching) return;
-
+        console.log("it is reexecuted ?");
         reexecuteQuery({
             requestPolicy: "cache-and-network",
         });
@@ -143,7 +143,6 @@ const Team: React.FC<TeamProps> = () => {
                                     <Th>Leader</Th>
                                     <Th>Details</Th>
                                     <Th>Edit</Th>
-                                    <Th>Members</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -209,22 +208,6 @@ const Team: React.FC<TeamProps> = () => {
                                                         customOpenModal();
                                                         setSelectedTeam(team);
                                                     }}
-                                                />
-                                            </Tooltip>
-                                        </Td>
-                                        <Td>
-                                            <Tooltip
-                                                hasArrow
-                                                aria-label="manage members"
-                                                label="Manage Members"
-                                                colorScheme="white"
-                                            >
-                                                <IconButton
-                                                    aria-label="Manage Members"
-                                                    icon={<HiUserGroup />}
-                                                    isRound={true}
-                                                    variant="ghost"
-                                                    mr={1}
                                                 />
                                             </Tooltip>
                                         </Td>
