@@ -69,8 +69,10 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     const toast = useToast();
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
+    const [teamMembersIds, setTeamMembersIds] = useState<string[]>([]);
     const color = { light: "black", dark: "white" };
-    const [teamMembers, setTeamMembers] = useState<Array<userSelectOption>>([]);
+
+    let teamMembers: Array<userSelectOption> = [];
 
     const handleShowOptions = useDisclosure();
     const handleShowMembers = useDisclosure();
@@ -140,22 +142,22 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         return index;
     };
 
-    const getCurrentTeamMemebers = (): void => {
-        optionsUser.data?.getUsersSelect?.forEach((user) => {
-            let alreadyMember = team?.members?.find((member) => {
-                return member.id === user.value;
-            });
+    const getCurrentTeamMemebers = (): Array<userSelectOption> => {
+        if (!teamMembers.length) {
+            optionsUser.data?.getUsersSelect?.forEach((user) => {
+                let alreadyMember = team?.members?.find((member) => {
+                    return member.id === user.value;
+                });
 
-            if (alreadyMember) {
-                setTeamMembers((prevMembers) => [
-                    ...prevMembers,
-                    {
+                if (alreadyMember) {
+                    teamMembers.push({
                         value: alreadyMember.id,
                         label: alreadyMember.name,
-                    },
-                ]);
-            }
-        });
+                    });
+                }
+            });
+        }
+        return teamMembers;
     };
 
     const handleSetInfo = () => {
@@ -177,15 +179,17 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 leader_id: team.leader.id,
                 members: team.members,
             }));
+            if (team.members) {
+                team.members.map((member) =>
+                    setTeamMembersIds((prevIds) => [...prevIds, member.id])
+                );
+            }
         }
     };
 
     useEffect(() => {
-        setLoading(true);
         if (optionsUser.fetching) return;
         handleSetInfo();
-        getCurrentTeamMemebers();
-        setLoading(false);
     }, [team, optionsUser.fetching]);
 
     const content = (
@@ -205,6 +209,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                             leader_id: teamInfo.leader_id,
                             name: teamInfo.name,
                             description: teamInfo.description,
+                            members: teamMembersIds,
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values) => {
@@ -217,6 +222,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                         description: values.description,
                                         leader_id: values.leader_id,
                                     },
+                                    members: values.members,
                                 });
                                 if (response.data?.updateTeam?.errors) {
                                     let result = definedErrorMap(
@@ -255,6 +261,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                         description: values.description,
                                         leader_id: values.leader_id,
                                     },
+                                    members: values.members,
                                 });
 
                                 if (response.data?.createTeam?.errors) {
@@ -434,7 +441,18 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                         optionsUser?.data
                                                             ?.getUsersSelect
                                                     }
-                                                    defaultValue={teamMembers}
+                                                    defaultValue={getCurrentTeamMemebers()}
+                                                    onChange={(e) => {
+                                                        setTeamMembersIds([]);
+                                                        e.map((option) =>
+                                                            setTeamMembersIds(
+                                                                (prevIds) => [
+                                                                    ...prevIds,
+                                                                    option.value,
+                                                                ]
+                                                            )
+                                                        );
+                                                    }}
                                                 />
                                             </FormControl>
                                         )}
@@ -474,7 +492,8 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
             onClose={() => {
                 onClose();
                 handleSetInfo();
-                setTeamMembers([]);
+                teamMembers = [];
+                setTeamMembersIds([]);
             }}
             scrollBehavior={"inside"}
             size={"2xl"}

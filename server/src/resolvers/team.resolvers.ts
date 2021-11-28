@@ -85,6 +85,8 @@ export class TeamResolver {
             id: team.leader_id,
         });
 
+        await em.populate(team, ["members"]);
+
         team.leader = leader;
 
         return { team };
@@ -137,9 +139,67 @@ export class TeamResolver {
         }
 
         if (members) {
-            const _members = await em.find(User, { id: members });
             await team.members.init();
-            _members.map((member) => team.members.add(member));
+            let idsToRemove: string[] = [];
+            let memberToRemove: User | null | undefined = null;
+            const previousMembers = await team.members.loadItems();
+            let hasChangeMembers = false;
+
+            if (!members.length) {
+                previousMembers.map((prevMember) => {
+                    if (prevMember.id !== leader.id) {
+                        idsToRemove.push(prevMember.id);
+                    }
+                });
+
+                for (let i = 0; i < idsToRemove.length; i++) {
+                    memberToRemove = previousMembers.find((member) => {
+                        return member.id === idsToRemove[i];
+                    });
+                    if (memberToRemove && memberToRemove !== undefined) {
+                        team.members.remove(memberToRemove);
+                    }
+                }
+                await em.persistAndFlush(team.members);
+            } else {
+                const _members = await em.find(User, { id: members });
+
+                idsToRemove = [];
+                memberToRemove = null;
+                previousMembers.map((prevMember) => {
+                    memberToRemove = _members.find((_member) => {
+                        return _member.id === prevMember.id;
+                    });
+                    if (!memberToRemove || memberToRemove === undefined) {
+                        idsToRemove.push(prevMember.id);
+                    }
+                });
+
+                if (idsToRemove.length) {
+                    for (let j = 0; j < idsToRemove.length; j++) {
+                        memberToRemove = previousMembers.find((member) => {
+                            return member.id === idsToRemove[j];
+                        });
+                        if (memberToRemove && memberToRemove !== undefined) {
+                            team.members.remove(memberToRemove);
+                        }
+                    }
+                    // salvando primeiramente os membros antigos que
+                    // foram removidos, se estes existirem
+                    await em.persistAndFlush(team);
+                }
+
+                _members.map((member) => {
+                    if (!team.members.contains(member)) {
+                        team.members.add(member);
+                        hasChangeMembers = true;
+                    }
+                });
+
+                if (hasChangeMembers) {
+                    await em.persistAndFlush(team);
+                }
+            }
         }
 
         team.leader_id = options.leader_id;
@@ -192,13 +252,13 @@ export class TeamResolver {
 
         await em.persistAndFlush(team);
 
+        await team.members.init();
         if (members) {
             const _members = await em.find(User, { id: members });
-            await team.members.init();
             _members.map((member) => team.members.add(member));
-            team.members.add(leader);
-            await em.persistAndFlush(team);
         }
+        team.members.add(leader);
+        await em.persistAndFlush(team);
 
         return { team };
     }
