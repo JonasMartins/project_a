@@ -37,9 +37,8 @@ import {
 } from "./../../generated/graphql";
 import { Field, Form, Formik } from "formik";
 import { getServerPathImage } from "../../utils/handleServerImagePaths";
-import { truncateString } from "../../helpers/generalUtilitiesFunctions";
 import { definedErrorMap } from "../../utils/toErrorMap";
-import Select from "react-select";
+import Select, { MultiValue } from "react-select";
 
 interface ModalCreateUpdateViewTeamsProps {
     onClose: () => void;
@@ -56,6 +55,7 @@ interface teamInfoType {
     description: string;
     leader_id: string;
     members: membersGetTeamsType;
+    membersIds: string[];
 }
 
 const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
@@ -66,6 +66,9 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     updateCallback,
     countUpdate,
 }) => {
+    let teamMembers: Array<userSelectOption> = [];
+    let ids: string[] = [];
+
     const toast = useToast();
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
@@ -82,10 +85,18 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
     );
     const color = { light: "black", dark: "white" };
 
-    let teamMembers: Array<userSelectOption> = [];
-
     const handleShowOptions = useDisclosure();
     const handleShowMembers = useDisclosure();
+
+    const manageIds = (team: teamGetTeamsType): string[] => {
+        let result: string[] = [];
+        if (team?.members?.length) {
+            team.members.forEach((member) => {
+                result.push(member.id);
+            });
+        }
+        return result;
+    };
 
     const [teamInfo, setTeamInfo] = useState<teamInfoType>({
         id: team?.id,
@@ -93,6 +104,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
         description: team?.description,
         leader_id: team?.leader.id,
         members: team?.members,
+        membersIds: manageIds(team),
     });
 
     const [customErrors, setCustonErrors] = useState<customTeamErrors>({
@@ -179,6 +191,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 description: "",
                 leader_id: "",
                 members: [],
+                membersIds: [],
             }));
         } else {
             setTeamInfo((prevInfo) => ({
@@ -188,15 +201,36 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                 description: team.description,
                 leader_id: team.leader.id,
                 members: team.members,
+                membersIds: manageIds(team),
             }));
+        }
+    };
 
-            let _membersIds: string[] = [];
-            if (team && team.members) {
-                team.members.forEach((member) => {
-                    _membersIds.push(member.id);
-                });
-            }
-            setTeamMembersIds(_membersIds);
+    const handleChangeMembers = (values: MultiValue<userSelectOption>) => {
+        let currentArr: string[] = [...teamInfo.membersIds];
+        values.forEach((option) => {
+            ids.push(option.value);
+        });
+
+        // was removed
+        if (currentArr.length > ids.length) {
+            let index = 0;
+            currentArr.forEach((id, _index) => {
+                if (ids.indexOf(id) === -1) {
+                    index = _index;
+                }
+            });
+
+            currentArr.splice(index, 1);
+            setTeamInfo((prevInfo) => ({
+                ...prevInfo,
+                membersIds: currentArr,
+            }));
+        } else if (currentArr.length < ids.length) {
+            setTeamInfo((prevInfo) => ({
+                ...prevInfo,
+                membersIds: ids,
+            }));
         }
     };
 
@@ -224,7 +258,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                             leader_id: teamInfo.leader_id,
                             name: teamInfo.name,
                             description: teamInfo.description,
-                            members: teamMembersIds,
+                            members: teamInfo.membersIds,
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values) => {
@@ -369,10 +403,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                     }
                                                     color={color[colorMode]}
                                                     onChange={handleChangeTeam}
-                                                    value={truncateString(
-                                                        teamInfo.description,
-                                                        50
-                                                    )}
+                                                    value={teamInfo.description}
                                                 />
                                                 <FormErrorMessage>
                                                     {customErrors.description}
@@ -459,17 +490,9 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                                             ?.getUsersSelect
                                                     }
                                                     defaultValue={getCurrentTeamMemebers()}
-                                                    onChange={(e) => {
-                                                        setTeamMembersIds([]);
-                                                        e.map((option) =>
-                                                            setTeamMembersIds(
-                                                                (prevIds) => [
-                                                                    ...prevIds,
-                                                                    option.value,
-                                                                ]
-                                                            )
-                                                        );
-                                                    }}
+                                                    onChange={
+                                                        handleChangeMembers
+                                                    }
                                                 />
                                             </FormControl>
                                         )}

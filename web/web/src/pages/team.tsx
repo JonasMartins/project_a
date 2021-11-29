@@ -1,34 +1,34 @@
 import {
     Box,
     Flex,
+    IconButton,
+    Image,
     Link,
-    Text,
     Table,
     Tbody,
     Td,
+    Text,
     Th,
     Thead,
-    Tr,
-    Image,
     Tooltip,
-    IconButton,
+    Tr,
     useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { AiFillEdit, AiOutlineEye } from "react-icons/ai";
+import { GrAdd } from "react-icons/gr";
+import { useQuery } from "urql";
 import { GlobalContext } from "../context/globalContext";
+import { getServerPathImage } from "../utils/handleServerImagePaths";
 import { Container } from "./../components/Container";
 import SideBar from "./../components/layout/SideBar";
+import ModalCreateUpdateViewTeams from "./../components/modal/ModalCreateUpdateViewTeams";
+import FlexSpinner from "./../components/rootComponents/FlexSpinner";
 import Footer from "./../components/rootComponents/Footer";
 import Navbar from "./../components/rootComponents/Navbar";
-import { useGetTeamsQuery } from "./../generated/graphql";
-import { teamGetTeamsType, generalContext } from "./../utils/generalGroupTypes";
-import FlexSpinner from "./../components/rootComponents/FlexSpinner";
-import { getServerPathImage } from "../utils/handleServerImagePaths";
-import { AiOutlineEye, AiFillEdit } from "react-icons/ai";
-import { GrAdd } from "react-icons/gr";
-import ModalCreateUpdateViewTeams from "./../components/modal/ModalCreateUpdateViewTeams";
-import { HiUserGroup } from "react-icons/hi";
+import { GetTeamsDocument } from "./../generated/graphql";
+import { generalContext, teamGetTeamsType } from "./../utils/generalGroupTypes";
 
 interface TeamProps {}
 
@@ -51,11 +51,20 @@ const Team: React.FC<TeamProps> = () => {
         _modalCreateUpdateViewTeam.onOpen();
     };
 
-    const [teamsQuery, reexecuteQuery] = useGetTeamsQuery();
+    const [teamsQuery, reexecuteQuery] = useQuery({
+        query: GetTeamsDocument,
+    });
+
+    const refreshGetTeams = useCallback(() => {
+        console.log("refresh?", countUpdate);
+        reexecuteQuery({
+            requestPolicy: "network-only",
+        });
+    }, []);
 
     useEffect(() => {
         if (teamsQuery.fetching) return;
-        console.log("it is reexecuted ?");
+
         reexecuteQuery({
             requestPolicy: "cache-and-network",
         });
@@ -71,7 +80,15 @@ const Team: React.FC<TeamProps> = () => {
             setPageWidth("3em");
             setNavBarWidth("50px");
         }
-    }, [expanded, teamsQuery.fetching, countUpdate]);
+    }, [expanded, teamsQuery.fetching]);
+
+    useEffect(() => {
+        refreshGetTeams();
+
+        if (teamsQuery.data?.getTeams?.teams) {
+            setTeams(teamsQuery.data?.getTeams?.teams);
+        }
+    }, [countUpdate]);
 
     useEffect(() => {
         return () => {

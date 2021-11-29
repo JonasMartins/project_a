@@ -14,7 +14,6 @@ import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { User } from "../entities/user.entity";
 import { EntityManager } from "@mikro-orm/knex";
-import { Collection } from "@mikro-orm/core";
 
 @ObjectType()
 class TeamResponse {
@@ -99,6 +98,7 @@ export class TeamResolver {
         @Arg("members", () => [String], { nullable: true }) members: string[],
         @Ctx() { em }: Context
     ): Promise<TeamResponse> {
+        console.log("members ", members);
         const team = await em.findOne(Team, { id });
 
         if (!team) {
@@ -160,7 +160,7 @@ export class TeamResolver {
                         team.members.remove(memberToRemove);
                     }
                 }
-                await em.persistAndFlush(team.members);
+                await em.persistAndFlush(team);
             } else {
                 const _members = await em.find(User, { id: members });
 
