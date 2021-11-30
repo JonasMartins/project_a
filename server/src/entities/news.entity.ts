@@ -17,6 +17,10 @@ export class News extends Base<News> {
     @Property({ fieldName: "description" })
     description!: string;
 
+    @Field()
+    @Property({ type: "text" })
+    public pathInfo!: string;
+
     @Field(() => User)
     @ManyToOne(() => User)
     public creator!: User;

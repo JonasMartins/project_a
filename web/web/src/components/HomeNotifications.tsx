@@ -46,7 +46,7 @@ const HomeNotifications: React.FC<HomeNotificationsProps> = ({}) => {
                     </Text>
                 </Flex>
             </Box>
-            <Flex justifyContent="flex-start" alignItems="stretch">
+            <Flex>
                 <Flex
                     boxShadow="xl"
                     p="2"

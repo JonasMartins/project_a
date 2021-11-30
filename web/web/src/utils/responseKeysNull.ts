@@ -19,4 +19,5 @@ export const _keys = {
     ErrorFieldHandler: () => null,
     TeamsResponse: () => null,
     UserSelect: () => null,
+    NewsResponse: () => null,
 };

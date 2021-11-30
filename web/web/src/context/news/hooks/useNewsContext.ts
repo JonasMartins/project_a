@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import NewsContext from "../newsContext";
+import NewsContext from "../NewsContext";
 import { NewsContextType } from "../NewsProvider";
 
 const useNewsContext = (): NewsContextType => useContext(NewsContext);

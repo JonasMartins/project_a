@@ -1,0 +1,23 @@
+mutation CreateNews(
+    $creator_id: String!
+    $description: String!
+    $pathInfo: String!
+    $usersRelated: [String!]
+) {
+    createNews(
+        creator_id: $creator_id
+        description: $description
+        usersRelated: $usersRelated
+        pathInfo: $pathInfo
+    ) {
+        errors {
+            field
+            method
+            message
+        }
+        news {
+            id
+            description
+        }
+    }
+}

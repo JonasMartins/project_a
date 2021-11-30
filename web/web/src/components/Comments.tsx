@@ -7,6 +7,7 @@ import {
     User,
     useGetCommentsByItemQuery,
     useCreateCommentMutation,
+    useCreateNewsMutation,
 } from "./../generated/graphql";
 import {
     Flex,
@@ -32,9 +33,10 @@ import { truncateString } from "./../helpers/generalUtilitiesFunctions";
 import { useUser } from "./../helpers/hooks/useUser";
 import { toErrorMap } from "../utils/toErrorMap";
 import { CloseButton } from "@chakra-ui/react";
+import { itemBacklog } from "./../helpers/items/ItemFunctinHelpers";
 
 interface commentsProps {
-    itemId: string;
+    item: itemBacklog;
 }
 
 interface newComment {
@@ -42,6 +44,7 @@ interface newComment {
     parentId?: string;
     body: string;
     parentName?: string;
+    parentAuthorId?: string;
     parentCreated?: Date;
 }
 
@@ -53,7 +56,10 @@ type commentsType = Array<
             parent?: Maybe<
                 { __typename?: "Comment" } & Pick<Comment, "id" | "body">
             >;
-            author: { __typename?: "User" } & Pick<User, "name" | "picture">;
+            author: { __typename?: "User" } & Pick<
+                User,
+                "id" | "name" | "picture"
+            >;
             item: { __typename?: "Item" } & Pick<Item, "id">;
             replies: Array<
                 { __typename?: "Comment" } & Pick<
@@ -69,7 +75,7 @@ type commentsType = Array<
         }
 >;
 
-const Comments: React.FC<commentsProps> = ({ itemId }) => {
+const Comments: React.FC<commentsProps> = ({ item }) => {
     const user = useUser();
 
     const handleReplyInfo = useDisclosure();
@@ -86,7 +92,7 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
     });
     const [comments, setComments] = useState<commentsType>(null);
     const [newComment, setNewComment] = useState<newComment>({
-        itemId: itemId,
+        itemId: item.id,
         body: "",
     });
     const { colorMode } = useColorMode();
@@ -96,11 +102,13 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
     const bodyCommentRef = useRef<HTMLInputElement>(null);
 
     const [{}, createComment] = useCreateCommentMutation();
+    const [{}, createNews] = useCreateNewsMutation();
 
     const [itemComments, reexecuteQuery] = useGetCommentsByItemQuery({
         variables: {
-            itemId: itemId,
+            itemId: item.id,
         },
+        pause: !item || !item.id,
     });
 
     const handleCommentBody = (e: ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +132,7 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                 )
             );
         }
-    }, [itemId, itemComments.fetching, hasCreatedComment, loading]);
+    }, [item, itemComments.fetching, hasCreatedComment, loading]);
 
     const content = (
         <Flex
@@ -153,6 +161,7 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                     ...parent,
                                     parentId: "",
                                     body: "",
+                                    parentAuthorId: "",
                                     parentName: "",
                                 }));
                                 handleReplyInfo.onClose();
@@ -179,7 +188,7 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
             <Flex p={2} justifyContent="center" flexGrow={1} flexFlow="inherit">
                 <Formik
                     initialValues={{
-                        itemId: newComment.itemId,
+                        itemId: item.id,
                         body: newComment.body,
                     }}
                     enableReinitialize={true}
@@ -193,6 +202,18 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                             order: parentComment.parentId ? 2 : 1,
                         });
 
+                        if (
+                            parentComment.parentId &&
+                            parentComment.parentAuthorId
+                        ) {
+                            await createNews({
+                                creator_id: user.userId,
+                                description: `@${user.name} has just replied to your comment: ${parentComment.body}`,
+                                usersRelated: [parentComment.parentAuthorId],
+                                pathInfo: `Location: Home > Backlog > Item: ${item.summary}`,
+                            });
+                        }
+
                         if (response.data?.createComment?.errors) {
                             setErrors(
                                 toErrorMap(response.data.createComment.errors)
@@ -203,6 +224,7 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                 ...parent,
                                 parentId: "",
                                 body: "",
+                                parentAuthorId: "",
                                 parentName: "",
                             }));
                             handleReplyInfo.onClose();
@@ -353,6 +375,8 @@ const Comments: React.FC<commentsProps> = ({ itemId }) => {
                                                 parentId: comment.id,
                                                 body: comment.body,
                                                 parentName: comment.author.name,
+                                                parentAuthorId:
+                                                    comment.author.id,
                                                 parentCreated:
                                                     comment.createdAt,
                                             }));

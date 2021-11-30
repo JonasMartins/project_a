@@ -6,6 +6,10 @@ class NewsValidator {
     @Field()
     @IsString()
     public description: string;
+
+    @Field()
+    @IsString()
+    public pathInfo: string;
 }
 
 export default NewsValidator;

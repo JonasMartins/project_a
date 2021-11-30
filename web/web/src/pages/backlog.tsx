@@ -538,7 +538,7 @@ const Backlog: React.FC<backlogProps> = ({}) => {
                                         <Text>{itemDetailed.description}</Text>
                                     </Flex>
                                     <Flex>
-                                        <Comments itemId={itemDetailed.id} />
+                                        <Comments item={itemDetailed} />
                                     </Flex>
                                 </Flex>
                             ) : (

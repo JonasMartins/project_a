@@ -1,6 +1,6 @@
 import { useReducer, Dispatch, ReactNode } from "react";
 
-import NewsContext, { initialState, NewsStateType } from "./newsContext";
+import NewsContext, { initialState, NewsStateType } from "./NewsContext";
 
 export type NewsActionType =
     | {

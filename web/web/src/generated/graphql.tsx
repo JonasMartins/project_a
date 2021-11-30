@@ -179,6 +179,7 @@ export type Mutation = {
     createProject: ProjectResponse;
     updateProject: ProjectResponse;
     createComment: CommentResponse;
+    createNews: NewsResponse;
 };
 
 export type MutationCreateItemArgs = {
@@ -263,6 +264,31 @@ export type MutationCreateCommentArgs = {
     body: Scalars["String"];
 };
 
+export type MutationCreateNewsArgs = {
+    usersRelated?: Maybe<Array<Scalars["String"]>>;
+    pathInfo: Scalars["String"];
+    creator_id: Scalars["String"];
+    description: Scalars["String"];
+};
+
+export type News = {
+    __typename?: "News";
+    id: Scalars["ID"];
+    createdAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"];
+    description: Scalars["String"];
+    pathInfo: Scalars["String"];
+    creator: User;
+    creator_id: Scalars["String"];
+    relatedUsers: Array<User>;
+};
+
+export type NewsResponse = {
+    __typename?: "NewsResponse";
+    errors?: Maybe<Array<ErrorFieldHandler>>;
+    news: Array<News>;
+};
+
 export type Project = {
     __typename?: "Project";
     id: Scalars["ID"];
@@ -307,6 +333,7 @@ export type Query = {
     getProjectById: ProjectResponse;
     getCommentById: CommentResponse;
     getCommentsByItem: CommentsResponse;
+    getNewsRelatedToUser: NewsResponse;
 };
 
 export type QueryGetItensRelatedToUserByPeriodArgs = {
@@ -384,6 +411,11 @@ export type QueryGetCommentByIdArgs = {
 
 export type QueryGetCommentsByItemArgs = {
     itemId: Scalars["String"];
+};
+
+export type QueryGetNewsRelatedToUserArgs = {
+    limit?: Maybe<Scalars["Float"]>;
+    userId: Scalars["String"];
 };
 
 export type RevokeResponse = {
@@ -501,6 +533,7 @@ export type User = {
     itenApprover: Array<Item>;
     teamLeader: Array<Team>;
     teams: Array<Team>;
+    news: Array<News>;
     role: Role;
     appointments: Array<Appointment>;
     comments?: Maybe<Array<Comment>>;
@@ -591,6 +624,27 @@ export type CreateItemMutation = { __typename?: "Mutation" } & {
                     >;
                 }
         >;
+    };
+};
+
+export type CreateNewsMutationVariables = Exact<{
+    creator_id: Scalars["String"];
+    description: Scalars["String"];
+    pathInfo: Scalars["String"];
+    usersRelated?: Maybe<Array<Scalars["String"]> | Scalars["String"]>;
+}>;
+
+export type CreateNewsMutation = { __typename?: "Mutation" } & {
+    createNews: { __typename?: "NewsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "field" | "method" | "message"
+                >
+            >
+        >;
+        news: Array<{ __typename?: "News" } & Pick<News, "id" | "description">>;
     };
 };
 
@@ -960,7 +1014,7 @@ export type GetCommentsByItemQuery = { __typename?: "Query" } & {
                         >;
                         author: { __typename?: "User" } & Pick<
                             User,
-                            "name" | "picture"
+                            "id" | "name" | "picture"
                         >;
                         item: { __typename?: "Item" } & Pick<Item, "id">;
                         replies: Array<
@@ -1099,6 +1153,25 @@ export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
                 >
             >
         >;
+    };
+};
+
+export type GetNewsRelatedToUserQueryVariables = Exact<{
+    limit?: Maybe<Scalars["Float"]>;
+    userId: Scalars["String"];
+}>;
+
+export type GetNewsRelatedToUserQuery = { __typename?: "Query" } & {
+    getNewsRelatedToUser: { __typename?: "NewsResponse" } & {
+        errors?: Maybe<
+            Array<
+                { __typename?: "ErrorFieldHandler" } & Pick<
+                    ErrorFieldHandler,
+                    "method" | "message" | "field"
+                >
+            >
+        >;
+        news: Array<{ __typename?: "News" } & Pick<News, "id" | "description">>;
     };
 };
 
@@ -1380,6 +1453,37 @@ export const CreateItemDocument = gql`
 export function useCreateItemMutation() {
     return Urql.useMutation<CreateItemMutation, CreateItemMutationVariables>(
         CreateItemDocument
+    );
+}
+export const CreateNewsDocument = gql`
+    mutation CreateNews(
+        $creator_id: String!
+        $description: String!
+        $pathInfo: String!
+        $usersRelated: [String!]
+    ) {
+        createNews(
+            creator_id: $creator_id
+            description: $description
+            usersRelated: $usersRelated
+            pathInfo: $pathInfo
+        ) {
+            errors {
+                field
+                method
+                message
+            }
+            news {
+                id
+                description
+            }
+        }
+    }
+`;
+
+export function useCreateNewsMutation() {
+    return Urql.useMutation<CreateNewsMutation, CreateNewsMutationVariables>(
+        CreateNewsDocument
     );
 }
 export const CreateProjectDocument = gql`
@@ -1790,6 +1894,7 @@ export const GetCommentsByItemDocument = gql`
                     body
                 }
                 author {
+                    id
                     name
                     picture
                 }
@@ -1946,6 +2051,33 @@ export function useGetItensRelatedToUserByPeriodQuery(
 ) {
     return Urql.useQuery<GetItensRelatedToUserByPeriodQuery>({
         query: GetItensRelatedToUserByPeriodDocument,
+        ...options,
+    });
+}
+export const GetNewsRelatedToUserDocument = gql`
+    query GetNewsRelatedToUser($limit: Float, $userId: String!) {
+        getNewsRelatedToUser(limit: $limit, userId: $userId) {
+            errors {
+                method
+                message
+                field
+            }
+            news {
+                id
+                description
+            }
+        }
+    }
+`;
+
+export function useGetNewsRelatedToUserQuery(
+    options: Omit<
+        Urql.UseQueryArgs<GetNewsRelatedToUserQueryVariables>,
+        "query"
+    > = {}
+) {
+    return Urql.useQuery<GetNewsRelatedToUserQuery>({
+        query: GetNewsRelatedToUserDocument,
         ...options,
     });
 }

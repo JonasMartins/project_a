@@ -56,7 +56,6 @@ const Team: React.FC<TeamProps> = () => {
     });
 
     const refreshGetTeams = useCallback(() => {
-        console.log("refresh?", countUpdate);
         reexecuteQuery({
             requestPolicy: "network-only",
         });

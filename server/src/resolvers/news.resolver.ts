@@ -61,7 +61,11 @@ export class NewsResolver {
             arrNewsId.push(userNews.news_id);
         });
 
-        const news = await em.find(News, { id: arrNewsId });
+        const qqb = (em as EntityManager).createQueryBuilder(News);
+
+        qqb.select("*").where({ id: arrNewsId }).orderBy({ createdAt: "DESC" });
+
+        const news = await qqb.getResult();
 
         return { news };
     }
@@ -70,6 +74,7 @@ export class NewsResolver {
     async createNews(
         @Arg("description") description: string,
         @Arg("creator_id") creator_id: string,
+        @Arg("pathInfo") pathInfo: string,
         @Arg("usersRelated", () => [String], { nullable: true })
         usersRelated: string[],
         @Ctx() { em }: Context
@@ -90,11 +95,12 @@ export class NewsResolver {
         const news = em.create(News, {
             description,
             creator_id,
+            pathInfo,
         });
 
         await em.persistAndFlush(news);
-        await news.relatedUsers.init();
         if (usersRelated) {
+            await news.relatedUsers.init();
             const usersNews = await em.find(User, {
                 id: usersRelated,
             });
@@ -103,7 +109,7 @@ export class NewsResolver {
                 usersNews.map((user) => news.relatedUsers.add(user));
             }
         }
-        news.relatedUsers.add(creator);
+        // news.relatedUsers.add(creator);
         await em.persistAndFlush(news);
 
         return { news: [news] };

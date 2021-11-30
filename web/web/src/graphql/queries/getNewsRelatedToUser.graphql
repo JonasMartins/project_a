@@ -1,0 +1,13 @@
+query GetNewsRelatedToUser($limit: Float, $userId: String!) {
+    getNewsRelatedToUser(limit: $limit, userId: $userId) {
+        errors {
+            method
+            message
+            field
+        }
+        news {
+            id
+            description
+        }
+    }
+}
