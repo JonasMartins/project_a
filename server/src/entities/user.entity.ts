@@ -14,6 +14,7 @@ import { Team } from "./team.entity";
 import { Role } from "./role.entity";
 import { Comment } from "./comments.entity";
 import { Appointment } from "./appointment.entity";
+import { News } from "./news.entity";
 
 @ObjectType()
 @Entity()
@@ -56,6 +57,12 @@ export class User extends Base<User> {
         mappedBy: "members",
     })
     public teams: Collection<Team> = new Collection<Team>(this);
+
+    @Field(() => [News])
+    @ManyToMany(() => News, (news: News) => news.relatedUsers, {
+        mappedBy: "relatedUsers",
+    })
+    public news: Collection<News> = new Collection<News>(this);
 
     @Field(() => Role)
     @ManyToOne(() => Role, { eager: true })

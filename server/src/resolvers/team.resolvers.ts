@@ -98,7 +98,6 @@ export class TeamResolver {
         @Arg("members", () => [String], { nullable: true }) members: string[],
         @Ctx() { em }: Context
     ): Promise<TeamResponse> {
-        console.log("members ", members);
         const team = await em.findOne(Team, { id });
 
         if (!team) {

@@ -14,6 +14,7 @@ import { AppointmentResolver } from "./resolvers/appointment.resolver";
 import { SprintResolver } from "./resolvers/sprint.resolver";
 import { ProjectResolver } from "./resolvers/project.resolver";
 import { CommentResolver } from "./resolvers/comment.resolver";
+import { NewsResolver } from "./resolvers/news.resolver";
 import { graphqlUploadExpress } from "graphql-upload";
 import { Context } from "./types";
 /*
@@ -99,6 +100,7 @@ export default class Application {
                     ProjectResolver,
                     AppointmentResolver,
                     CommentResolver,
+                    NewsResolver,
                 ],
                 validate: false,
             }),

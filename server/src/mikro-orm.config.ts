@@ -9,6 +9,8 @@ import { Sprint } from "./entities/sprint.entity";
 import { Project } from "./entities/project.entity";
 import { Appointment } from "./entities/appointment.entity";
 import { Comment } from "./entities/comments.entity";
+import { News } from "./entities/news.entity";
+import { NewsRelatedUsers } from "./entities/newsRelatedUsers.entity";
 
 const microConfig = {
     migrations: {
@@ -26,6 +28,8 @@ const microConfig = {
         Project,
         Appointment,
         Comment,
+        News,
+        NewsRelatedUsers,
     ],
     dbName: process.env.DB_NAME,
     user: process.env.DB_USER,
