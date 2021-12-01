@@ -114,4 +114,42 @@ export class NewsResolver {
 
         return { news: [news] };
     }
+
+    @Mutation(() => Boolean)
+    async addSeenUserNews(
+        @Arg("newsId") newsId: string,
+        @Arg("userId") userId: string,
+        @Ctx() { em }: Context
+    ): Promise<Boolean> {
+        const news = await em.findOne(News, { id: newsId });
+
+        if (!news) {
+            return new Promise((resolve, _) => {
+                resolve(false);
+            });
+        }
+
+        let arrSeen = news.usersSeen;
+        if (!arrSeen || arrSeen === undefined) {
+            arrSeen = [];
+            arrSeen?.push(userId);
+            news.usersSeen = arrSeen;
+        } else {
+            arrSeen.push(userId);
+            news.usersSeen = arrSeen;
+            const a = 1;
+        }
+
+        try {
+            await em.persistAndFlush(news);
+            return new Promise((resolve, _) => {
+                resolve(true);
+            });
+        } catch (e) {
+            console.log(e);
+            return new Promise((resolve, _) => {
+                resolve(false);
+            });
+        }
+    }
 }

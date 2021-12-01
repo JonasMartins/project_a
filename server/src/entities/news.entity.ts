@@ -4,6 +4,7 @@ import {
     ManyToMany,
     Property,
     ManyToOne,
+    ArrayType,
 } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { Base } from "./../utils/entities/base.entity";
@@ -32,6 +33,10 @@ export class News extends Base<News> {
     @Field(() => [User])
     @ManyToMany(() => User, (user: User) => user.news, { owner: true })
     public relatedUsers: Collection<User> = new Collection<User>(this);
+
+    @Field(() => [String])
+    @Property({ type: ArrayType, nullable: true })
+    usersSeen?: string[];
 
     constructor(body: NewsValidator) {
         super(body);
