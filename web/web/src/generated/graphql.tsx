@@ -180,6 +180,7 @@ export type Mutation = {
     updateProject: ProjectResponse;
     createComment: CommentResponse;
     createNews: NewsResponse;
+    addUsersWhoSawTheNews: Scalars["Boolean"];
 };
 
 export type MutationCreateItemArgs = {
@@ -271,6 +272,11 @@ export type MutationCreateNewsArgs = {
     description: Scalars["String"];
 };
 
+export type MutationAddUsersWhoSawTheNewsArgs = {
+    userId: Scalars["String"];
+    newsId: Scalars["String"];
+};
+
 export type News = {
     __typename?: "News";
     id: Scalars["ID"];
@@ -281,6 +287,7 @@ export type News = {
     creator: User;
     creator_id: Scalars["String"];
     relatedUsers: Array<User>;
+    usersSeen: Array<Scalars["String"]>;
 };
 
 export type NewsResponse = {
@@ -580,6 +587,16 @@ export type TokenAndId = {
     name?: Maybe<Scalars["String"]>;
     userRoleCode?: Maybe<Scalars["String"]>;
 };
+
+export type AddUsersWhoSawTheNewsMutationVariables = Exact<{
+    newsId: Scalars["String"];
+    userId: Scalars["String"];
+}>;
+
+export type AddUsersWhoSawTheNewsMutation = { __typename?: "Mutation" } & Pick<
+    Mutation,
+    "addUsersWhoSawTheNews"
+>;
 
 export type ChangeItemStatusMutationVariables = Exact<{
     id: Scalars["String"];
@@ -1171,7 +1188,12 @@ export type GetNewsRelatedToUserQuery = { __typename?: "Query" } & {
                 >
             >
         >;
-        news: Array<{ __typename?: "News" } & Pick<News, "id" | "description">>;
+        news: Array<
+            { __typename?: "News" } & Pick<
+                News,
+                "id" | "description" | "usersSeen"
+            >
+        >;
     };
 };
 
@@ -1398,6 +1420,18 @@ export type LogedInTestQuery = { __typename?: "Query" } & {
         };
 };
 
+export const AddUsersWhoSawTheNewsDocument = gql`
+    mutation AddUsersWhoSawTheNews($newsId: String!, $userId: String!) {
+        addUsersWhoSawTheNews(newsId: $newsId, userId: $userId)
+    }
+`;
+
+export function useAddUsersWhoSawTheNewsMutation() {
+    return Urql.useMutation<
+        AddUsersWhoSawTheNewsMutation,
+        AddUsersWhoSawTheNewsMutationVariables
+    >(AddUsersWhoSawTheNewsDocument);
+}
 export const ChangeItemStatusDocument = gql`
     mutation ChangeItemStatus($id: String!, $newStatus: ItemStatus!) {
         changeItemStatus(id: $id, newStatus: $newStatus)
@@ -2065,6 +2099,7 @@ export const GetNewsRelatedToUserDocument = gql`
             news {
                 id
                 description
+                usersSeen
             }
         }
     }

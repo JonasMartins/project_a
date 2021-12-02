@@ -9,6 +9,7 @@ import {
     Td,
     IconButton,
     Tooltip,
+    Circle,
 } from "@chakra-ui/react";
 import { useGetNewsRelatedToUserQuery } from "./../../generated/graphql";
 import FlexSpinner from "./../rootComponents/FlexSpinner";
@@ -31,7 +32,6 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
     });
 
     const refreshNotifications = useCallback(() => {
-        console.log("refresh ?");
         reexecuteQuery({
             requestPolicy: "network-only",
         });
@@ -39,6 +39,7 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
 
     useEffect(() => {
         if (news.fetching) return;
+        // console.log(news.data?.getNewsRelatedToUser?.news);
     }, [news.fetching, user.userId]);
 
     useEffect(() => {
@@ -46,7 +47,7 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
     }, []);
 
     const content = (
-        <Table variant="striped" size="sm">
+        <Table size="sm">
             <Thead>
                 <Tr>
                     <Th></Th>
@@ -59,7 +60,14 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
                     news.data.getNewsRelatedToUser.news.map((notification) => (
                         <Tr key={notification.id}>
                             <Td>
-                                <BellIcon />
+                                <Circle
+                                    w="25px"
+                                    h="25px"
+                                    bg="red.500"
+                                    color="white"
+                                >
+                                    <BellIcon />
+                                </Circle>
                             </Td>
                             <Td>
                                 {truncateString(notification.description, 50)}

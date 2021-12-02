@@ -1,0 +1,3 @@
+mutation AddUsersWhoSawTheNews($newsId: String!, $userId: String!) {
+    addUsersWhoSawTheNews(newsId: $newsId, userId: $userId)
+}

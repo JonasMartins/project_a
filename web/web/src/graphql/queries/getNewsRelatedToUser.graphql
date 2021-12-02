@@ -8,6 +8,7 @@ query GetNewsRelatedToUser($limit: Float, $userId: String!) {
         news {
             id
             description
+            usersSeen
         }
     }
 }

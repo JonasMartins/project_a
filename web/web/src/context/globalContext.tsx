@@ -1,4 +1,8 @@
 import React, { createContext, useState } from "react";
+import {
+    useAddUsersWhoSawTheNewsMutation,
+    useCreateNewsMutation,
+} from "./../generated/graphql";
 
 export const GlobalContext = createContext<GlobalContext | null>(null);
 

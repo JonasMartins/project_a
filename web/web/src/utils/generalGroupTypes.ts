@@ -106,3 +106,10 @@ export interface defaultSelectPattern {
     value: string;
     label: string;
 }
+
+export type createNewsVariables = {
+    creator_id: string;
+    description: string;
+    usersRelated: string | string[];
+    pathInfo: string;
+};

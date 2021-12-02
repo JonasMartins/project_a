@@ -27,6 +27,13 @@ interface Item {
     status: ItemStatus;
 }
 
+interface createNewsVariables {
+    creator_id: string;
+    description: string;
+    usersRelated: string | [string];
+    pathInfo: string;
+}
+
 interface User {
     id: string;
     createdAt: Date;

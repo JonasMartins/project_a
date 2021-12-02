@@ -96,6 +96,7 @@ export class NewsResolver {
             description,
             creator_id,
             pathInfo,
+            usersSeen: [],
         });
 
         await em.persistAndFlush(news);
@@ -116,7 +117,7 @@ export class NewsResolver {
     }
 
     @Mutation(() => Boolean)
-    async addSeenUserNews(
+    async addUsersWhoSawTheNews(
         @Arg("newsId") newsId: string,
         @Arg("userId") userId: string,
         @Ctx() { em }: Context
@@ -135,9 +136,10 @@ export class NewsResolver {
             arrSeen?.push(userId);
             news.usersSeen = arrSeen;
         } else {
-            arrSeen.push(userId);
-            news.usersSeen = arrSeen;
-            const a = 1;
+            if (!arrSeen.includes(userId)) {
+                arrSeen.push(userId);
+                news.usersSeen = arrSeen;
+            }
         }
 
         try {
