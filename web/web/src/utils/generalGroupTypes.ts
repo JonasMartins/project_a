@@ -5,6 +5,7 @@ import {
     Role,
     User,
     UserSelect,
+    News,
 } from "./../generated/graphql";
 
 export type generalContext = "create" | "update" | "view";
@@ -77,6 +78,11 @@ export type projectType = {
 export type userSelectOption = { __typename?: "UserSelect" } & Pick<
     UserSelect,
     "value" | "label"
+>;
+
+export type newsRelatedToUserType = { __typename?: "News" } & Pick<
+    News,
+    "id" | "description" | "pathInfo" | "usersSeen"
 >;
 
 export interface projectInfo {

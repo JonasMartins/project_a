@@ -1,3 +1,4 @@
+import { BellIcon } from "@chakra-ui/icons";
 import {
     Modal,
     ModalBody,
@@ -8,39 +9,62 @@ import {
     ModalOverlay,
     Text,
     Flex,
+    useColorMode,
+    Circle,
 } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { AiFillInfoCircle } from "react-icons/ai";
+import { newsRelatedToUserType } from "./../../utils/generalGroupTypes";
 
 interface ModalSeeNotificaionProps {
     onClose: () => void;
     isOpen: boolean;
+    news: newsRelatedToUserType | null;
 }
 
 const ModalSeeNotificaion: React.FC<ModalSeeNotificaionProps> = ({
     isOpen,
     onClose,
+    news,
 }) => {
-    return (
+    const { colorMode } = useColorMode();
+    const color = { light: "black", dark: "white" };
+
+    useEffect(() => {}, [news]);
+
+    const content = (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
             scrollBehavior={"inside"}
-            size={"4xl"}
+            size={"lg"}
         >
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
                     <Flex>
-                        <Text>Title</Text>
+                        <Circle w="40px" h="40px" bg="blue.500" color="white">
+                            <AiFillInfoCircle />
+                        </Circle>
                     </Flex>
                 </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody></ModalBody>
+                <ModalCloseButton color={color[colorMode]} />
+                <ModalBody>
+                    <Text mt={2} color={color[colorMode]}>
+                        {news && news.description}
+                    </Text>
+                    <Text mt={2} color={color[colorMode]}>
+                        {news && news.pathInfo}
+                    </Text>
+                </ModalBody>
                 <ModalFooter>
                     <ModalBody></ModalBody>
                 </ModalFooter>
             </ModalContent>
         </Modal>
     );
+
+    return news ? content : <></>;
 };
 
 export default ModalSeeNotificaion;

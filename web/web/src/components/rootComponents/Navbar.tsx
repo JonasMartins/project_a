@@ -66,7 +66,6 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
         <Flex
             overflow="hidden"
             top="0"
-            zIndex={0}
             flexGrow={1}
             m={0}
             p={[0, 2]}

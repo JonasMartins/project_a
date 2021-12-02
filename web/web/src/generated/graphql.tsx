@@ -1191,7 +1191,7 @@ export type GetNewsRelatedToUserQuery = { __typename?: "Query" } & {
         news: Array<
             { __typename?: "News" } & Pick<
                 News,
-                "id" | "description" | "usersSeen"
+                "id" | "description" | "pathInfo" | "usersSeen"
             >
         >;
     };
@@ -2099,6 +2099,7 @@ export const GetNewsRelatedToUserDocument = gql`
             news {
                 id
                 description
+                pathInfo
                 usersSeen
             }
         }
