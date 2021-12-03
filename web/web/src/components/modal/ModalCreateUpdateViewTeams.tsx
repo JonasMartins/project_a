@@ -34,11 +34,13 @@ import {
     useCreateTeamMutation,
     useUpdateTeamMutation,
     useGetUsersSelectQuery,
+    useCreateNewsMutation,
 } from "./../../generated/graphql";
 import { Field, Form, Formik } from "formik";
 import { getServerPathImage } from "../../utils/handleServerImagePaths";
 import { definedErrorMap } from "../../utils/toErrorMap";
 import Select, { MultiValue } from "react-select";
+import { useUser } from "./../../helpers/hooks/useUser";
 
 interface ModalCreateUpdateViewTeamsProps {
     onClose: () => void;
@@ -68,7 +70,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
 }) => {
     let teamMembers: Array<userSelectOption> = [];
     let ids: string[] = [];
-
+    const user = useUser();
     const toast = useToast();
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState(false);
@@ -116,6 +118,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
 
     const [{}, createTeam] = useCreateTeamMutation();
     const [{}, updateTeam] = useUpdateTeamMutation();
+    const [{}, createNews] = useCreateNewsMutation();
 
     const [optionsUser] = useGetUsersSelectQuery({
         variables: {
@@ -262,8 +265,6 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                         }}
                         enableReinitialize={true}
                         onSubmit={async (values) => {
-                            console.log(values);
-
                             setLoading(true);
                             if (context === "update") {
                                 const response = await updateTeam({
@@ -275,6 +276,7 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                     },
                                     members: values.members,
                                 });
+
                                 if (response.data?.updateTeam?.errors) {
                                     let result = definedErrorMap(
                                         response.data?.updateTeam?.errors
@@ -288,22 +290,26 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                         setLoading(false);
                                     }, 300);
                                 } else {
-                                    setTimeout(() => {
-                                        setTimeout(() => {
-                                            updateCallback(countUpdate + 1);
-                                            toast({
-                                                title: "Team Updated",
-                                                description:
-                                                    "Team successfully updated",
-                                                status: "success",
-                                                duration: 8000,
-                                                isClosable: true,
-                                                position: "bottom-right",
-                                            });
-                                            setLoading(false);
-                                            onClose();
-                                        }, 500);
+                                    await createNews({
+                                        creator_id: user.userId,
+                                        description: `@${user.name} has just updated the team "${values.name}".`,
+                                        usersRelated: values.members,
+                                        pathInfo: `Location: Home > Teams > Team updated: ${values.name}`,
                                     });
+                                    setTimeout(() => {
+                                        updateCallback(countUpdate + 1);
+                                        toast({
+                                            title: "Team Updated",
+                                            description:
+                                                "Team successfully updated",
+                                            status: "success",
+                                            duration: 8000,
+                                            isClosable: true,
+                                            position: "bottom-right",
+                                        });
+                                        setLoading(false);
+                                        onClose();
+                                    }, 500);
                                 }
                             } else {
                                 const response = await createTeam({
@@ -328,22 +334,26 @@ const ModalCreateUpdateViewTeams: React.FC<ModalCreateUpdateViewTeamsProps> = ({
                                         setLoading(false);
                                     }, 300);
                                 } else {
-                                    setTimeout(() => {
-                                        setTimeout(() => {
-                                            updateCallback(countUpdate + 1);
-                                            toast({
-                                                title: "Team Created",
-                                                description:
-                                                    "Team successfully created",
-                                                status: "success",
-                                                duration: 8000,
-                                                isClosable: true,
-                                                position: "bottom-right",
-                                            });
-                                            setLoading(false);
-                                            onClose();
-                                        }, 500);
+                                    await createNews({
+                                        creator_id: user.userId,
+                                        description: `@${user.name} has just created a team called "${values.name}", and made you as member.`,
+                                        usersRelated: values.members,
+                                        pathInfo: `Location: Home > Teams > Team created: ${values.name}`,
                                     });
+                                    setTimeout(() => {
+                                        updateCallback(countUpdate + 1);
+                                        toast({
+                                            title: "Team Created",
+                                            description:
+                                                "Team successfully created",
+                                            status: "success",
+                                            duration: 8000,
+                                            isClosable: true,
+                                            position: "bottom-right",
+                                        });
+                                        setLoading(false);
+                                        onClose();
+                                    }, 500);
                                 }
                             }
                         }}

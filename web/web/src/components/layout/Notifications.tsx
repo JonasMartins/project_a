@@ -52,6 +52,11 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
         pause: !user || !user.userId,
     });
 
+    const [countUpdate, setCountUpdate] = useState(0);
+    const updatedCallback = (value: number): void => {
+        setCountUpdate(value);
+    };
+
     const [resultAddNotificationHasBeenSeen, addUserAlreadySawThisNews] =
         useAddUsersWhoSawTheNewsMutation();
 
@@ -84,7 +89,7 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
 
     useEffect(() => {
         refreshNotifications();
-    }, []);
+    }, [countUpdate]);
 
     const content = (
         <React.Fragment>
@@ -172,6 +177,8 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
                 isOpen={modalSeeNotification.isOpen}
                 onClose={modalSeeNotification.onClose}
                 news={selectedNews}
+                countUpdate={countUpdate}
+                updateCallback={updatedCallback}
             />
         </React.Fragment>
     );

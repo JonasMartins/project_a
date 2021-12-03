@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { AiFillEdit, AiOutlineEye } from "react-icons/ai";
+import { AiFillBell, AiFillEdit, AiOutlineEye } from "react-icons/ai";
 import { GrAdd } from "react-icons/gr";
 import { useQuery } from "urql";
 import { GlobalContext } from "../context/globalContext";
@@ -29,6 +29,7 @@ import Footer from "./../components/rootComponents/Footer";
 import Navbar from "./../components/rootComponents/Navbar";
 import { GetTeamsDocument } from "./../generated/graphql";
 import { generalContext, teamGetTeamsType } from "./../utils/generalGroupTypes";
+import ModalCreateTeamsNews from "./../components/modal/ModalCreateTeamsNews";
 
 interface TeamProps {}
 
@@ -47,6 +48,8 @@ const Team: React.FC<TeamProps> = () => {
     };
 
     const _modalCreateUpdateViewTeam = useDisclosure();
+    const _modalCreateNotification = useDisclosure();
+
     const customOpenModal = (): void => {
         _modalCreateUpdateViewTeam.onOpen();
     };
@@ -159,6 +162,7 @@ const Team: React.FC<TeamProps> = () => {
                                     <Th>Leader</Th>
                                     <Th>Details</Th>
                                     <Th>Edit</Th>
+                                    <Th>News</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -227,6 +231,25 @@ const Team: React.FC<TeamProps> = () => {
                                                 />
                                             </Tooltip>
                                         </Td>
+                                        <Td>
+                                            <Tooltip
+                                                hasArrow
+                                                aria-label="Create Notification to all team's members."
+                                                label="Create Notification to all team's members."
+                                                colorScheme="white"
+                                            >
+                                                <IconButton
+                                                    isRound={true}
+                                                    aria-label="Create Notification"
+                                                    colorScheme="red"
+                                                    mr={1}
+                                                    icon={<AiFillBell />}
+                                                    onClick={
+                                                        _modalCreateNotification.onOpen
+                                                    }
+                                                />
+                                            </Tooltip>
+                                        </Td>
                                     </Tr>
                                 ))}
                             </Tbody>
@@ -246,6 +269,11 @@ const Team: React.FC<TeamProps> = () => {
                 team={selectedTeam}
                 countUpdate={countUpdate}
                 updateCallback={updatedCallback}
+            />
+            <ModalCreateTeamsNews
+                isOpen={_modalCreateNotification.isOpen}
+                onClose={_modalCreateNotification.onClose}
+                team={selectedTeam}
             />
         </Container>
     );

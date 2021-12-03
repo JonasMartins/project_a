@@ -346,6 +346,9 @@ const ModalCreateUpdateSprint: React.FC<ModalCreateUpdateSprintProps> = ({
                                                 <Select
                                                     placeholder="project"
                                                     {...field}
+                                                    disabled={
+                                                        context === "update"
+                                                    }
                                                     id="project"
                                                     borderRadius="2em"
                                                     isRequired

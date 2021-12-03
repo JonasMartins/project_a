@@ -20,12 +20,16 @@ interface ModalSeeNotificaionProps {
     onClose: () => void;
     isOpen: boolean;
     news: newsRelatedToUserType | null;
+    countUpdate: number;
+    updateCallback: (number) => void;
 }
 
 const ModalSeeNotificaion: React.FC<ModalSeeNotificaionProps> = ({
     isOpen,
     onClose,
     news,
+    countUpdate,
+    updateCallback,
 }) => {
     const { colorMode } = useColorMode();
     const color = { light: "black", dark: "white" };
@@ -35,7 +39,10 @@ const ModalSeeNotificaion: React.FC<ModalSeeNotificaionProps> = ({
     const content = (
         <Modal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={() => {
+                updateCallback(countUpdate + 1);
+                onClose();
+            }}
             scrollBehavior={"inside"}
             size={"lg"}
         >
