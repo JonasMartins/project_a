@@ -244,9 +244,10 @@ const Team: React.FC<TeamProps> = () => {
                                                     colorScheme="red"
                                                     mr={1}
                                                     icon={<AiFillBell />}
-                                                    onClick={
-                                                        _modalCreateNotification.onOpen
-                                                    }
+                                                    onClick={() => {
+                                                        setSelectedTeam(team);
+                                                        _modalCreateNotification.onOpen();
+                                                    }}
                                                 />
                                             </Tooltip>
                                         </Td>
