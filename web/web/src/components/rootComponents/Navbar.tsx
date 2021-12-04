@@ -1,5 +1,4 @@
 import {
-    BellIcon,
     DragHandleIcon,
     MoonIcon,
     SettingsIcon,
@@ -126,21 +125,6 @@ const Navbar: React.FC<NavbarProps> = ({ pageWidth }) => {
                             }
                         />
                     </Box>
-
-                    <MenuButton
-                        mr={2}
-                        borderRadius={"full"}
-                        as={IconButton}
-                        aria-label="Notifications"
-                        icon={<BellIcon />}
-                    ></MenuButton>
-                    <MenuList>
-                        <MenuItem>Download</MenuItem>
-                        <MenuItem>Create a Copy</MenuItem>
-                        <MenuItem></MenuItem>
-                        <MenuItem>Delete</MenuItem>
-                        <MenuItem>Attend a Workshop</MenuItem>
-                    </MenuList>
                 </Menu>
                 <Menu>
                     <MenuButton

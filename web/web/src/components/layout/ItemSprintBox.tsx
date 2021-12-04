@@ -1,6 +1,6 @@
 import {
     Box,
-    Button,
+    Image,
     Flex,
     IconButton,
     Text,
@@ -11,21 +11,15 @@ import React from "react";
 import { useDrag } from "react-dnd";
 import { AiOutlineEye } from "react-icons/ai";
 import { MdDragHandle } from "react-icons/md";
+import { getServerPathImage } from "../../utils/handleServerImagePaths";
 import ModalShowItem from "../modal/ModalShowItem";
-import { Item } from "./../../generated/graphql";
 import { truncateString } from "./../../helpers/generalUtilitiesFunctions";
 import {
     getItemTypeIcon,
     returnPriorityIconHeaderModal,
+    itemQuery,
 } from "./../../helpers/items/ItemFunctinHelpers";
 import { Primary } from "./../layout/ContainerShades";
-
-type itemQuery = {
-    __typename?: "Item";
-} & Pick<
-    Item,
-    "id" | "description" | "summary" | "status" | "priority" | "type"
->;
 
 interface ItemSprintBoxProps {
     item: itemQuery;
@@ -74,7 +68,19 @@ const ItemSprintBox: React.FC<ItemSprintBoxProps> = ({ item }) => {
                         {returnPriorityIconHeaderModal(item.priority)}
                     </Flex>
                 </Flex>
-                <Flex justifyContent="flex-end">
+                <Flex justifyContent="space-between" mt={2}>
+                    <Tooltip
+                        hasArrow
+                        aria-label="item's responsible"
+                        label={`Responsible: ${item.responsible.name}`}
+                        colorScheme="withe"
+                    >
+                        <Image
+                            borderRadius="full"
+                            boxSize="32px"
+                            src={getServerPathImage(item.responsible.picture)}
+                        />
+                    </Tooltip>
                     <Tooltip
                         hasArrow
                         aria-label="See item details"

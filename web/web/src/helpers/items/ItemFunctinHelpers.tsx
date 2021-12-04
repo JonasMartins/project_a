@@ -18,6 +18,7 @@ import {
     Project,
     Item,
     ItemType,
+    User,
 } from "./../../generated/graphql";
 
 export type itemQuery = {
@@ -25,7 +26,17 @@ export type itemQuery = {
 } & Pick<
     Item,
     "id" | "description" | "summary" | "status" | "priority" | "type"
->;
+> & {
+        responsible: {
+            __typename?: "User";
+        } & Pick<User, "id" | "name" | "picture">;
+        approver: {
+            __typename?: "User";
+        } & Pick<User, "id" | "name" | "picture">;
+        reporter: {
+            __typename?: "User";
+        } & Pick<User, "id" | "name" | "picture">;
+    };
 
 export type itemBacklog = { __typename?: "Item" } & Pick<
     Item,
@@ -83,6 +94,23 @@ export type itensBacklog = {
         >
     >;
 };
+
+export type itemRelatedToUser = { __typename?: "Item" } & Pick<
+    Item,
+    | "id"
+    | "summary"
+    | "description"
+    | "status"
+    | "type"
+    | "priority"
+    | "responsible_id"
+    | "reporter_id"
+    | "approver_id"
+> & {
+        sprint: { __typename?: "Sprint" } & {
+            project: { __typename?: "Project" } & Pick<Project, "id">;
+        };
+    };
 
 export const getItemTypeIcon = (type: string): JSX.Element => {
     let componentType: JSX.Element | null = null;

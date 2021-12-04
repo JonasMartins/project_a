@@ -9,6 +9,7 @@ import {
     Tabs,
     Text,
     Tooltip,
+    Link,
     useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
@@ -16,40 +17,27 @@ import { BsSearch } from "react-icons/bs";
 import { useGetItensRelatedToUserByPeriodQuery } from "./../../generated/graphql";
 import { getPastOrFutureDate } from "./../../helpers/generalUtilitiesFunctions";
 import {
-    enumItemPriority,
-    enumItemType,
     getItemTypeIcon,
+    itemRelatedToUser,
 } from "./../../helpers/items/ItemFunctinHelpers";
 import ModalitemDetail from "./../modal/ModalitemDetail";
 import FullPageSpinner from "./../rootComponents/FullPageSpinner";
+import NextLink from "next/link";
 
 interface ItensHomeProps {
     userId: string;
 }
 
 const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
-    const [summary, setSummary] = useState("");
-    const [description, setDescription] = useState("");
-    const [itemType, setItemType] = useState<enumItemType | null>(null);
-    const [itemPriority, setItemPriority] = useState<enumItemPriority | null>(
-        null
-    );
+    const [selectedItem, setSelectedItem] = useState<itemRelatedToUser>(null);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const today = getPastOrFutureDate(new Date(), 1, "future");
     const lastYear = getPastOrFutureDate(today, 365, "past");
 
-    const customOnOpen = (
-        summary: string,
-        description: string,
-        type: enumItemType,
-        priority: enumItemPriority
-    ): void => {
-        setDescription(description);
-        setSummary(summary);
-        setItemType(type);
-        setItemPriority(priority);
+    const customOnOpen = (item: itemRelatedToUser): void => {
+        setSelectedItem(item);
         onOpen();
     };
 
@@ -67,19 +55,10 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
     useEffect(() => {
         if (fetching) return;
 
-        // Set up to refetch in one second, if the query is idle
-        // const timerId = setTimeout(() => {
-        //     reexecuteQuery({ requestPolicy: "cache-only" });
-        // }, 1000);
-
-        // return () => clearTimeout(timerId);
-
         reexecuteQuery({ requestPolicy: "cache-first" });
     }, [fetching, reexecuteQuery]);
 
     if (error) return <p>Oh no... {error.message}</p>;
-
-    // console.log("data", data);
 
     const loading = <FullPageSpinner />;
     const content = (
@@ -118,17 +97,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                         rounded="full"
                                                         aria-label="See Item Details"
                                                         onClick={() =>
-                                                            customOnOpen(
-                                                                item.summary,
-                                                                item.description,
-                                                                enumItemType[
-                                                                    item.type
-                                                                ],
-                                                                enumItemPriority[
-                                                                    item
-                                                                        .priority
-                                                                ]
-                                                            )
+                                                            customOnOpen(item)
                                                         }
                                                         variant="outline"
                                                         size="lg"
@@ -136,9 +105,15 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                     />
                                                 </Tooltip>
                                             </Box>
-                                            <Text fontSize="lg">
-                                                {item.summary}
-                                            </Text>
+                                            <NextLink
+                                                href={`/project/${item.sprint.project.id}`}
+                                            >
+                                                <Link>
+                                                    <Text fontSize="lg">
+                                                        {item.summary}
+                                                    </Text>
+                                                </Link>
+                                            </NextLink>
                                         </Flex>
                                     )
                             )}
@@ -165,17 +140,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                         rounded="full"
                                                         aria-label="See Item Details"
                                                         onClick={() =>
-                                                            customOnOpen(
-                                                                item.summary,
-                                                                item.description,
-                                                                enumItemType[
-                                                                    item.type
-                                                                ],
-                                                                enumItemPriority[
-                                                                    item
-                                                                        .priority
-                                                                ]
-                                                            )
+                                                            customOnOpen(item)
                                                         }
                                                         variant="outline"
                                                         size="lg"
@@ -183,9 +148,15 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                                                     />
                                                 </Tooltip>
                                             </Box>
-                                            <Text fontSize="lg">
-                                                {item.summary}
-                                            </Text>
+                                            <NextLink
+                                                href={`/project/${item.sprint.project.id}`}
+                                            >
+                                                <Link>
+                                                    <Text fontSize="lg">
+                                                        {item.summary}
+                                                    </Text>
+                                                </Link>
+                                            </NextLink>
                                         </Flex>
                                     )
                             )}
@@ -193,48 +164,52 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
                     <TabPanel>
                         {data &&
                             data.getItensRelatedToUserByPeriod.itens.map(
-                                (item) =>
-                                    item.status !== "COMPLETED" &&
-                                    item.status !== "CLOSED" &&
-                                    item.reporter_id === userId && (
-                                        <Flex alignItems="center" key={item.id}>
-                                            {getItemTypeIcon(item.type)}
+                                (item) => {
+                                    return (
+                                        item.status !== "COMPLETED" &&
+                                        item.status !== "CLOSED" &&
+                                        item.reporter_id === userId && (
+                                            <Flex
+                                                alignItems="center"
+                                                key={item.id}
+                                            >
+                                                {getItemTypeIcon(item.type)}
 
-                                            <Box ml="1em" mr="1em">
-                                                <Tooltip
-                                                    hasArrow
-                                                    aria-label="Open Details"
-                                                    label="Open Details"
-                                                    colorScheme="withe"
-                                                    placement="right"
-                                                >
-                                                    <IconButton
-                                                        rounded="full"
-                                                        aria-label="See Item Details"
-                                                        onClick={() =>
-                                                            customOnOpen(
-                                                                item.summary,
-                                                                item.description,
-                                                                enumItemType[
-                                                                    item.type
-                                                                ],
-                                                                enumItemPriority[
+                                                <Box ml="1em" mr="1em">
+                                                    <Tooltip
+                                                        hasArrow
+                                                        aria-label="Open Details"
+                                                        label="Open Details"
+                                                        colorScheme="withe"
+                                                        placement="right"
+                                                    >
+                                                        <IconButton
+                                                            rounded="full"
+                                                            aria-label="See Item Details"
+                                                            onClick={() =>
+                                                                customOnOpen(
                                                                     item
-                                                                        .priority
-                                                                ]
-                                                            )
-                                                        }
-                                                        variant="outline"
-                                                        size="lg"
-                                                        icon={<BsSearch />}
-                                                    />
-                                                </Tooltip>
-                                            </Box>
-                                            <Text fontSize="lg">
-                                                {item.summary}
-                                            </Text>
-                                        </Flex>
-                                    )
+                                                                )
+                                                            }
+                                                            variant="outline"
+                                                            size="lg"
+                                                            icon={<BsSearch />}
+                                                        />
+                                                    </Tooltip>
+                                                </Box>
+                                                <NextLink
+                                                    href={`/project/${item.sprint.project.id}`}
+                                                >
+                                                    <Link>
+                                                        <Text fontSize="lg">
+                                                            {item.summary}
+                                                        </Text>
+                                                    </Link>
+                                                </NextLink>
+                                            </Flex>
+                                        )
+                                    );
+                                }
                             )}
                     </TabPanel>
                 </TabPanels>
@@ -242,10 +217,7 @@ const ItensHome: React.FC<ItensHomeProps> = ({ userId }) => {
             <ModalitemDetail
                 isOpen={isOpen}
                 onClose={onClose}
-                summary={summary}
-                description={description}
-                type={itemType}
-                priority={itemPriority}
+                item={selectedItem}
             />
         </>
     );

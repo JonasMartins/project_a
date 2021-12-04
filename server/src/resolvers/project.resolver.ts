@@ -15,6 +15,7 @@ import { Context } from "../types";
 import { genericError } from "./../utils/generalAuxiliaryMethods";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { Collection } from "@mikro-orm/core";
+import { Item } from "../entities/item.entity";
 
 @ObjectType()
 class ProjectResponse {
@@ -131,7 +132,27 @@ export class ProjectResolver {
             };
         }
 
-        const project = await em.findOne(Project, id);
+        const qb = (em as EntityManager).createQueryBuilder(Project);
+
+        qb.select("*").where({ id: id }).limit(1);
+
+        const result = await qb.getResult();
+
+        let project: Project | null = null;
+        if (result.length) {
+            project = result[0];
+        }
+
+        const qqb = (em as EntityManager).createQueryBuilder(Sprint);
+
+        qqb.select("*")
+            .where({ project_id: id })
+            .andWhere({ active: true })
+            .limit(1);
+
+        const sprint = await qqb.getResult();
+
+        await em.populate(sprint, ["itens"]);
 
         if (!project) {
             return {
@@ -144,18 +165,22 @@ export class ProjectResolver {
             };
         }
 
-        /**/
-        const sprint = await em.findOne(
-            Sprint,
-
-            { project, active: true },
-            {
-                populate: ["itens"],
-            }
-        );
-
         if (sprint) {
-            project.sprints.add(sprint);
+            await project.sprints.init();
+            await project.sprints.add(sprint[0]);
+
+            const itensQuery = (em as EntityManager).createQueryBuilder(Item);
+
+            itensQuery.select("*").where({ sprint_id: sprint[0].id });
+
+            const itens = await itensQuery.getResult();
+
+            await em.populate(itens, ["responsible"]);
+            await em.populate(itens, ["reporter"]);
+            await em.populate(itens, ["approver"]);
+
+            await sprint[0].itens.init();
+            await sprint[0].itens.set(itens);
         }
 
         return { project };

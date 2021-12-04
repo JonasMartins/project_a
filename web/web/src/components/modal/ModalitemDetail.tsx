@@ -16,23 +16,18 @@ import {
     returnHeaderGradient,
     returnIconHeaderLabel,
     returnPriorityIconHeaderModal,
+    itemRelatedToUser,
 } from "./../../helpers/items/ItemFunctinHelpers";
 interface ModalitemDetailProps {
-    summary: string;
-    description: string;
     isOpen: boolean;
-    type: enumItemType | null;
-    priority: enumItemPriority | null;
     onClose: () => void;
+    item: itemRelatedToUser | null;
 }
 
 const ModalitemDetail: React.FC<ModalitemDetailProps> = ({
     isOpen,
     onClose,
-    summary,
-    description,
-    type,
-    priority,
+    item,
 }) => {
     const { colorMode } = useColorMode();
     const color = { light: "black", dark: "white" };
@@ -46,10 +41,10 @@ const ModalitemDetail: React.FC<ModalitemDetailProps> = ({
         >
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader bgGradient={returnHeaderGradient(type)}>
+                <ModalHeader bgGradient={returnHeaderGradient(item?.type)}>
                     <Flex flexDirection="row" alignItems="center">
                         <Text textColor="white">Task Preview</Text>
-                        {returnIconHeaderLabel(type)}
+                        {returnIconHeaderLabel(item?.type)}
                     </Flex>
                 </ModalHeader>
                 <ModalCloseButton />
@@ -63,14 +58,16 @@ const ModalitemDetail: React.FC<ModalitemDetailProps> = ({
                             <Text color={color[colorMode]} fontSize="lg">
                                 Summary:
                             </Text>
-                            {returnPriorityIconHeaderModal(priority)}
+                            {returnPriorityIconHeaderModal(item?.priority)}
                         </Flex>
-                        <Text color={color[colorMode]}>{summary}</Text>
+                        <Text color={color[colorMode]}>{item?.summary}</Text>
 
                         <Text mt={3} color={color[colorMode]}>
                             Description:
                         </Text>
-                        <Text color={color[colorMode]}>{description}</Text>
+                        <Text color={color[colorMode]}>
+                            {item?.description}
+                        </Text>
                     </Flex>
                 </ModalBody>
 

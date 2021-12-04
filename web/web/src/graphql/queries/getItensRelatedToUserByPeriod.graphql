@@ -12,6 +12,8 @@ query GetItensRelatedToUserByPeriod(
     ) {
         errors {
             message
+            field
+            method
         }
         itens {
             id
@@ -23,6 +25,11 @@ query GetItensRelatedToUserByPeriod(
             responsible_id
             reporter_id
             approver_id
+            sprint {
+                project {
+                    id
+                }
+            }
         }
     }
 }

@@ -13,16 +13,18 @@ import {
     ItemStatus,
     useGetProjectByIdQuery,
     useChangeItemStatusMutation,
+    useCreateNewsMutation,
 } from "../../generated/graphql";
 import { GlobalContext } from "./../../context/globalContext";
 import { itemQuery } from "./../../helpers/items/ItemFunctinHelpers";
-
+import { useUser } from "./../../helpers/hooks/useUser";
 interface projectsProps {
-    id: string;
+    id: string | null;
 }
 
 const Project: React.FC<projectsProps> = ({}) => {
     const router = useRouter();
+    const user = useUser();
 
     let previousItemStatus: string = "";
 
@@ -36,6 +38,8 @@ const Project: React.FC<projectsProps> = ({}) => {
     const [doneItens, setDoneItens] = useState<Array<itemQuery>>([]);
     const [pendingItens, setPendingItens] = useState<Array<itemQuery>>([]);
     const [progressItens, setProgressItens] = useState<Array<itemQuery>>([]);
+
+    const [{}, createNews] = useCreateNewsMutation();
 
     const bgColor = { light: "gray.200", dark: "gray.800" };
     const color = { light: "black", dark: "white" };
@@ -56,12 +60,32 @@ const Project: React.FC<projectsProps> = ({}) => {
         pause: !project,
     });
 
+    const getItemRelatedUsersIds = (item: itemQuery): string[] => {
+        let result: string[] = [];
+        if (item.responsible.id !== user.userId) {
+            result.push(item.responsible.id);
+        }
+        if (item.approver.id !== user.userId) {
+            result.push(item.approver.id);
+        }
+        if (item.reporter.id !== user.userId) {
+            result.push(item.reporter.id);
+        }
+        return result;
+    };
+
     const handleChangeStatus = async (item: itemQuery, status: ItemStatus) => {
-        // setLoading(true);
-        // setFillItens(false);
+        const previousStatus = item.status;
         await changeItemStatus({
             id: item.id,
             newStatus: status,
+        });
+
+        await createNews({
+            creator_id: user.userId,
+            description: `@${user.name} has just change the item: ${item.summary} status from: ${previousStatus} to: ${status} `,
+            pathInfo: `Location: Home > Projects > ${data?.getProjectById?.project?.name}`,
+            usersRelated: getItemRelatedUsersIds(item),
         });
 
         reexecuteQuery({ requestPolicy: "cache-and-network" });
@@ -304,7 +328,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                     <NextLink href={`/project/${project}`}>
                         <Link>
                             <Text>
-                                {data && data.getProjectById.project.name}
+                                {data && data?.getProjectById?.project?.name}
                             </Text>
                         </Link>
                     </NextLink>
@@ -323,7 +347,7 @@ const Project: React.FC<projectsProps> = ({}) => {
                 transition="0.3s"
             >
                 <Text fontSize="3xl">
-                    {data && data.getProjectById.project.name}
+                    {data && data?.getProjectById?.project?.name}
                 </Text>
             </Flex>
             {data?.getProjectById?.project?.sprints?.length ? (

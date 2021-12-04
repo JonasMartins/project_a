@@ -206,7 +206,9 @@ export class ItemResolver {
 
         // console.log(qb.getQuery());
 
-        const itens = await qb.execute();
+        const itens = await qb.getResult();
+
+        await em.populate(itens, ["sprint"]);
 
         return { itens };
     }

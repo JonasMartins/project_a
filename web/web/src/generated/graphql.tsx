@@ -1150,7 +1150,7 @@ export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
             Array<
                 { __typename?: "ErrorFieldHandler" } & Pick<
                     ErrorFieldHandler,
-                    "message"
+                    "message" | "field" | "method"
                 >
             >
         >;
@@ -1167,7 +1167,14 @@ export type GetItensRelatedToUserByPeriodQuery = { __typename?: "Query" } & {
                     | "responsible_id"
                     | "reporter_id"
                     | "approver_id"
-                >
+                > & {
+                        sprint: { __typename?: "Sprint" } & {
+                            project: { __typename?: "Project" } & Pick<
+                                Project,
+                                "id"
+                            >;
+                        };
+                    }
             >
         >;
     };
@@ -1235,7 +1242,26 @@ export type GetProjectByIdQuery = { __typename?: "Query" } & {
                                         | "status"
                                         | "priority"
                                         | "type"
-                                    >
+                                    > & {
+                                            responsible: {
+                                                __typename?: "User";
+                                            } & Pick<
+                                                User,
+                                                "id" | "picture" | "name"
+                                            >;
+                                            approver: {
+                                                __typename?: "User";
+                                            } & Pick<
+                                                User,
+                                                "id" | "picture" | "name"
+                                            >;
+                                            reporter: {
+                                                __typename?: "User";
+                                            } & Pick<
+                                                User,
+                                                "id" | "picture" | "name"
+                                            >;
+                                        }
                                 >;
                             }
                     >;
@@ -2061,6 +2087,8 @@ export const GetItensRelatedToUserByPeriodDocument = gql`
         ) {
             errors {
                 message
+                field
+                method
             }
             itens {
                 id
@@ -2072,6 +2100,11 @@ export const GetItensRelatedToUserByPeriodDocument = gql`
                 responsible_id
                 reporter_id
                 approver_id
+                sprint {
+                    project {
+                        id
+                    }
+                }
             }
         }
     }
@@ -2141,6 +2174,21 @@ export const GetProjectByIdDocument = gql`
                         status
                         priority
                         type
+                        responsible {
+                            id
+                            picture
+                            name
+                        }
+                        approver {
+                            id
+                            picture
+                            name
+                        }
+                        reporter {
+                            id
+                            picture
+                            name
+                        }
                     }
                 }
             }

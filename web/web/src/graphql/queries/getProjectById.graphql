@@ -21,6 +21,21 @@ query getProjectById($id: String!) {
                     status
                     priority
                     type
+                    responsible {
+                        id
+                        picture
+                        name
+                    }
+                    approver {
+                        id
+                        picture
+                        name
+                    }
+                    reporter {
+                        id
+                        picture
+                        name
+                    }
                 }
             }
         }
