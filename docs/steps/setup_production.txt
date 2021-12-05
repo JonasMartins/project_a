@@ -1,6 +1,0 @@
-Ajustes a fazer no banco ao iniciar um novo setup ou produção:
-
-
-em sprint: alterar o tamanho do campo codigo para 10 caracteres
-
-alterar o tipo 'money' na tabela "role" para o tipo numeric para que funcione corretamente

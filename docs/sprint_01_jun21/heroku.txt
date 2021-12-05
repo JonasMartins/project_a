@@ -1,9 +1,0 @@
-
-Log in cli heroku:
-
-heroku login -i
-
-
-
-
-

@@ -1,5 +1,0 @@
-Para executar debugger do server por exemplo:
-
-em debugger select javascript debug terminal e roda
-normalmente o yarn dev, no terminal que surgir em baixo no vscode
-

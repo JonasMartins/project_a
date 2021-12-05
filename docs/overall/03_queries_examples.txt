@@ -1,5 +1,0 @@
-select u.name
-from item i
-inner join public.user u on u.id = i.responsible_id
-where i.responsible_id = '97a444c2-c1ef-4a0f-962f-47d3c1266b59'
- 

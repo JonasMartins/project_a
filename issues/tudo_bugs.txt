@@ -17,11 +17,11 @@ status: SOLVED
 3: Also related to bug number two, check if the image is successfully uploaded
 with correct path, if the navbar imediately updates the user's nwe photo.
 
-status: OPEN
+status: SOLVED
 
 
 4: The logout button on dropdown menu on top-right conner on the navbar, when 
 the page is backlog, do not allow the user to logout, even stranger is that allow click
 on "about this project", only the logout don't work on this page.
 
-status: OPEN
+status: SOLVED
