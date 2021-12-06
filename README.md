@@ -1,8 +1,8 @@
 # Project A
 
-<img src="web/web/public/favicon/android-chrome-512x512.png" alt="Logo" width="100" style="display:block;margin-left:auto;margin-right:auto;margin-bottom:40px" />
+<img src="web/web/public/favicon/android-chrome-512x512.png" alt="Logo" width="100"  />
 
-Project A is a website based on JIRA, in which a team of users, each on with his role, like developers, managers and testers work together to make software projects.
+Project A is a website based on JIRA, in which a team of users, each on with his own role, like developers, managers and testers work together to make software projects.
 
 ## This is a Portfolio Project...
 
@@ -11,11 +11,11 @@ This project is a portfolio project, with the purpose of putting into practice t
 ## Technologies used.
 
 <p>
-<img src="web/web/public/images/about_images/graphql-logo-2.png" alt="graphQL" width="40" style="margin-right:20px" />
-<img src="web/web/public/images/about_images/node.png" alt="Node" width="40" style="margin-right:20px" />
-<img src="web/web/public/images/about_images/next.jpeg" alt="NextJs" width="40" style="margin-right:20px"/>
-<img src="web/web/public/images/about_images/postgres.png" alt="Postgres" width="40" style="margin-right:20px" />
-<img src="web/web/public/images/about_images/react.png" alt="ReactJs" width="40" style="margin-right:20px" />
+<img src="web/web/public/images/about_images/graphql-logo-2.png" alt="graphQL" width="40"  />
+<img src="web/web/public/images/about_images/node.png" alt="Node" width="40"  />
+<img src="web/web/public/images/about_images/next.jpeg" alt="NextJs" width="40" />
+<img src="web/web/public/images/about_images/postgres.png" alt="Postgres" width="40"  />
+<img src="web/web/public/images/about_images/react.png" alt="ReactJs" width="40"  />
 <img src="web/web/public/images/about_images/urql.png" alt="Urql" width="40" />
 </p>
 
@@ -27,7 +27,7 @@ This project is a portfolio project, with the purpose of putting into practice t
 
 ### Front:
 
-**NextJs, Urql, React Icons, React DnD, Formik, React Select and GraphQL Code Generator. (TypeScript)**
+**NextJs, Chakra UI, Urql, React Icons, React DnD, Formik, React Select and GraphQL Code Generator. (TypeScript)**
 
 ## Tutorials that helped me make this project:
 
